@@ -10,7 +10,7 @@
         <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
       </a> -->
 
-      <md-badge v-if="$auth.isAuthenticated && $auth.userDB" class="md-accent" md-content="12" style="margin-left:auto;margin-top:2px;">
+      <md-badge v-if="$auth.isAuthenticated && $auth.userDB" class="md-accent" style="margin-left:auto;margin-top:2px;">
         <md-menu md-size="small" md-align-trigger>
           <md-button class="md-icon-button" style="width=32px" md-menu-trigger>
             <md-avatar style="transform: scale(0.8);">
