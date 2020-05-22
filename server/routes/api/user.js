@@ -55,9 +55,9 @@ router.get("/consent-signed", function (req, res) {
   function sendEmail(userEmail, userName) {
     return new Promise(function (resolve, reject) {
 
-      var title = "Encounter App - Disclosure & Consent";
+      var title = "Healthy Reentry App - Disclosure & Consent";
       var firstName = userName.split(' ')[0];
-      var thisHTML = "<div><p>"+ firstName+ ",<br><br>Thank you for enrolling in the Encounter application. Attached is the disclosure and consent file you reviewed and agreed to.</p></div>";
+      var thisHTML = "<div><p>"+ firstName+ ",<br><br>Thank you for enrolling in the Healthy Reentry application. Attached is the disclosure and consent file you reviewed and agreed to.</p></div>";
 
       const path = './server/assets/Disclosure.pdf';
       var attachment = fs.readFileSync(path);
