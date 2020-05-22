@@ -26,12 +26,16 @@ import 'vue-material/dist/theme/default.css'
 window.$ = window.jQuery = require('jquery');
 
 Vue.use(VueMaterial);
+Vue.use(VueQrcodeReader);
 // Vue.use(MdButton)
 // Vue.use(MdContent)
 // Vue.use(MdTabs)
 
 Vue.prototype.moment = moment;
 
+
+import browserDetect from "vue-browser-detect-plugin";
+Vue.use(browserDetect);
 
 async function main() {
 

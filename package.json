@@ -36,10 +36,10 @@
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4",
     "vue": "^2.6.11",
+    "vue-browser-detect-plugin": "^0.1.13",
     "vue-material": "^1.0.0-beta-13",
     "vue-qrcode-reader": "^2.3.0",
     "vue-router": "^3.1.6",
-    "vuejs-datepicker": "^1.6.2",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
