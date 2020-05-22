@@ -12,7 +12,7 @@
           </a>
         </div>
         <div class="md-layout-item md-xsmall-hide">
-          <span>
+          <span class="row">
             &nbsp;&nbsp;&copy; {{new Date().getFullYear()}}
           </span>
         </div>
