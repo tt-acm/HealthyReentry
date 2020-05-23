@@ -6,8 +6,6 @@ export const authGuard = (to, from, next) => {
 
   const fn = () => {
     // If the user is authenticated, continue with the route
-    console.log("to",to);
-    console.log("authService.isAuthenticated", authService.isAuthenticated);
     if (authService.isAuthenticated) {
       if (authService.userDB) {
         store.commit('setUser', authService.userDB);
@@ -20,15 +18,9 @@ export const authGuard = (to, from, next) => {
           routeUserFunction(returnedUser.data);
         });
       }
-      // return next();
       function routeUserFunction(user) {
-        // console.log("to",to);
-        console.log("store.state",store.state);
-        console.log("user in router",user);
-        // if (!authService.userDB) return next();//un-authenticated stays at home
         //authenticated
         if (user.dateOfConsent) {//consent signed
-          console.log("SIGNED");
           if (to.name === "home" || to.name === "disclosure") return next("/menu");//route signed user to menu
           else return next();
         }

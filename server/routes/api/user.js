@@ -103,7 +103,6 @@ router.get("/consent-signed", function (req, res) {
 
 //get all users
 router.get("/get-all", function (req, res) {
-  console.log("coming here", req.user);
 
   // returns only email, profile name, and _id
   let include = {
@@ -151,7 +150,6 @@ router.post('/', async (req, res) => {
   if (!u || u === {}) {
     return res.status(400).send();
   }
-  console.log("presearch user");
   let user = await User.findOne({ email: String(u.email) });
   console.log("found user", user);
   if (user) {
@@ -165,9 +163,7 @@ router.post('/', async (req, res) => {
     email: u.email,
     picture: u.picture
   });
-  console.log("constructed pre save", user);
   user = await user.save();
-  console.log("constructed POST save", user);
   return res.json(user);
 
 });

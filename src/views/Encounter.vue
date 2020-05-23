@@ -383,16 +383,6 @@ export default {
       // Vue.set(this, "date", formattedDate);
       return formattedDate;
     },
-    // getSelectedDate() {
-    //   if (this.todaySelected) {
-    //     this.date = new Date().toJSON().slice(0, 10).replace(/-/g, '/');
-    //   } else {
-    //     //this
-    //     //var formattedDate =  moment(this.date).format('YYYY/MM/DD');
-    //     //console.log("formattedDate", formattedDate);
-    //     //Vue.set(this,"date", formattedDate);
-    //   }
-    // },
     removeUser(e) {
       this.encountered.splice(
         this.encountered.indexOf(e),
@@ -400,16 +390,13 @@ export default {
       );
     },
     saveEncounters() {
-      console.log("this.encountered", this.encountered);
 
       var body = {
         encounters: this.encountered,
         date: this.date,
         isGroup: this.isGroup
       };
-      //console.log(body);
       this.$api.post("/api/encounters/add-many", body).then(result => {
-        // console.log("result", result);
         if (result) {
           this.$emit("encounterMsg");
           this.$router.push({

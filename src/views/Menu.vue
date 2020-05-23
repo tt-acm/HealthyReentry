@@ -81,8 +81,6 @@ export default {
     mapButtonCSS() {
       const buttonWidth = screen.width * 0.6 > 310 ? screen.width * 0.7 : 310;
 
-      console.log("buttonWidth", buttonWidth);
-
       window.$("#mainControls").css("transform", 'translateY(' + (screen.height / 6) + 'px)');
       // window.$("#controlButtons").css("transform", 'translatex(-8px)');
       window.$(".menu-button").css("width", buttonWidth + 'px');

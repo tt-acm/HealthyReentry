@@ -105,10 +105,8 @@ export default {
     submit: function() {
       // console.log("submitting");
       this.$api.get("/api/user/consent-signed").then(consent => {
-        console.log("consent", consent);
         this.$emit("disclosureMsg");
         this.$auth.userDB = consent.data;
-        // alert("Consent Submitted" + "\n" + "\n" + "Thank you for submitting your consent. We have emailed a copy of the disclosure and consent to your TT email for reference.");
         this.$router.push({ name: 'menu' });
       });
 

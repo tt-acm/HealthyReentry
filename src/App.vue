@@ -58,11 +58,6 @@ export default {
     // console.log("window.jquery", window);
   },
   methods: {
-    getUser() {
-      console.log("getting user", this.$auth.isAuthenticated);
-      console.log("this.user", this.$auth.userDB);
-
-    },
     login() {
       this.$auth.loginWithRedirect();
     },

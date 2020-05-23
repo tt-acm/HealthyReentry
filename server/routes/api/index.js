@@ -37,7 +37,6 @@ const errHandler = async function (err, req, res, next) {
 
 
 const addUserToReq = async function(req, res, next) {
-  console.log("adding user to REQ", req.headers.email);
   let userEmail = req.headers.email;
   let user = await User.findOne({email: userEmail});
   if (user) {
@@ -51,7 +50,6 @@ const addUserToReq = async function(req, res, next) {
 
 // public routes
 router.get('/test', function(req, res) {
-  console.log('Test route');
   return res.send('Test route');
 });
 
