@@ -78,7 +78,7 @@ async function triggerUpdates(triggerData, byAdmin) {
       // gather direct contacts for mail and second degree contacts for the csv
       let emails = graph.reduce(function(out, x) {
         if (x['degree-of-separation'] === 1 || x['degree-of-separation'] === 2) csv += nodeToCsvLine(x);
-        if (x['degree-of-separation'] === 1 && x.status < 1) out.push(x.name);
+        if (x['degree-of-separation'] === 1 && x.status < 1) out.push(x.email);
         return out;
       }, []);
 
@@ -106,7 +106,7 @@ async function triggerUpdates(triggerData, byAdmin) {
       let emails = graph.reduce(function(out, x) {
         if (x['degree-of-separation'] === 1) {
           csv += nodeToCsvLine(x);
-          if (x.status < 1) out.push(x.name);
+          if (x.status < 1) out.push(x.email);
         }
         return out;
       }, []);
