@@ -3,6 +3,7 @@ const fs = require('fs');
 const sgClient = require("../../lib/sgClient");
 
 const User = require('../../models/User');
+const parseUser = require('../../util/parseUser');
 
 
 router.post("/user-by-email", function(req, res) {
@@ -146,21 +147,25 @@ router.get("/get-all", function (req, res) {
  *                $ref: '#/components/schemas/User'
  */
 router.post('/', async (req, res) => {
-  const u = req.body;
-  if (!u || u === {}) {
-    return res.status(400).send();
+  const u = parseUser(req.body);
+  if (!u.email) {
+    return res.status(403).send();
   }
   let user = await User.findOne({ email: String(u.email) });
-  console.log("found user", user);
   if (user) {
     return res.json(user);
   }
-  console.log("constructing new user", u);
+
+  var userName = u.name;
+  if (u.name && u.name.includes(',')) {
+    let nameCollection = u.name.replace(/\s/g,'').split(',');
+    if (nameCollection.length > 1) userName = nameCollection[nameCollection.length-1] + " " + nameCollection[0];
+  }
 
   user = new User({
-    // username: u.nickname,
-    name: u.name,
+    name: userName,
     email: u.email,
+    location: u.location,
     picture: u.picture
   });
   user = await user.save();

@@ -329,4 +329,7 @@ export default {
 .md-tabs+.md-tabs {
   margin-top: 24px;
 }
+.md-dialog /deep/ .md-dialog-container {
+  transform: none;
+}
 </style>
