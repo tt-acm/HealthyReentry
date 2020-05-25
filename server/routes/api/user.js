@@ -3,6 +3,7 @@ const fs = require('fs');
 const sgClient = require("../../lib/sgClient");
 
 const User = require('../../models/User');
+const Status = require('../../models/Status');
 const parseUser = require('../../util/parseUser');
 
 
@@ -169,7 +170,19 @@ router.post('/', async (req, res) => {
     picture: u.picture
   });
   user = await user.save();
-  return res.json(user);
+
+
+  var status = new Status({
+    status: 0,
+    user: user
+  });
+
+  status.save(async function (err, savedStatus) {
+    if (err) return res.status(500).send(err);
+
+    // return res.json(savedStatus);
+    return res.json(user);
+  });
 
 });
 
