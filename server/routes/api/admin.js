@@ -3,7 +3,6 @@ const router = require('express').Router();
 const User = require('../../models/User');
 const Status = require('../../models/Status');
 
-const variables = require("../../util/variables");
 const triggerUpdates = require('../../lib/trigger_updates');
 
 
@@ -15,7 +14,7 @@ const triggerUpdates = require('../../lib/trigger_updates');
  * @apiGroup admin
  */
 router.use(function (req, res, next) {
-  if (!variables.ADMIN_USERS.includes(req.user.email.toLowerCase())) {
+  if (!req.user.permissions.admin) {
     res.status("404").send("Not found");
   } else {
     next();

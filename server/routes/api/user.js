@@ -130,7 +130,7 @@ router.get("/get-all", function (req, res) {
  * path:
  *  /api/user/:
  *    post:
- *      summary: Create a new user. Returns existing user of same email if found.
+ *      summary: Create a new user. Returns existing user of same name if found.
  *      tags: [Users]
  *      requestBody:
  *        required: true
