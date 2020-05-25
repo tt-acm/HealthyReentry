@@ -1,0 +1,17 @@
+{
+  "name": "HealthyReentry",
+  "short_name": "HR",
+  "theme_color": "#d03c27",
+  "background_color": "#2196f3",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/imgs/logo-256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    }
+  ],
+}
