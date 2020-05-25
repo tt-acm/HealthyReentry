@@ -58,7 +58,7 @@ async function triggerUpdates(triggerData, byAdmin) {
 
     if (statusEnum === 1) // Status Reported Orange
     {
-      let graph = await eg(user.email);
+      let graph = await eg(user.email, 2 );// get last two days of encounters...
 
       let csv = csvHeader;
 
@@ -83,7 +83,7 @@ async function triggerUpdates(triggerData, byAdmin) {
         await sendEmail(emails, sub, orangeContent);
       }
     } else { // Status Reported Red
-      let graph = await eg(user.email);
+      let graph = await eg(user.email, variables.INCUBATION_PERIDOD); // get encounters within incubation period
 
       let csv = csvHeader;
 
