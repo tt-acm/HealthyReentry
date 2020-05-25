@@ -274,12 +274,8 @@
 
         <tbody>
           <tr v-for="user in usersInView" :key="user.id">
-            <td style="width: 15%" class="text-center">
-              <i
-                style="cursor: pointer"
-                :class="'far ' + (user.selected ? 'fa-check-square' : 'fa-square')"
-                @click="user.selected = !user.selected"
-              ></i>
+            <td style="width: 15%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
+              {{ (user.selected) ? '&#9745;' : '&#9744;' }}
             </td>
             <td style="width: 5%" class="text-center">
               <i :class="'fas fa-circle ' + user.status.css_key"></i>
