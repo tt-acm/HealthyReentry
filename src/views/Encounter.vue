@@ -349,22 +349,28 @@ export default {
     searchUserByEmail(emailStr){
       if (emailStr === this.user.email.toLowerCase()) {
         this.$emit("noDupUser");
-      } else if (emailStr && emailStr.toLowerCase().indexOf("@thorntontomasetti.com") > 0) {
+      } else if (emailStr) {
         var body = {
           "email": emailStr
         }
         this.$api.post("/api/user/user-by-email", body).then(res => {
           const encountered = this.encountered.map(en=>en._id);
 
-          if (res && res._id) {
-            if (encountered.includes(res._id)){//encounter already exists
+          if (res.data && res.data._id) {
+            if (res.data.email === this.user.email) {
+              this.selfScan = true;
+              this.camera = 'off';
+            }
+            else if (encountered.includes(res.data._id)){//encounter already exists
               // this.$emit("encounterExists", [{
               //   message: "Encounter already exists.",
               //   type: "warning"
               // }]);
+              this.dupUser = true;
+              this.camera = 'off';
             }
             else {
-              this.encountered.push(res);//adding scanned user to encounter
+              this.encountered.push(res.data);//adding scanned user to encounter
               this.scanSucceed = true;
 
               this.camera = 'off';
