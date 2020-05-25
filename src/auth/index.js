@@ -1,5 +1,6 @@
 import Vue from "vue";
 import createAuth0Client from "@auth0/auth0-spa-js";
+import store from '@/store/index.js';
 
 /** Define a default action to perform after authentication */
 const DEFAULT_REDIRECT_CALLBACK = async () => {
@@ -26,6 +27,7 @@ export const useAuth0 = ({
         loading: true,
         isAuthenticated: false,
         user: {},
+        userDB: null,
         token: null,
         jwt: null,
         auth0Client: null,
@@ -53,12 +55,13 @@ export const useAuth0 = ({
           this.token = await this.auth0Client.getTokenSilently();
           this.jwt = await this.auth0Client.getIdTokenClaims();
           this.$api.defaults.headers.common['Authorization'] = `Bearer ${this.jwt.__raw}`;
-          this.$api.defaults.headers.common['Username'] = this.user.nickname;
+          this.$api.defaults.headers.common['Email'] = this.user.email;
         } else {
           this.token = null;
           this.jwt = null;
           this.$api.defaults.headers.common['Authorization'] = null;
           this.$api.defaults.headers.common['Username'] = null;
+          this.$api.defaults.headers.common['Email'] = null;
         }
       },
       /** Handles the callback when logging in using a redirect */
@@ -83,11 +86,13 @@ export const useAuth0 = ({
           this.jwt = await this.auth0Client.getIdTokenClaims();
           this.$api.defaults.headers.common['Authorization'] = `Bearer ${this.jwt.__raw}`;
           this.$api.defaults.headers.common['Username'] = this.user.nickname;
+          this.$api.defaults.headers.common['Email'] = this.user.email;
         } else {
           this.token = null;
           this.jwt = null;
           this.$api.defaults.headers.common['Authorization'] = null;
           this.$api.defaults.headers.common['Username'] = null;
+          this.$api.defaults.headers.common['Email'] = null;
         }
       },
       /** Authenticates the user using the redirect method */
@@ -135,7 +140,10 @@ export const useAuth0 = ({
           await this.updateStateVars();
 
           if (this.isAuthenticated) {
-            await this.$api.post('/api/users', this.user);
+            await this.$api.post('/api/user', this.user).then(returnedUser => {
+              this.userDB = returnedUser.data;
+              store.commit('setUser', this.userDB);
+            });
           }
 
           // Notify subscribers that the redirect callback has happened, passing the appState

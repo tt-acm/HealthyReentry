@@ -1,15 +1,41 @@
 <template>
   <div>
-    <router-link to="/">Home</router-link>
-    &nbsp;|&nbsp;
-    <router-link to="/about">About</router-link>
-    &nbsp;|&nbsp;
-    <router-link v-if="$auth.isAuthenticated" to="/profile">Profile</router-link>
-    &nbsp;|&nbsp;
-    <span v-if="!$auth.loading">
-      <a v-if="!$auth.isAuthenticated" @click="login" href="#!">Log in</a>
-      <a v-if="$auth.isAuthenticated" @click="logout" href="#!">Log out({{ $auth.user.name }})</a>
-    </span>
+    <md-toolbar class="md-primary" id="appHeader">
+      <router-link class="md-title" :to="{ name: 'menu' }">
+        <span>Healthy Reentry</span>
+        <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
+      </router-link>
+      <!-- <a  href="/">
+        <span>Healthy Reentry</span>
+        <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
+      </a> -->
+
+      <div v-if="$auth.isAuthenticated && $auth.userDB" class="md-accent" style="margin-left:auto;margin-top:2px;margin-right:4px;">
+        <md-menu md-size="small" md-align-trigger>
+          <md-button class="md-icon-button" style="width=32px" md-menu-trigger>
+            <md-avatar style="transform: scale(0.8);">
+              <!-- <img src="https://gravatar.com/avatar/4dacc85086497a31cf2c646031d2cb01?d=retro" alt="Avatar"> -->
+              <img :src="$auth.userDB.picture" alt="Avatar">
+            </md-avatar>
+          </md-button>
+
+          <md-menu-content>
+            <md-menu-item disabled>{{$auth.userDB.name}}</md-menu-item>
+            <md-menu-item>
+              <router-link :to="{ name: 'admin' }">
+                Admin View
+              </router-link>
+            </md-menu-item>
+            <!-- <md-menu-item>Profile</md-menu-item> -->
+            <md-menu-item @click="logout()">Log out</md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </div>
+      <a v-else class="md-title md-dense mr-2" style="margin-left:auto" @click="login()" href="#!">
+        Login
+      </a>
+
+    </md-toolbar>
   </div>
 </template>
 
@@ -18,7 +44,10 @@ export default {
   name: 'Navbar',
   methods: {
     login() {
-      this.$auth.loginWithRedirect();
+      // console.log(this.$route.fullPath);
+      // this.$auth.loginWithRedirect();
+      // this.$auth.loginWithRedirect({ appState: { targetUrl: this.$route.fullPath }});
+      if (this.$auth.isAuthenticated === false) this.$auth.loginWithRedirect();
     },
     logout() {
       this.$auth.logout({
@@ -29,6 +58,10 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+#appHeader {
+  position: fixed;
+  width: 100%;
+  background-color: rgb(52, 58, 64);
+}
 </style>

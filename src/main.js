@@ -1,8 +1,16 @@
 import Vue from 'vue';
 import App from '@/App.vue';
+import axios from 'axios';
+Vue.prototype.$api = axios.create();
+
+import { Auth0Plugin } from "./auth";
 import router from '@/router';
 import store from '@/store';
-import axios from 'axios';
+
+import moment from 'moment';
+import VueQrcodeReader from "vue-qrcode-reader";
+import '@fortawesome/fontawesome-free/css/all.css'
+import '@fortawesome/fontawesome-free/js/all.js'
 
 import 'bootstrap';
 import './css/app.scss';
@@ -18,12 +26,16 @@ import 'vue-material/dist/theme/default.css'
 window.$ = window.jQuery = require('jquery');
 
 Vue.use(VueMaterial);
+Vue.use(VueQrcodeReader);
 // Vue.use(MdButton)
 // Vue.use(MdContent)
 // Vue.use(MdTabs)
-import { Auth0Plugin } from "./auth";
 
-Vue.prototype.$api = axios.create();
+Vue.prototype.moment = moment;
+
+
+import browserDetect from "vue-browser-detect-plugin";
+Vue.use(browserDetect);
 
 async function main() {
 

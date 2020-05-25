@@ -9,7 +9,7 @@
         <md-content class="p-3">
           <p class="mb-2">
             We respect your privacy. As we continue to monitor COVID-19 and its impact on our people and offices, it is important that designated members of our Talent Team are aware of COVID-19 related cases at our firm. To protect all of our
-            employees, the Encounter application will allow you to securely and confidentially record:
+            employees, the Healthy Reentry application will allow you to securely and confidentially record:
           </p>
           <p class="text-muted mb-2">
             1. your personal COVID-19 status through a series of colors (green, orange and red).
@@ -72,13 +72,15 @@
       </md-dialog-content>
 
       <md-dialog-actions>
-        <md-button class="md-primary" @click="showDialog = false">Close</md-button>
-        <md-button class="md-primary" @click="showDialog = false">Save</md-button>
+        <md-button class="md-primary text-muted" @click="showDialog = false">
+          <router-link :to="{ name: 'home' }"> <p class="mb-0 text-muted">Close</p> </router-link>
+        </md-button>
+        <md-button class="md-primary" @click="showDialog = false;submit()" :disabled="!consentBool">Submit</md-button>
       </md-dialog-actions>
     </md-dialog>
   </md-content>
 
-  <md-button class="md-primary md-raised" @click="showDialog = true">Show Dialog</md-button>
+  <!-- <md-button class="md-primary md-raised" @click="showDialog = true">Show Dialog</md-button> -->
 
 </div>
 </template>
@@ -94,27 +96,22 @@ export default {
   },
   data() {
     return {
-      showPage1: true,
       consentBool: false,
       showDialog: true,
       fullScreen: false
     };
   },
   methods: {
-    // submit: function() {
-    //   // console.log("submitting");
-    //   $.get("/api/user/consent-signed").then(consent => {
-    //     console.log("consent", consent);
-    //     this.$emit("getNotification", [{message:"Your consent has been submitted. A copy of the disclosure and consent has been sent to your TT email for reference (keep an eye out for an email from encounter-notifications@thorntontomasetti.com).", type: "success" }]);
-    //     // alert("Consent Submitted" + "\n" + "\n" + "Thank you for submitting your consent. We have emailed a copy of the disclosure and consent to your TT email for reference.");
-    //     this.$router.push({ name: 'menu' });
-    //   }).fail(function(xhr, err) {
-    //     this.$emit("getNotification", [{message:"Cannot save your consent, please try again later.", type: "warning" }]);
-    //     // alert(formatErrorMessage(xhr, err) + "\n" + "Cannot save your consent, please try again later");
-    //   });
-    //
-    //
-    // }
+    submit: function() {
+      // console.log("submitting");
+      this.$api.get("/api/user/consent-signed").then(consent => {
+        this.$emit("disclosureMsg");
+        this.$auth.userDB = consent.data;
+        this.$router.push({ name: 'menu' });
+      });
+
+
+    }
   }
 };
 </script>

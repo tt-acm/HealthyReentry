@@ -10,5 +10,7 @@ module.exports = {
         logLevel: "debug"
       }
     }
-  }
+  },
+  lintOnSave: false,
+  runtimeCompiler: true
 };

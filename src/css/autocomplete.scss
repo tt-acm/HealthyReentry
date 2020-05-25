@@ -1,0 +1,60 @@
+/*
+ █████  ██    ██ ████████  ██████   ██████  ██████  ███    ███ ██████  ██      ███████ ████████ ███████
+██   ██ ██    ██    ██    ██    ██ ██      ██    ██ ████  ████ ██   ██ ██      ██         ██    ██
+███████ ██    ██    ██    ██    ██ ██      ██    ██ ██ ████ ██ ██████  ██      █████      ██    █████
+██   ██ ██    ██    ██    ██    ██ ██      ██    ██ ██  ██  ██ ██      ██      ██         ██    ██
+██   ██  ██████     ██     ██████   ██████  ██████  ██      ██ ██      ███████ ███████    ██    ███████
+*/
+
+.autocomplete {
+	position: relative;
+	label {
+		// display: block;
+		// margin-bottom: 5px;
+		// font-size: 14px;
+		// font-weight: 100;
+	}
+	&-input {
+		// padding: 7px 10px;
+		// width: 100%;
+		// border: 1px solid #ddd;
+		// border-radius: 4px;
+		// outline: none;
+		// &:focus {
+		// 	border-color: #000;
+		// }
+	}
+	&-list {
+		// position: absolute;
+		// // position: relative;
+		// z-index: 2;
+		//
+		overflow: auto;
+		//
+		min-width: 300px;
+		max-height: 150px;
+		margin: 0;
+		margin-top: 5px;
+		padding: 0;
+
+		border: 1px solid #eee;
+
+		list-style: none;
+
+		border-radius: 4px;
+		background-color: #fff;
+		box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+		li {
+			margin: 0;
+			padding: 8px 15px;
+
+			border-bottom: 1px solid #f5f5f5;
+			&:last-child {
+				border-bottom: 0;
+			}
+			&:hover, &.active {
+				background-color: #f5f5f5;
+			}
+		}
+	}
+}

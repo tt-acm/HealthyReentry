@@ -9,7 +9,10 @@ const DIR = 'dist';
 const PORT = process.env.PORT || 8080;
 
 const mongoURI = process.env.MONGO_URL;
-mongoose.connect(mongoURI, { useNewUrlParser: true });
+mongoose.connect(mongoURI, { useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true
+});
 
 const app = express();
 app.use(express.static(DIR));

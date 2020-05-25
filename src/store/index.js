@@ -5,14 +5,21 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    count: 0
+    // gotSession: false,
+    user: null
   },
   mutations: {
-    increment (state) {
-      state.count++;
-    },
-    decrement (state) {
-      state.count--;
+    setUser(state, user) {
+      // state.gotSession = true;
+      state.user = user;
+
+      // if (user) {
+      //     state.userIsTT = user.sso.isTT;
+      //     state.userIsMaster = user.sso.masterStatus;
+      // } else {
+      //     state.userIsTT = false;
+      //     state.userIsMaster = false;
+      // }
     }
   }
 });

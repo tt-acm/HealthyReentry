@@ -47,7 +47,7 @@ export default {
       console.log(res.data);
     },
     async onTestUserRoute() {
-      let res = await this.$api.get('/api/users/test');
+      let res = await this.$api.get('/api/user/test');
       console.log(res.data);
     }
   }
