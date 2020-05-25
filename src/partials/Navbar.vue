@@ -21,7 +21,7 @@
 
           <md-menu-content>
             <md-menu-item disabled>{{$auth.userDB.name}}</md-menu-item>
-            <md-menu-item>
+            <md-menu-item v-if="$auth.userDB && $auth.userDB.permissions && $auth.userDB.permissions.admin">
               <router-link :to="{ name: 'admin' }">
                 Admin View
               </router-link>
