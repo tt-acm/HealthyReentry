@@ -222,51 +222,63 @@
                 </span>
               </i></small>
               <br />
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'selected' ? '' : ' disabled')"
+                :class="(sortBy === 'selected' ? '' : ' disabled')"
                 @click="sortUsers('selected', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Select
             </th>
             <th style="width: 5%" class="text-center">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'status' ? '' : ' disabled')"
+                :class="(sortBy === 'statusCode' ? '' : ' disabled')"
                 @click="sortUsers('statusCode', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Status
             </th>
             <th style="width: 25%">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'name' ? '' : ' disabled')"
+                :class="(sortBy === 'name' ? '' : ' disabled')"
                 @click="sortUsers('name', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Name
             </th>
             <th style="width: 20%">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'officeCode' ? '' : ' disabled')"
+                :class="(sortBy === 'officeCode' ? '' : ' disabled')"
                 @click="sortUsers('officeCode', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Office
             </th>
             <th style="width: 20%">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'lastUpdated' ? '' : ' disabled')"
+                :class="(sortBy === 'lastUpdated' ? '' : ' disabled')"
                 @click="sortUsers('lastUpdated', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Last Updated
             </th>
             <th style="width: 15%">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'dateOfConsent' ? '' : ' disabled')"
+                :class="(sortBy === 'dateOfConsent' ? '' : ' disabled')"
                 @click="sortUsers('dateOfConsent', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Consent Date
             </th>
           </tr>
@@ -274,12 +286,8 @@
 
         <tbody>
           <tr v-for="user in usersInView" :key="user.id">
-            <td style="width: 15%" class="text-center">
-              <i
-                style="cursor: pointer"
-                :class="'far ' + (user.selected ? 'fa-check-square' : 'fa-square')"
-                @click="user.selected = !user.selected"
-              ></i>
+            <td style="width: 15%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
+              {{ (user.selected) ? '&#9745;' : '&#9744;' }}
             </td>
             <td style="width: 5%" class="text-center">
               <i :class="'fas fa-circle ' + user.status.css_key"></i>
@@ -428,7 +436,7 @@ export default {
           status: status,
           statusCode: status.code,
           lastUpdatedFormatted: updateDate,
-          lastUpdated: hasStatus ? u.status.date : null,
+          lastUpdated: hasStatus ? new Date(u.status.date) : null,
           dateOfConsent: u.dateOfConsent ? new Date(u.dateOfConsent) : 0,
           dateOfConsentFormatted: u.dateOfConsent ? new Date(u.dateOfConsent).toDateString() : 'Not Available'
         };

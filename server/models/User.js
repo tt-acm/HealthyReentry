@@ -73,7 +73,7 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre("save", function (next) {
     var user = this;
     // set admin
-    if(variables.ADMIN_USERS.includes(user.email)) user.permissions.admin= true;
+    if(variables.ADMIN_USERS.includes(user.email.toLowerCase())) user.permissions.admin= true;
     next();
 
 });
