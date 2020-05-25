@@ -1,6 +1,6 @@
 <template>
   <div>
-    <md-toolbar class="md-primary md-dense md-layout md-alignment-bottom-right" id="appFooter">
+    <md-toolbar class="md-primary md-dense md-layout md-alignment-bottom-right pb-2" id="appFooter">
         <div class="md-layout-item md-xsmall-hide">
           <a href="https://coresso.thorntontomasetti.com/eula" target="_blank">
             <span style="color:white;">License</span>
