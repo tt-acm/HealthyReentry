@@ -10,7 +10,7 @@
         <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
       </a> -->
 
-      <md-badge v-if="$auth.isAuthenticated && $auth.userDB" class="md-accent" style="margin-left:auto;margin-top:2px;">
+      <div v-if="$auth.isAuthenticated && $auth.userDB" class="md-accent" style="margin-left:auto;margin-top:2px;margin-right:4px;">
         <md-menu md-size="small" md-align-trigger>
           <md-button class="md-icon-button" style="width=32px" md-menu-trigger>
             <md-avatar style="transform: scale(0.8);">
@@ -30,7 +30,7 @@
             <md-menu-item @click="logout()">Log out</md-menu-item>
           </md-menu-content>
         </md-menu>
-      </md-badge>
+      </div>
       <a v-else class="md-title md-dense mr-2" style="margin-left:auto" @click="login()" href="#!">
         Login
       </a>

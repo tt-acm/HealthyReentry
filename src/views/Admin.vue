@@ -354,7 +354,6 @@ export default {
   },
   created() {},
   mounted() {
-    console.log("enumStatusMap", enumStatusMap);
   },
   data() {
     return {
@@ -406,8 +405,6 @@ export default {
                             .map(o => o.LocationName);
       let officeFilteredUsers = this.users.filter(u => officeArr.includes(u.location));
 
-      console.log("officeFilteredUsers", officeFilteredUsers);
-
       let nameFilteredUsers = officeFilteredUsers;
       if(this.nameFilter !== "") {
         let nfLower = this.nameFilter.toLowerCase();
@@ -450,7 +447,6 @@ export default {
           var users = userData.data;
           users.sort((a, b) => (a.name < b.name) ? -1 : 1)
           that.users = users;
-          console.log("that.users", that.users);
           that.users.forEach(u => {
             let loc = u.location || 'unknown';
             officesSet.add(loc);

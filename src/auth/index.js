@@ -97,7 +97,6 @@ export const useAuth0 = ({
       },
       /** Authenticates the user using the redirect method */
       loginWithRedirect(o) {
-        console.log("o", o);
         return this.auth0Client.loginWithRedirect(o);
       },
       /** Returns all the claims present in the ID token */
@@ -144,7 +143,6 @@ export const useAuth0 = ({
             await this.$api.post('/api/user', this.user).then(returnedUser => {
               this.userDB = returnedUser.data;
               store.commit('setUser', this.userDB);
-              console.log("STOREUSER", store.state.user);
             });
           }
 

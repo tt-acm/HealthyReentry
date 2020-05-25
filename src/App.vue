@@ -3,9 +3,8 @@
   <Navbar />
   <!-- <hr /> -->
   <!-- <md-content class="mx-3" style="max-width:600px"> -->
-  <span v-model="notificationMsg"></span>
   <md-content class="mx-auto" style="padding-top:75px;padding-bottom:40px;">
-    <router-view class="px-3" @disclosureMsg="disclosureMsg" @statusMsg="statusMsg" @encounterMsg="encounterMsg" @noDupUser="noDupUser" @scanSucceed="scanSucceed"/>
+    <router-view class="px-3" @disclosureMsg="disclosureMsg" @statusMsg="statusMsg" @encounterMsg="encounterMsg"/>
   </md-content>
 
   <!-- Notifications -->
@@ -17,12 +16,6 @@
   </md-snackbar>
   <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showEncounterMsg" md-persistent style="margin-bottom:55px; background-color: gray">
     <span> Encounter submitted successfully.</span>
-  </md-snackbar>
-  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showDupUserMsg" md-persistent style="margin-bottom:55px; background-color: orange">
-    <span> Cannot add yourself as an encounter.</span>
-  </md-snackbar>
-  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="scanSucceedMsg" md-persistent style="margin-bottom:55px; background-color: gray">
-    <span> QR code scanned submitted successfully.</span>
   </md-snackbar>
 
   <Footer />
@@ -45,9 +38,6 @@ export default {
       showDisclosureMsg: false,
       showStatusMsg: false,
       showEncounterMsg: false,
-      showDupUserMsg: false,
-      scanSucceedMsg: false,
-      notificationMsg: "nothing"
     };
   },
   mounted() {
@@ -58,11 +48,6 @@ export default {
     // console.log("window.jquery", window);
   },
   methods: {
-    getUser() {
-      console.log("getting user", this.$auth.isAuthenticated);
-      console.log("this.user", this.$auth.userDB);
-
-    },
     login() {
       this.$auth.loginWithRedirect();
     },
@@ -74,8 +59,6 @@ export default {
     statusMsg: function(alerts) { this.showStatusMsg = true; },
     disclosureMsg: function() { this.showDisclosureMsg = true; },
     encounterMsg: function() { this.showEncounterMsg = true; },
-    noDupUser: function() { this.showDupUserMsg = true; },
-    scanSucceed: function() { this.scanSucceedMsg = true; },
   }
 }
 </script>

@@ -30,18 +30,26 @@
   </div>
 
   <div class="d-flex align-items-end">
-    <b class="mt-3 mb-0">Your Encounter(s):</b>
+    <b class="mt-3 mb-0">Your New Encounter(s):</b>
     <a class="ml-1" href="https://app.gitbook.com/@core-studio/s/healthy-reentry/faq#what-counts-as-an-encounter-that-should-be-logged" target="blank">
       <md-icon class="md-size-1x m-0" md-src="/imgs/info-circle-solid-small.svg" ></md-icon>
     </a>
   </div>
-  <small>NOTE: You will only be able to search for employees who have opted into the app.</small>
 
-  <div class="mb-2 d-flex align-items-center">
+  <div v-if="encountered" class="row mx-0 mt-2">
+    <div v-for="encounter in encountered">
+      <span class="badge badge-pill badge-info mx-1">{{encounter.name}}</span>
+      <button type="button" class="close text-center" aria-label="Close" v-on:click="removeUser(encounter)" data-toggle="modal" data-target="#deleteUserModal">
+        <span class="text-center" aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-0 d-flex align-items-center">
     <div class="mt-1 px-0 mr-2 col" style="min-width:18rem;">
       <!-- <autocomplete v-if="minUsers.length > 0" label="Encounters:" v-bind:items="minUsers" v-bind:split="splitChar" :frequentEncounters="frequentEncounters" placeholder="Search by email or name" @sendBack="getAutoFillUser"></autocomplete> -->
 
-      <md-autocomplete v-model="selectedEmployee" :md-options="minUsers" :md-fuzzy-search="true" :md-open-on-focus="false">
+      <md-autocomplete v-model="selectedEmployee" :md-options="minUsers" :md-fuzzy-search="true" :md-open-on-focus="false" @md-selected="nameSelected()">
         <label>Search by email or name</label>
 
         <template slot="md-autocomplete-item" slot-scope="{ item, term }">
@@ -67,15 +75,10 @@
     </div>
 
   </div>
+  <small>NOTE: You will only be able to search for employees who have opted into the app.</small>
 
-  <div v-if="encountered" class="row mx-0 mb-1">
-    <div v-for="encounter in encountered">
-      <span class="badge badge-pill badge-info mx-1">{{encounter.name}}</span>
-      <button type="button" class="close text-center" aria-label="Close" v-on:click="removeUser(encounter)" data-toggle="modal" data-target="#deleteUserModal">
-        <span class="text-center" aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  </div>
+
+
   <div class="form-check my-2">
     <input v-if="encountered.length > 1" class="form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1">
     <input v-else class="form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1" disabled>
@@ -165,9 +168,19 @@
       </md-dialog-actions>
     </md-dialog>
 
-
-
-
+    <!-- Notifications -->
+    <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="userAdded" md-persistent style="margin-bottom:55px; background-color: gray">
+      <span> Encounter added.</span>
+    </md-snackbar>
+    <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="dupUser" md-persistent style="margin-bottom:55px; background-color: orange">
+      <span> Duplicated user found in your selection</span>
+    </md-snackbar>
+    <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="selfScan" md-persistent style="margin-bottom:55px; background-color: orange">
+      <span> Cannot add yourself as an encounter.</span>
+    </md-snackbar>
+    <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="scanSucceed" md-persistent style="margin-bottom:55px; background-color: gray">
+      <span> QR code scanned successfully.</span>
+    </md-snackbar>
 
 </div>
 </template>
@@ -177,7 +190,6 @@
 <script>
 import Vue from 'vue';
 import Vuex from 'vuex';
-import autocomplete from "@/components/autoComplete.vue";
 import {
   QrcodeStream
 } from 'vue-qrcode-reader'
@@ -186,7 +198,6 @@ import {
 export default {
   name: "encounter",
   components: {
-    autocomplete,
     QrcodeStream
     // appAlerts
   },
@@ -215,7 +226,10 @@ export default {
       // Vue.set(this, "frequentEncounters", mostEncountered.data.map(item=>item.name + "_" + item.email));
       Vue.set(this, "encountersToday", mostEncountered.data.filter(u=>u.encounteredToday===true));
 
-      if (this.$route.params.scannedUser) this.searchUserByEmail(this.$route.params.scannedUser);
+      if (this.$route.params.scannedUser) {
+        console.log("coming here");
+        this.searchUserByEmail(this.$route.params.scannedUser);
+      }
     });
 
 
@@ -225,6 +239,12 @@ export default {
   },
   data() {
     return {
+      userAdded: false,
+      dupUser: false,
+      scanSucceed: false,
+      notificationDuration: 4000,
+      showEncounterMsg: false,
+      selfScan: false,
       selectedEmployee: null,
       splitChar: "",
       encountered: [],
@@ -246,29 +266,29 @@ export default {
     };
   },
   watch: {
-    selectedEmployee() {
-
-      if (this.selectedEmployee) {
-        var u = this.userDictionary[this.selectedEmployee];
-        if (!u) return;
-        if (this.encountered.length === 0){
-          let newList = [];
-          newList.push(u);
-          this.encountered = newList;
-        }
-        else if (this.encountered.map(e=>e._id).indexOf(u._id) === -1) {
-          this.encountered.push(u);
-        }
-        else{
-          //user already added as encounter
-          // this.$emit("getNotification", [{
-          //   message: "This user has already been added as your encounter.",
-          //   type: "warning"
-          // }]);
-        }
-      }
-      this.selectedEmployee = '';
-    },
+    // selectedEmployee() {
+    //
+    //   if (this.selectedEmployee) {
+    //     var u = this.userDictionary[this.selectedEmployee];
+    //     if (!u) return;
+    //     if (this.encountered.length === 0){
+    //       let newList = [];
+    //       newList.push(u);
+    //       this.encountered = newList;
+    //     }
+    //     else if (this.encountered.map(e=>e._id).indexOf(u._id) === -1) {
+    //       this.encountered.push(u);
+    //     }
+    //     else{
+    //       //user already added as encounter
+    //       // this.$emit("getNotification", [{
+    //       //   message: "This user has already been added as your encounter.",
+    //       //   type: "warning"
+    //       // }]);
+    //     }
+    //   }
+    //   this.selectedEmployee = '';
+    // },
     encountered() {
       this.disableSubmitUser = true;
       if (this.encountered.length > 0) {
@@ -284,27 +304,26 @@ export default {
     user: state => state.user,
   }),
   methods: {
-    selected() {
-      // console.log("got selected");
-      // if (this.selectedEmployee) {
-      //   var u = this.userDictionary[this.selectedEmployee];
-      //   if (this.encountered.length === 0){
-      //     let newList = [];
-      //     newList.push(u);
-      //     this.encountered = newList;
-      //   }
-      //   else if (this.encountered.map(e=>e._id).indexOf(u._id) === -1) {
-      //     this.encountered.push(u);
-      //   }
-      //   else{
-      //     //user already added as encounter
-      //     // this.$emit("getNotification", [{
-      //     //   message: "This user has already been added as your encounter.",
-      //     //   type: "warning"
-      //     // }]);
-      //   }
-      // }
-      // this.selectedEmployee = '';
+    nameSelected() {
+      console.log("got selected");
+      if (this.selectedEmployee) {
+        var u = this.userDictionary[this.selectedEmployee];
+        if (this.encountered.length === 0){
+          let newList = [];
+          newList.push(u);
+          this.encountered = newList;
+          this.userAdded = true;
+        }
+        else if (this.encountered.map(e=>e._id).indexOf(u._id) === -1) {
+          this.encountered.push(u);
+          this.userAdded = true;
+        }
+        else{
+          this.dupUser = true;//user already added as encounter
+        }
+        // this.selectedEmployee = null;
+      }
+
     },
     checkFuture(date) {
       return new Date() <= date;
@@ -346,7 +365,7 @@ export default {
             }
             else {
               this.encountered.push(res);//adding scanned user to encounter
-              this.$emit("scanSucceed");
+              this.scanSucceed = true;
 
               this.camera = 'off';
             }
@@ -383,16 +402,6 @@ export default {
       // Vue.set(this, "date", formattedDate);
       return formattedDate;
     },
-    // getSelectedDate() {
-    //   if (this.todaySelected) {
-    //     this.date = new Date().toJSON().slice(0, 10).replace(/-/g, '/');
-    //   } else {
-    //     //this
-    //     //var formattedDate =  moment(this.date).format('YYYY/MM/DD');
-    //     //console.log("formattedDate", formattedDate);
-    //     //Vue.set(this,"date", formattedDate);
-    //   }
-    // },
     removeUser(e) {
       this.encountered.splice(
         this.encountered.indexOf(e),
@@ -400,16 +409,13 @@ export default {
       );
     },
     saveEncounters() {
-      console.log("this.encountered", this.encountered);
 
       var body = {
         encounters: this.encountered,
         date: this.date,
         isGroup: this.isGroup
       };
-      //console.log(body);
       this.$api.post("/api/encounters/add-many", body).then(result => {
-        // console.log("result", result);
         if (result) {
           this.$emit("encounterMsg");
           this.$router.push({

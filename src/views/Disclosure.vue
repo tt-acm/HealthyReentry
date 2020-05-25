@@ -9,7 +9,7 @@
         <md-content class="p-3">
           <p class="mb-2">
             We respect your privacy. As we continue to monitor COVID-19 and its impact on our people and offices, it is important that designated members of our Talent Team are aware of COVID-19 related cases at our firm. To protect all of our
-            employees, the Encounter application will allow you to securely and confidentially record:
+            employees, the Healthy Reentry application will allow you to securely and confidentially record:
           </p>
           <p class="text-muted mb-2">
             1. your personal COVID-19 status through a series of colors (green, orange and red).
@@ -105,9 +105,8 @@ export default {
     submit: function() {
       // console.log("submitting");
       this.$api.get("/api/user/consent-signed").then(consent => {
-        console.log("consent", consent);
         this.$emit("disclosureMsg");
-        // alert("Consent Submitted" + "\n" + "\n" + "Thank you for submitting your consent. We have emailed a copy of the disclosure and consent to your TT email for reference.");
+        this.$auth.userDB = consent.data;
         this.$router.push({ name: 'menu' });
       });
 
