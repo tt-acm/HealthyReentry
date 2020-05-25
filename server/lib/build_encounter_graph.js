@@ -120,7 +120,7 @@ function buildEncounterGraph(users, encounters) {
 
 }
 
-function findEncounterTree(user, incubationPeriod) {//incubation period 2 days if status reported Orange vs 14 days for Red. 
+function findEncounterTree(user, incubationPeriod) {//incubation period 2 days if status reported Orange vs 14 days for Red.
     // TODO : Add another date input for the date of last reported date.
     // Function to find up to n'th degree encounters of user
 
@@ -143,17 +143,21 @@ function findEncounterTree(user, incubationPeriod) {//incubation period 2 days i
                         let nd = g.node(u);
                         if (r[u].distance == 1) {
                             data.push({
-                                "name": u,
+                                "name": nd.name.replace(',', ''),
+                                "email": u,
                                 "number_of_encounters": g.edge(user, u),
                                 "degree-of-separation": 1,
-                                "status": (nd.status) ? nd.status.status : -1 // mark -1 if person hasn't ever reported any status
+                                "status": (nd.status) ? nd.status.status : -1, // mark -1 if person hasn't ever reported any status
+                                "statusLastUpdated": (nd.status) ? nd.status.date : "N/A"
                             });
                         } else if (r[u].distance > 1 && r[u].distance < Infinity) {
                             data.push({
-                                "name": u,
+                                "name": nd.name.replace(',', ''),
+                                "email": u,
                                 "number_of_encounters": 0,
                                 "degree-of-separation": r[u].distance,
-                                "status": (nd.status) ? nd.status.status : -1 // mark -1 if person hasn't ever reported any status
+                                "status": (nd.status) ? nd.status.status : -1, // mark -1 if person hasn't ever reported any status
+                                "statusLastUpdated": (nd.status) ? nd.status.date : "N/A"
                             });
                         }
                         isDone();
