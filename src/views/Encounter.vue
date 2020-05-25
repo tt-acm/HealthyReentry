@@ -446,9 +446,9 @@ export default {
   padding-top: 0px;
   padding-bottom: 0px;
 } */
-/* .md-dialog /deep/ .md-dialog-container {
+.md-dialog /deep/ .md-dialog-container {
   transform: none;
-} */
+}
 
 
 </style>
