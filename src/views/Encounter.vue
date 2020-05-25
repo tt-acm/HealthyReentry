@@ -357,7 +357,7 @@ export default {
           const encountered = this.encountered.map(en=>en._id);
 
           if (res.data && res.data._id) {
-            if (res.data.email === this.user.email) {
+            if (res.data.email.toLowerCase() === this.user.email.toLowerCase()) {
               this.selfScan = true;
               this.camera = 'off';
             }

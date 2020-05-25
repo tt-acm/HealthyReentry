@@ -16,7 +16,7 @@ router.post("/user-by-email", function(req, res) {
   }
 
   User.findOne({
-    "email": req.body.email
+    "email": req.body.email.toLowerCase()
   }, include)
       .exec(function(err, user) {
           if (err) {
@@ -151,7 +151,7 @@ router.post('/', async (req, res) => {
   if (!u.email) {
     return res.status(403).send();
   }
-  let user = await User.findOne({ email: String(u.email) });
+  let user = await User.findOne({ email: String(u.email).toLowerCase() });
   if (user) {
     return res.json(user);
   }
@@ -164,7 +164,7 @@ router.post('/', async (req, res) => {
 
   user = new User({
     name: userName,
-    email: u.email,
+    email: u.email.toLowerCase(),
     location: u.location,
     picture: u.picture
   });
