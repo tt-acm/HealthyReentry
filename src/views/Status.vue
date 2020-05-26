@@ -78,13 +78,17 @@
             </small>
             <small class="mb-0">
               <ul class="pl-3 mb-0">
+                <li>Fever or chills</li>
                 <li>Cough</li>
                 <li>Shortness of breath or difficulty breathing</li>
-                <li>Fever</li>
-                <li>Chills</li>
-                <li>Muscle pain</li>
-                <li>Sore throat</li>
+                <li>Fatigue</li>
+                <li>Muscle or body aches</li>
+                <li>Headache</li>
                 <li>New loss of taste or smell</li>
+                <li>Sore throat</li>
+                <li>Congestion or runny nose</li>
+                <li>Nausea or vomiting</li>
+                <li>Diarrhea</li>
               </ul>
             </small>
           </div>
