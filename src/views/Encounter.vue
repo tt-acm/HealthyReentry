@@ -31,7 +31,7 @@
 
   <div class="d-flex align-items-end">
     <b class="mt-3 mb-0">Your New Encounter(s):</b>
-    <a class="ml-1" href="https://app.gitbook.com/@core-studio/s/healthy-reentry/faq#what-counts-as-an-encounter-that-should-be-logged" target="blank">
+    <a class="ml-1" href="https://core-studio.gitbook.io/healthy-reentry/faq#what-counts-as-an-encounter-that-should-be-logged" target="blank">
       <md-icon class="md-size-1x m-0" md-src="/imgs/info-circle-solid-small.svg" ></md-icon>
     </a>
   </div>
@@ -80,15 +80,15 @@
 
 
   <div class="form-check my-2">
-    <input v-if="encountered.length > 1" class="form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1">
-    <input v-else class="form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1" disabled>
+    <input v-if="encountered.length > 1" class="mt-2 form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1">
+    <input v-else class="mt-2 form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1" disabled>
     <div class="d-flex align-items-end">
       <label class="form-check-label d-flex" for="defaultCheck1">
         Group
-        <a class="mb-0 ml-1" href="https://app.gitbook.com/@core-studio/s/healthy-reentry/faq#when-should-i-use-the-group-checkbox" target="blank">
-          <md-icon class="md-size-1x m-0" md-src="/imgs/info-circle-solid-small.svg" ></md-icon>
-        </a>
       </label>
+      <a class="mb-0 ml-1" href="https://core-studio.gitbook.io/healthy-reentry/faq#when-should-i-use-the-group-checkbox" target="blank">
+        <md-icon class="md-size-1x m-0" md-src="/imgs/info-circle-solid-small.svg" ></md-icon>
+      </a>
     </div>
 
   </div>
