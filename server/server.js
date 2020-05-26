@@ -28,20 +28,6 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-//HTTPS redirect middleware
-function ensureSecure(req, res, next) {
-  //Heroku stores the origin protocol in a header variable. The app itself is isolated within the dyno and all request objects have an HTTP protocol.
-  if (req.get('X-Forwarded-Proto') == 'https' || req.hostname == 'localhost') {
-    //Serve Vue App by passing control to the next middleware
-    next();
-  } else if (req.get('X-Forwarded-Proto') != 'https' && req.get('X-Forwarded-Port') != '443') {
-    //Redirect if not HTTP with original request URL
-    res.redirect('https://' + req.hostname + req.url);
-  }
-}
-//attach middleware to app
-app.all('*', ensureSecure);
-
 app.use("/", require('./routes'));
 
 swaggerAPIDocSetup.setup(app);
