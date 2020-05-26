@@ -5,10 +5,6 @@ export const authGuard = (to, from, next) => {
   const authService = getInstance();
 
   const fn = () => {
-    console.log(window.location);
-    if (window.location.protocol !== 'https:') window.location.href = `https://${window.location.host}`;
-    console.log(window.location);
-    console.log('-----------------------');
     // If the user is authenticated, continue with the route
     if (authService.isAuthenticated) {
       if (authService.userDB) {
