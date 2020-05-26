@@ -177,9 +177,9 @@
 
   <!-- Modal -->
   <md-dialog :md-active.sync="showDialog" :md-fullscreen="false">
-    <md-dialog-title>Report Your Health Status</md-dialog-title>
-    <md-subheader class="mx-2 mb-3">
-      Review your health status selection below, then click &nbsp;<b class="ml-1">Submit</b>. To edit, click &nbsp;<b class="ml-1">Go Back</b>.
+    <md-dialog-title>Review Your Health Status</md-dialog-title>
+    <md-subheader class="mx-2 mb-0">
+      Review the details below then click <b class="ml-1 mr-0 px-0">Submit</b>. To edit, click <b class="ml-1 mr-0 px-0">Go Back</b>.
     </md-subheader>
     <md-content class="mx-4">
 
@@ -202,7 +202,7 @@
 
 
     <md-dialog-actions class="mx-4 my-2">
-      <md-button class="md-primary" @click="showDialog=false">Close</md-button>
+      <md-button class="md-primary" @click="showDialog=false">Go Back</md-button>
       <md-button class="md-primary md-raised" @click="showDialog=false; submitEncounter()">Submit</md-button>
     </md-dialog-actions>
   </md-dialog>
