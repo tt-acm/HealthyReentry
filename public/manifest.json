@@ -7,7 +7,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "icons": [
     {
       "src": "imgs/logo-256.png",
