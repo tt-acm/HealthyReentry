@@ -2,7 +2,7 @@
 <!-- <div class="mx-auto" style="transform: translateY(150%)"> -->
 <div>
   <div v-if="latestStatus" class="card mx-auto" id="statusCard" style="margin-top: 10px;">
-    <div class="card-body p-2 text-white" style="background-color: #F17300">
+    <div class="card-body p-2 text-white" id="statusCardBackground" :style="styleObject">
       <h6 class="ml-auto mt-auto mb-0">
         <b>Last Updated on:</b> {{showDisplayDate(new Date(latestStatus.date))}} as {{status[latestStatus.status]}}
       </h6>
@@ -49,6 +49,7 @@
 </template>
 <script>
 // import store from "store/index.js";
+const statusColors = ["#00C851", "#FF9800", "#DC3545"]
 
 import Vuex from 'vuex';
 
@@ -57,6 +58,8 @@ export default {
   created() {
     this.$api.get("/api/status/get-current").then(returnedStatus => {
       this.latestStatus = returnedStatus.data;
+
+      this.styleObject.backgroundColor = statusColors[returnedStatus.data.status];
     })
   },
   mounted() {
@@ -68,6 +71,10 @@ export default {
   data() {
     return {
       latestStatus: null,
+      styleObject: {
+        backgroundColor: 'lightgray'
+        // fontSize: '13px'
+      },
       status: ["Green - No Signs or Symptoms",
         "Orange - Possible Exposure",
         "Red - Positive Diagnosis"
