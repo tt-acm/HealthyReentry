@@ -17,16 +17,8 @@ mongoose.connect(mongoURI, {
 });
 
 const app = express();
-app.use(express.static(DIR));
 
-app.use(cookieParser());
-app.use(bodyParser.json({
-  limit: '500mb'
-}));
-app.use(bodyParser.urlencoded({
-  limit: '500mb',
-  extended: true
-}));
+
 
 //HTTPS redirect middleware
 function ensureSecure(req, res, next) {
@@ -40,7 +32,20 @@ function ensureSecure(req, res, next) {
   }
 }
 //attach middleware to app
-app.all('*', ensureSecure);
+app.use('*', ensureSecure);
+
+
+
+app.use(express.static(DIR));
+
+app.use(cookieParser());
+app.use(bodyParser.json({
+  limit: '500mb'
+}));
+app.use(bodyParser.urlencoded({
+  limit: '500mb',
+  extended: true
+}));
 
 app.use("/", require('./routes'));
 
