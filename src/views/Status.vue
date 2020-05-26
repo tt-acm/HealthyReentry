@@ -78,13 +78,17 @@
             </small>
             <small class="mb-0">
               <ul class="pl-3 mb-0">
+                <li>Fever or chills</li>
                 <li>Cough</li>
                 <li>Shortness of breath or difficulty breathing</li>
-                <li>Fever</li>
-                <li>Chills</li>
-                <li>Muscle pain</li>
-                <li>Sore throat</li>
+                <li>Fatigue</li>
+                <li>Muscle or body aches</li>
+                <li>Headache</li>
                 <li>New loss of taste or smell</li>
+                <li>Sore throat</li>
+                <li>Congestion or runny nose</li>
+                <li>Nausea or vomiting</li>
+                <li>Diarrhea</li>
               </ul>
             </small>
           </div>
@@ -214,8 +218,6 @@ import Vuex from 'vuex';
 var tabIds = ["tab-green", "tab-orange", "tab-red", "tab-blue"]
 export default {
   created() {
-    console.log("this.user in status", this.user);
-
     this.$api.get("/api/status/get-current").then(returnedStatus => {
       var curStatus = returnedStatus.data;
       if (curStatus) {
@@ -237,7 +239,6 @@ export default {
         this.latestStatusDate = String(new Date(curStatus.date)).split(" ").slice(1, 4).join("/");
       } else {
         this.selectedStatus = 0; //default to green
-        console.log("in created", this.selectedStatus);
       }
     });
   },
@@ -306,32 +307,12 @@ export default {
     showDisplayDate(date) {
       return this.moment(date).format('ll');
     },
-    // alertGreen() {
-    //   if (!this.enableBlue) {
-    //     this.selectedStatus = null;
-    //     this.$emit("getNotification", [{
-    //       message: "Due to your previous status selection, you are unable to select this color. Please reach out to Lizette Agostini for further guidance.",
-    //       type: "warning"
-    //     }]);
-    //   }
-    // },
-    // alertBlue() {
-    //   if (!this.enableBlue) {
-    //     this.selectedStatus = null;
-    //     this.$emit("getNotification", [{
-    //       message: "Due to your previous status selection, you are unable to select this color. Please reach out to Lizette Agostini for further guidance.",
-    //       type: "warning"
-    //     }]);
-    //   }
-    // },
     submitEncounter() {
-      console.log("submitting status");
       // use this when status submitted -- this saves number
       const body = {
         status: this.selectedStatus
       }
       this.$api.post("/api/status/report", body).then(savedStatus => {
-        console.log("status Saved", savedStatus);
         this.latestStatus = savedStatus;
 
         if (savedStatus) {
@@ -343,16 +324,6 @@ export default {
 
         }
       });
-
-      // //compare status and see if it changed
-      // if (this.selectedStatus !== 0) {
-      //   //console.log("status no longer green", this.selectedStatus, this.latestStatus.status);
-      //   if (!this.latestStatus) this.alertStatusChanged(); //first time non green
-      //   else if (this.selectedStatus !== this.latestStatus.status && this.selectedStatus !== 3 && this.selectedStatus > this.latestStatus.status) {
-      //     console.log("status got worse!", this.status[this.selectedStatus]);
-      //     this.alertStatusChanged();
-      //   }
-      // }
     }
   }
 };
@@ -361,5 +332,8 @@ export default {
 <style scoped>
 .md-tabs+.md-tabs {
   margin-top: 24px;
+}
+.md-dialog /deep/ .md-dialog-container {
+  transform: none;
 }
 </style>

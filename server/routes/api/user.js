@@ -3,6 +3,8 @@ const fs = require('fs');
 const sgClient = require("../../lib/sgClient");
 
 const User = require('../../models/User');
+const Status = require('../../models/Status');
+const parseUser = require('../../util/parseUser');
 
 
 router.post("/user-by-email", function(req, res) {
@@ -15,7 +17,7 @@ router.post("/user-by-email", function(req, res) {
   }
 
   User.findOne({
-    "email": req.body.email
+    "email": req.body.email.toLowerCase()
   }, include)
       .exec(function(err, user) {
           if (err) {
@@ -55,9 +57,9 @@ router.get("/consent-signed", function (req, res) {
   function sendEmail(userEmail, userName) {
     return new Promise(function (resolve, reject) {
 
-      var title = "Encounter App - Disclosure & Consent";
+      var title = "Healthy Reentry App - Disclosure & Consent";
       var firstName = userName.split(' ')[0];
-      var thisHTML = "<div><p>"+ firstName+ ",<br><br>Thank you for enrolling in the Encounter application. Attached is the disclosure and consent file you reviewed and agreed to.</p></div>";
+      var thisHTML = "<div><p>"+ firstName+ ",<br><br>Thank you for enrolling in the Healthy Reentry application. Attached is the disclosure and consent file you reviewed and agreed to.</p></div>";
 
       const path = './server/assets/Disclosure.pdf';
       var attachment = fs.readFileSync(path);
@@ -103,7 +105,6 @@ router.get("/consent-signed", function (req, res) {
 
 //get all users
 router.get("/get-all", function (req, res) {
-  console.log("coming here", req.user);
 
   // returns only email, profile name, and _id
   let include = {
@@ -147,28 +148,41 @@ router.get("/get-all", function (req, res) {
  *                $ref: '#/components/schemas/User'
  */
 router.post('/', async (req, res) => {
-  const u = req.body;
-  if (!u || u === {}) {
-    return res.status(400).send();
+  const u = parseUser(req.body);
+  if (!u.email) {
+    return res.status(403).send();
   }
-  console.log("presearch user");
-  let user = await User.findOne({ email: String(u.email) });
-  console.log("found user", user);
+  let user = await User.findOne({ email: String(u.email).toLowerCase() });
   if (user) {
     return res.json(user);
   }
-  console.log("constructing new user", u);
+
+  var userName = u.name;
+  if (u.name && u.name.includes(',')) {
+    let nameCollection = u.name.replace(/\s/g,'').split(',');
+    if (nameCollection.length > 1) userName = nameCollection[nameCollection.length-1] + " " + nameCollection[0];
+  }
 
   user = new User({
-    // username: u.nickname,
-    name: u.name,
-    email: u.email,
+    name: userName,
+    email: u.email.toLowerCase(),
+    location: u.location,
     picture: u.picture
   });
-  console.log("constructed pre save", user);
   user = await user.save();
-  console.log("constructed POST save", user);
-  return res.json(user);
+
+
+  var status = new Status({
+    status: 0,
+    user: user
+  });
+
+  status.save(async function (err, savedStatus) {
+    if (err) return res.status(500).send(err);
+
+    // return res.json(savedStatus);
+    return res.json(user);
+  });
 
 });
 
