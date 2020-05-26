@@ -97,7 +97,7 @@ export const useAuth0 = ({
       },
       /** Authenticates the user using the redirect method */
       loginWithRedirect(o) {
-        return this.auth0Client.loginWithRedirect(o);
+        return this.auth0Client.loginWithRedirect({connection: 'TT-SSO'});
       },
       /** Returns all the claims present in the ID token */
       getIdTokenClaims(o) {
