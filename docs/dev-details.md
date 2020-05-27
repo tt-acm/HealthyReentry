@@ -36,7 +36,7 @@ AUTH0_TOKEN_ISSUER=https://<YOUR-APP-NAME>.auth0.com/
 
 
 ### Setup MongoDB Atlas
-- Sign up with [MongoDB Atlas](https://account.mongodb.com/account/register).  
+- Sign up at [MongoDB Atlas](https://account.mongodb.com/account/register).  
 - Click on 'New Project'.
 ![Create a new Atlas project](./imgs/Atlas_CreateNewProject.png)
 - Create a new project with a name you desire
@@ -60,10 +60,19 @@ AUTH0_TOKEN_ISSUER=https://<YOUR-APP-NAME>.auth0.com/
 
 - Navigate back to cluster connection modal, go to "Choose a connection method" tab, then click on "Connection your application"
 ![Choose connection method](./imgs/Atlas_ChooseConnectionMethod.png)
-- Choose Node.js as your driver, and use the driver code example below in your .env file as the "MONGO_URL". Replace the keywords in the example with your DB username and password. 
+- Choose Node.js as your driver, and use the driver code example below in your .env file as the "MONGO_URL". Replace the keywords in the example with your DB username and password.
 ![Create connection string](./imgs/Atlas_GenerateConnectionString.png)
 
 
-### Get SendGrid credentials
-
-### Get MongoDB credentials
+### Setup SendGrid Service
+- Sign up at [SendGrid](https://signup.sendgrid.com/).  
+- Create an account and verify your email address
+![Choose connection method](./imgs/SendGrid_SetupAccount.png)
+- Once you are logged in, go to ["Single Sender Verification"](https://app.sendgrid.com/settings/sender_auth/senders/new), then setup a sender with your company info and the email address you desire to send out notifications.
+- After the new sender is setup, you will receive another verification email in your inbox.
+- Once verified, go to "API Key" section under "Settings" on the left, then click on "Create API Key"
+![Generate API Key](./imgs/SendGrid_GenerateAPIKey.png)
+- Name the API key as you desire, then choose "Full Access" under "API Key Permissions" section.
+![Setip API Key](./imgs/SendGrid_SetupAPIKey.png)
+- After clicking "Create & View", your API Key should show up on the screen. Save this API Key and put it in your .env file under (SENDGRID_API_KEY=)
+- Please also use the email of the SendGrid sender you created in the .env file, under (SENDGRID_EMAIL =)
