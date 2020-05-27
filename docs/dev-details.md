@@ -67,7 +67,7 @@ AUTH0_TOKEN_ISSUER=https://<YOUR-APP-NAME>.auth0.com/
 ### Setup SendGrid Service
 - Sign up at [SendGrid](https://signup.sendgrid.com/).  
 - Create an account and verify your email address
-![Choose connection method](./imgs/SendGrid_SetupAccount.png)
+![Choose connection method](./imgs/SendGrid_SetupAccount.PNG)
 - Once you are logged in, go to ["Single Sender Verification"](https://app.sendgrid.com/settings/sender_auth/senders/new), then setup a sender with your company info and the email address you desire to send out notifications.
 - After the new sender is setup, you will receive another verification email in your inbox.
 - Once verified, go to "API Key" section under "Settings" on the left, then click on "Create API Key"
@@ -75,4 +75,5 @@ AUTH0_TOKEN_ISSUER=https://<YOUR-APP-NAME>.auth0.com/
 - Name the API key as you desire, then choose "Full Access" under "API Key Permissions" section.
 ![Setip API Key](./imgs/SendGrid_SetupAPIKey.png)
 - After clicking "Create & View", your API Key should show up on the screen. Save this API Key and put it in your .env file under (SENDGRID_API_KEY=)
+![Setip API Key](./imgs/SendGrid_APIKey.png)
 - Please also use the email of the SendGrid sender you created in the .env file, under (SENDGRID_EMAIL =)
