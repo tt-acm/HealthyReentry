@@ -33,7 +33,7 @@ function parseUser(ssoUser) {
   let user = {
     name: userName,
     email: ssoUser.email.toLowerCase(),
-    location: ssoUser['https://adfs.thorntontomasetti.com/office'],
+    location: ssoUser['https://adfs.thorntontomasetti.com/office'] || 'N/A',
     picture: ssoUser.picture,
   }
   
