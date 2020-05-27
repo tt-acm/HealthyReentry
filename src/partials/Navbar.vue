@@ -1,10 +1,10 @@
 <template>
   <div>
     <md-toolbar class="md-primary" id="appHeader">
-      <router-link class="md-title" :to="{ name: 'menu' }">
+      <a class="md-title" @click="login()" href="#!">
         <span>Healthy Reentry</span>
         <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
-      </router-link>
+      </a>
       <!-- <a  href="/">
         <span>Healthy Reentry</span>
         <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
@@ -51,6 +51,7 @@ export default {
       // this.$auth.loginWithRedirect();
       // this.$auth.loginWithRedirect({ appState: { targetUrl: this.$route.fullPath }});
       if (this.$auth.isAuthenticated === false) this.$auth.loginWithRedirect();
+      else this.$router.replace("/menu");
     },
     logout() {
       this.$auth.logout({
