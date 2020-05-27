@@ -23,7 +23,21 @@ registering for the application.
 
 */
 function parseUser(ssoUser) {
-  return ssoUser
+  
+  let userName = ssoUser.name;
+  if (ssoUser.name && ssoUser.name.includes(',')) {
+    let nameCollection = ssoUser.name.replace(/\s/g,'').split(',');
+    if (nameCollection.length > 1) userName = nameCollection[nameCollection.length-1] + " " + nameCollection[0];
+  }
+
+  let user = {
+    name: userName,
+    email: ssoUser.email.toLowerCase(),
+    location: ssoUser['https://adfs.thorntontomasetti.com/office'],
+    picture: ssoUser.picture,
+  }
+  
+  return user
 }
 
 
