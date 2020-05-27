@@ -4,16 +4,19 @@ Healthy Reentry is a web app to track in-person encounters within an organizatio
 
 ## Screenshots
 **Home Page**  
-![Healthy Reentry Home Page](./docs/imgs/screensots_homepage.png)
+![Healthy Reentry Home Page](./docs/imgs/screenshots_homepage.png)
+
+**Status Screen**  
+![Healthy Reentry Status Screen](./docs/imgs/screenshots_status.png)
 
 **Encounter Screen**  
-![Healthy Reentry Encounter Screen](./docs/imgs/screensots_encounter.png)
+![Healthy Reentry Encounter Screen](./docs/imgs/screenshots_encounter.png)
 
 **QR Code Screen**  
-![Healthy Reentry QR Code Screen](./docs/imgs/screensots_qrcode.png)
+![Healthy Reentry QR Code Screen](./docs/imgs/screenshots_qrcode.png)
 
 **Admin Screen**  
-![Healthy Reentry Admin Screen](./docs/imgs/screensots_admin.png)
+![Healthy Reentry Admin Screen](./docs/imgs/screenshots_admin.png)
 
 ## Quickstart
 The project is based on a few external services (Auth0, SendGrid, MongoDB). If you need help setting up that check the [detailed development guide](./docs/dev-details.md) and come back to this. The quickstart assumed you have all values for `.env` file configuration.  

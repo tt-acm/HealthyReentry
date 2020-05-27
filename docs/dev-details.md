@@ -30,12 +30,40 @@ AUTH0_TOKEN_ISSUER: https://<YOUR-APP-NAME>.auth0.com/
 ```
 AUTH0_DOMAIN=<YOUR-APP-NAME>.auth0.com
 AUTH0_CLIENT_ID=<RANDOM-STRING-OF-32-CHARACTERS>
-
 AUTH0_JWKS_URI=https://<YOUR-APP-NAME>.auth0.com/.well-known/jwks.json
 AUTH0_TOKEN_ISSUER=https://<YOUR-APP-NAME>.auth0.com/
 ```
 
+
+### Setup MongoDB Atlas
+- Sign up with [MongoDB Atlas](https://account.mongodb.com/account/register).  
+- Click on 'New Project'.
+![Create a new Atlas project](./imgs/Atlas_CreateNewProject.png)
+- Create a new project with a name you desire
+- Once the project is created, create a new cluster  
+![Create a new project cluster](./imgs/Atlas_BuildACluster.png)
+- Create a new cluster that will host your data.
+- Click on "Connect"
+![Connect to cluster](./imgs/Atlas_ConnectToCluster.png)
+- Go to "Setup connection security" tab
+![Connect to cluster](./imgs/Atlas_SetupConnectionSecurity.png)
+  1. Whitelist a connection IP address
+    - Select "ADD CURRENT IP ADDRESS" for local testing, or use "0.0.0.0/0" for production deployment
+  ![Add to whitelist 1](./imgs/Atlas_AddWhiteList.png)
+  ![Add to whitelist 2](./imgs/Atlas_AddToWhiteList.png)
+
+  2. Create a MongoDB User
+    - Create a new database user with specific access
+  ![Create new DB user 1](./imgs/Atlas_CreateNewDBUser.png)
+  ![Create new DB user 2](./imgs/Atlas_DBUserCredential.png)
+
+
+- Navigate back to cluster connection modal, go to "Choose a connection method" tab, then click on "Connection your application"
+![Choose connection method](./imgs/Atlas_ChooseConnectionMethod.png)
+- Choose Node.js as your driver, and use the driver code example below in your .env file as the "MONGO_URL". Replace the keywords in the example with your DB username and password. 
+![Create connection string](./imgs/Atlas_GenerateConnectionString.png)
+
+
 ### Get SendGrid credentials
 
 ### Get MongoDB credentials
-
