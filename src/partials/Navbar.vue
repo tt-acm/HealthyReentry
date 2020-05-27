@@ -1,14 +1,10 @@
 <template>
   <div>
     <md-toolbar class="md-primary" id="appHeader">
-      <a class="md-title" @click="login()" href="#!">
-        <span>Healthy Reentry</span>
+      <a v-if="appTitle" class="md-title" @click="login()" href="#!">
+        <span>{{appTitle}}</span>
         <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
       </a>
-      <!-- <a  href="/">
-        <span>Healthy Reentry</span>
-        <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
-      </a> -->
       <div class="d-flex align-items-center"style="margin-left:auto;margin-right:4px;">
         <a class="px-1 mr-3" href="https://core-studio.gitbook.io/healthy-reentry/testing-guidence/guide" target="blank" style ="color: rgb(180,193,209);"><i class="far fa-question-circle"></i></a>
 
@@ -45,6 +41,14 @@
 <script>
 export default {
   name: 'Navbar',
+  created() {
+    this.appTitle = process.env.VUE_APP_NAME;
+  },
+  data() {
+    return {
+      appTitle: null
+    };
+  },
   methods: {
     login() {
       // console.log(this.$route.fullPath);
