@@ -157,15 +157,9 @@ router.post('/', async (req, res) => {
     return res.json(user);
   }
 
-  var userName = u.name;
-  if (u.name && u.name.includes(',')) {
-    let nameCollection = u.name.replace(/\s/g,'').split(',');
-    if (nameCollection.length > 1) userName = nameCollection[nameCollection.length-1] + " " + nameCollection[0];
-  }
-
   user = new User({
-    name: userName,
-    email: u.email.toLowerCase(),
+    name: u.name,
+    email: u.email,
     location: u.location,
     picture: u.picture
   });
