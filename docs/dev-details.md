@@ -75,4 +75,5 @@ AUTH0_TOKEN_ISSUER=https://<YOUR-APP-NAME>.auth0.com/
 - Name the API key as you desire, then choose "Full Access" under "API Key Permissions" section.
 ![Setip API Key](./imgs/SendGrid_SetupAPIKey.png)
 - After clicking "Create & View", your API Key should show up on the screen. Save this API Key and put it in your .env file under (SENDGRID_API_KEY=)
+![Setip API Key](./imgs/SendGrid_APIKey.png)
 - Please also use the email of the SendGrid sender you created in the .env file, under (SENDGRID_EMAIL =)
