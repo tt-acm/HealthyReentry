@@ -77,8 +77,6 @@ function checkUsersStatus(client_db) {
 
 sendEmail = (toEmails) => {
     console.log("emails", toEmails)
-    // TEST
-    toEmails= ["eertugrul@thorntontomasetti.com", "lkunjukutty@thorntontomasetti.com"];
     const mailOptions = {
         to: toEmails,
         from: sender,
