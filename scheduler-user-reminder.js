@@ -8,7 +8,7 @@ const sgClient = require('@sendgrid/mail');
 sgClient.setApiKey(process.env.SENDGRID_API_KEY); 
 var sender = process.env.SENDGRID_EMAIL;
 
-MongoClient.connect(process.env.MONGO_URL).then(function (db) {
+MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(function (db) {
     console.log("CONNECTED TO DB");
     checkUsersStatus(db);
 
@@ -17,8 +17,8 @@ MongoClient.connect(process.env.MONGO_URL).then(function (db) {
     console.error(err);
 });
 
-function checkUsersStatus(db) {
-
+function checkUsersStatus(client_db) {
+    let db = client_db.db();
     // get all users 
     // for each user check status date greater than 7 days
     let counter = 0;
@@ -68,6 +68,8 @@ function checkUsersStatus(db) {
         //console.log("isDONE", allUsersCount, counter)
         if (allUsersCount === counter) {
             sendEmail(emails);
+            console.log("Closing DB");
+            client_db.close();
         }
     }
 
