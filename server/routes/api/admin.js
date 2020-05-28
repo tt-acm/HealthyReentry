@@ -3,6 +3,7 @@ const router = require('express').Router();
 const User = require('../../models/User');
 const Status = require('../../models/Status');
 
+const eg = require('../../lib/build_encounter_graph');
 const triggerUpdates = require('../../lib/trigger_updates');
 
 
@@ -125,6 +126,19 @@ router.post("/update-users", async function(req, res) {
 
   res.json(savedData);
 
+});
+
+
+
+
+router.get("/graph/:emails", async function(req, res) {
+  let emailList = req.params.emails.split(",");
+  let graphs = [];
+  for(let email of emailList) {
+    let graph = await eg(email, 14);
+    graphs.push(graph);
+  }
+  res.json(graphs);
 });
 
 
