@@ -40,6 +40,7 @@ router.get("/get-all-users", async function(req, res) {
     "_id": 1,
     "dateOfConsent": 1,
     "name": 1,
+    "email": 1,
     "location": 1
   }
 

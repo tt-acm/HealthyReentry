@@ -396,8 +396,11 @@ export default {
     }
   },
   methods: {
-    downloadGraphForSelectedAsCSV() {
-      console.log('foo');
+    async downloadGraphForSelectedAsCSV() {
+      let userEmails = this.selectedUsers.map(u => u.email).reduce((a, b) => `${a},${b}`);  
+      console.log(userEmails);
+      let res = await this.$api.get(`/api/admin/graph/${userEmails}`);
+      console.log(res.data);
     },
     downloadSelectedAsCSV() {
       let tot = "Name,Status,Office,LastUpdated";
@@ -438,6 +441,7 @@ export default {
           id: u._id,
           selected: false,
           name: u.name,
+          email: u.email,
           officeCode: u.location,
           status: status,
           statusCode: status.code,
