@@ -154,9 +154,9 @@
       </div>
 
 
-      <div class="d-flex mb-2">
+      <div class="d-flex justify-content-between mb-2">
 
-        <!-- <div class="col-lg-11 col-sm-9"> -->
+        <div>
 
           <button id="actionDropdown" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Action
@@ -184,13 +184,16 @@
 
           </div>
 
-        <!-- </div> -->
+        </div>
 
-        <!-- <div class="col-lg-1 col-sm-3"> -->
-          <button type="button" class="btn  btn-secondary btn-outline-tertiary ml-auto" @click="downloadSelectedAsCSV();">
-            Download
+        <div>
+          <button type="button" class="btn btn-secondary btn-outline-tertiary ml-2" @click="downloadGraphForSelectedAsCSV();">
+            Download Selected Users Graph
           </button>
-        <!-- </div> -->
+          <button type="button" class="btn btn-secondary btn-outline-tertiary ml-2" @click="downloadSelectedAsCSV();">
+            Download Selected
+          </button>
+        </div>
 
       </div>
 
@@ -393,6 +396,9 @@ export default {
     }
   },
   methods: {
+    downloadGraphForSelectedAsCSV() {
+      console.log('foo');
+    },
     downloadSelectedAsCSV() {
       let tot = "Name,Status,Office,LastUpdated";
       let csv = this.selectedUsers
