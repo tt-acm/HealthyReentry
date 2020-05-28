@@ -261,7 +261,7 @@ router.post("/get-graph", function (req, res) {
 
         ///EMAIL SERVICE
         // Admin List to Change
-        var title = "Healthy Reentry Alert - ALPHA TESTING";
+        var title = process.env.VUE_APP_NAME + " Alert - ALPHA TESTING";
         var thisHTML = "<div><p><strong>Attention:</strong><br><br>" + req.user.name + " reported their COVID_19 status as <i>" + req.body.status + ".</i><br><br>Attached are all of the employee’s encounters that have occurred within the last 14 days.</p></div>";
 
         var dateObj = new Date();
