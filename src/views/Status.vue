@@ -2,7 +2,7 @@
 <div>
   <!-- <div class="d-flex"> -->
   <h4 class="text-muted">Report Your Health Status</h4>
-  <p v-if="latestStatusDate" class="ml-auto mt-auto mb-0"> <b>Last Updated on:</b> {{showDisplayDate(new Date(latestStatusDate))}} as {{status[latestStatus.status]}}</p>
+  <p v-if="latestStatus" class="ml-auto mt-auto mb-0"> <b>Last Updated on:</b> {{showDisplayDate(new Date(latestStatus.date))}} as {{status[latestStatus.status]}}</p>
   <!-- </div> -->
 
   <!-- <hr class="mt-2 mb-0" /> -->
@@ -236,7 +236,6 @@ export default {
             }
           }
         }
-        this.latestStatusDate = String(new Date(curStatus.date)).split(" ").slice(1, 4).join("/");
       } else {
         this.selectedStatus = 0; //default to green
       }
@@ -268,7 +267,6 @@ export default {
       latestStatus: {
         status: 0
       },
-      latestStatusDate: null,
       enableBlue: false,
       disableSubmit: false,
       status: ["Green - No Signs or Symptoms",
