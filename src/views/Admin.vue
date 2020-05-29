@@ -60,19 +60,19 @@
 
             <hr />
 
-            <div class="row">
-              <div class="col-6">
-                <p v-for="ofc in officesList.slice(0, 15)" :key="ofc.LocationID" class="pl-4">
+            <div class="row overflow-auto mx-0" style="height:400px">
+              <div class="col">
+                <p v-for="ofc in officesList" :key="ofc.LocationID" class="pl-4">
                   <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
                   {{ofc.LocationName}}
                 </p>
               </div>
-              <div class="col-6">
+              <!-- <div class="col-6">
                 <p v-for="ofc in officesList.slice(15)" :key="ofc.LocationID">
                   <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
                   {{ofc.LocationName}}
                 </p>
-              </div>
+              </div> -->
             </div>
 
           </div>
@@ -448,6 +448,7 @@ export default {
 
       let that = this;
       let officesSet = new Set();
+      let officeArray = [];
 
       let apiurl = `/api/admin/get-all-users`;
       this.$api.get(apiurl)
@@ -457,8 +458,9 @@ export default {
           that.users = users;
           that.users.forEach(u => {
             let loc = u.location || 'unknown';
-            officesSet.add(loc);
+            if (!officeArray.includes(loc)) officeArray.push(loc);
           });
+          officeArray.sort().forEach(o=> officesSet.add(o));
           this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
           that.updateUsersInView();
         })
