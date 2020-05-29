@@ -320,15 +320,16 @@
 
 <script>
 import enumStatusMap from "../../server/util/enumStatusMap.js";
-import moment from 'moment';
+import graphToCsv from "../../server/util/csvUtils.js";
 
-
-let csvHeader = "Name,Email,Number Of Direct Encounters,Degree of Separation,Status,Status Last Updated\r\n";
-
-function nodeToCsvLine(node) {
-  let status = enumStatusMap.filter(i => i.code === node.status)[0];
-  if (node['statusLastUpdated'] !== "N/A") return `${node.name},${node.email},${node['number_of_encounters']},${node['degree-of-separation']},${status.label},${String(moment(node['statusLastUpdated']).format('lll')).replace(/\,/g, '')}\r\n`;
-  else return `${node.name},${node.email},${node['number_of_encounters']},${node['degree-of-separation']},${status.label},${node['statusLastUpdated']}\r\n`;
+function downloadCSV(content, fileName) {
+  let dlTrigger = document.createElement('a');
+  dlTrigger.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+  dlTrigger.setAttribute('download', fileName);
+  dlTrigger.style.display = 'none';
+  document.body.appendChild(dlTrigger);
+  dlTrigger.click();
+  document.body.removeChild(dlTrigger);
 }
 
 // ref: https://stackoverflow.com/questions/7641791/javascript-library-for-human-friendly-relative-date-formatting
@@ -409,34 +410,20 @@ export default {
     async downloadGraphForSelectedAsCSV() {
       let userEmails = this.selectedUsers.map(u => u.email).reduce((a, b) => `${a},${b}`);  
       let res = await this.$api.get(`/api/admin/graph/${userEmails}`);
-      let csv = csvHeader;
       let allGraphs = res.data;
+      let fileTxt = "";
       allGraphs.forEach(graph => {
-        graph.map(n => {
-          csv += nodeToCsvLine(n);
-        });
-        csv += "\r\n";
+        let gCSV = graphToCsv(graph);
+        fileTxt += gCSV + "\r\n";
       })
-      let dlTrigger = document.createElement('a');
-      dlTrigger.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
-      dlTrigger.setAttribute('download', 'encounters.csv');
-      dlTrigger.style.display = 'none';
-      document.body.appendChild(dlTrigger);
-      dlTrigger.click();
-      document.body.removeChild(dlTrigger);
+      downloadCSV(fileTxt, 'encounters(graph).csv');
     },
     downloadSelectedAsCSV() {
       let tot = "Name,Status,Office,LastUpdated";
       let csv = this.selectedUsers
                     .map(u => `${u.name},${u.status.label},${u.officeCode},${String(this.moment(u.lastUpdated).format('lll')).replace(/\,/g, '')}`)
                     .reduce((tot, cur) => tot + "\n" + cur, tot);
-      let dlTrigger = document.createElement('a');
-      dlTrigger.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
-      dlTrigger.setAttribute('download', 'encounters.csv');
-      dlTrigger.style.display = 'none';
-      document.body.appendChild(dlTrigger);
-      dlTrigger.click();
-      document.body.removeChild(dlTrigger);
+      downloadCSV(csv, 'encounters.csv');
     },
     updateUsersInView() {
 
