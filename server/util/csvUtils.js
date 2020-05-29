@@ -1,5 +1,5 @@
-import moment from 'moment';
-import enumStatusMap from "../../server/util/enumStatusMap.js";
+const moment = require("moment");
+const enumStatusMap = require("../../server/util/enumStatusMap.js");
 
 
 let csvHeader = "Name,Email,Number Of Direct Encounters,Degree of Separation,Status,Status Last Updated\r\n";

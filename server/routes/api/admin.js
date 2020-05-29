@@ -132,11 +132,16 @@ router.post("/update-users", async function(req, res) {
 
 
 
-router.get("/graph/:emails", async function(req, res) {
-  let emailList = req.params.emails.split(",");
+router.post("/graph", async function(req, res) {
+  let emailList = req.body.emails;
+  let incubationDays = parseInt(req.body.incubationDays);
+  if (!emailList || emailList.length < 1 || !incubationDays) {
+    res.status(400).send("Missing parameters.");
+    return;
+  }
   let graphs = [];
   for(let email of emailList) {
-    let graph = await eg(email, 14);
+    let graph = await eg(email, incubationDays);
     graphs.push(graph);
   }
   res.json(graphs);

@@ -154,9 +154,9 @@
       </div>
 
 
-      <div class="d-flex justify-content-between mb-2">
+      <div class="d-flex mb-2">
 
-        <div>
+        <div class="mr-auto">
 
           <button id="actionDropdown" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Action
@@ -184,6 +184,23 @@
 
           </div>
 
+        </div>
+
+        <div>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="incubationDays">Incubation days:</span>
+            </div>
+            <input
+              type="number"
+              min="1"
+              class="form-control"
+              style="width: 60px;"
+              v-model="incubationDays"
+              aria-label="Number of days to check for encounters"
+              aria-describedby="incubationDays"
+            />
+          </div>
         </div>
 
         <div>
@@ -387,6 +404,7 @@ export default {
       officesList: [],
       usersInView: [],
       users: [],
+      incubationDays: 2,
       enumStatusMap: enumStatusMap,
       userUpdateData: {
         statusCodeToSet: -1,
@@ -408,8 +426,12 @@ export default {
   },
   methods: {
     async downloadGraphForSelectedAsCSV() {
-      let userEmails = this.selectedUsers.map(u => u.email).reduce((a, b) => `${a},${b}`);  
-      let res = await this.$api.get(`/api/admin/graph/${userEmails}`);
+      let userEmails = this.selectedUsers.map(u => u.email);  
+      let postBody = {
+        emails: userEmails,
+        incubationDays: this.incubationDays
+      }
+      let res = await this.$api.post(`/api/admin/graph`, postBody);
       let allGraphs = res.data;
       let fileTxt = "";
       allGraphs.forEach(graph => {
