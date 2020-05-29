@@ -320,6 +320,16 @@
 
 <script>
 import enumStatusMap from "../../server/util/enumStatusMap.js";
+import moment from 'moment';
+
+
+let csvHeader = "Name,Email,Number Of Direct Encounters,Degree of Separation,Status,Status Last Updated\r\n";
+
+function nodeToCsvLine(node) {
+  let status = enumStatusMap.filter(i => i.code === node.status)[0];
+  if (node['statusLastUpdated'] !== "N/A") return `${node.name},${node.email},${node['number_of_encounters']},${node['degree-of-separation']},${status.label},${String(moment(node['statusLastUpdated']).format('lll')).replace(/\,/g, '')}\r\n`;
+  else return `${node.name},${node.email},${node['number_of_encounters']},${node['degree-of-separation']},${status.label},${node['statusLastUpdated']}\r\n`;
+}
 
 // ref: https://stackoverflow.com/questions/7641791/javascript-library-for-human-friendly-relative-date-formatting
 function fuzzyTime(date) {
@@ -398,9 +408,22 @@ export default {
   methods: {
     async downloadGraphForSelectedAsCSV() {
       let userEmails = this.selectedUsers.map(u => u.email).reduce((a, b) => `${a},${b}`);  
-      console.log(userEmails);
       let res = await this.$api.get(`/api/admin/graph/${userEmails}`);
-      console.log(res.data);
+      let csv = csvHeader;
+      let allGraphs = res.data;
+      allGraphs.forEach(graph => {
+        graph.map(n => {
+          csv += nodeToCsvLine(n);
+        });
+        csv += "\r\n";
+      })
+      let dlTrigger = document.createElement('a');
+      dlTrigger.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
+      dlTrigger.setAttribute('download', 'encounters.csv');
+      dlTrigger.style.display = 'none';
+      document.body.appendChild(dlTrigger);
+      dlTrigger.click();
+      document.body.removeChild(dlTrigger);
     },
     downloadSelectedAsCSV() {
       let tot = "Name,Status,Office,LastUpdated";
