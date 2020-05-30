@@ -517,33 +517,28 @@ export default {
       this.isLoading = false;
 
     },
-    sendUpdateData() {
+    async sendUpdateData() {
 
+      this.isLoading = true;
       this.userUpdateData.selectedUserIds = this.selectedUsers
                                                 .map(u => { return { userId: u.id }});
 
-      let that = this;
+      let res = await this.$api.post("/api/admin/update-users", this.userUpdateData);
+      let updatedUsers = res.data;
+      updatedUsers.forEach(nu => {
+        let idx = this.users.findIndex(u => u._id === nu._id);
+        this.users[idx] = nu;
+        this.updateUsersInView();
+      });
 
-      this.$api.post("/api/admin/update-users", this.userUpdateData)
-        .then(updatedUsers => {
-
-          updatedUsers.forEach(nu => {
-            let idx = this.users.findIndex(u => u._id === nu._id);
-            that.users[idx] = nu;
-            that.updateUsersInView();
-          });
-
-          that.userUpdateData.statusCodeToSet = -1;
-          that.userUpdateData.selectedUserIds = [];
-
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      this.userUpdateData.statusCodeToSet = -1;
+      this.userUpdateData.selectedUserIds = [];
 
       $(function () {
         $('#updateConfModal').modal('toggle');
       });
+      
+      this.isLoading = false;
 
     },
     updInviewUserSelectedState(val) {
