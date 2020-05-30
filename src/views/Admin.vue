@@ -434,9 +434,11 @@ export default {
       let res = await this.$api.post(`/api/admin/graph`, postBody);
       let allGraphs = res.data;
       let fileTxt = "";
+      let c = 0;
       allGraphs.forEach(graph => {
         let gCSV = graphToCsv(graph);
-        fileTxt += gCSV + "\r\n";
+        fileTxt += this.selectedUsers[c].name + "\r\n" + gCSV + "\r\n";
+        c++;
       })
       downloadCSV(fileTxt, 'encounters(graph).csv');
     },
