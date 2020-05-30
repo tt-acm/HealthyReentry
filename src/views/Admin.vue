@@ -61,14 +61,20 @@
             <hr />
 
             <div class="row">
-              <div class="col-6">
-                <p v-for="ofc in officesList.slice(0, 15)" :key="ofc.LocationID" class="pl-4">
+              <div class="col-4">
+                <p v-for="ofc in officesList.slice(0, Math.floor(officesList.length/3))" :key="ofc.LocationID" class="pl-4">
                   <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
                   {{ofc.LocationName}}
                 </p>
               </div>
-              <div class="col-6">
-                <p v-for="ofc in officesList.slice(15)" :key="ofc.LocationID">
+              <div class="col-4">
+                <p v-for="ofc in officesList.slice(Math.floor(officesList.length/3), Math.floor(officesList.length/3 * 2))" :key="ofc.LocationID">
+                  <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
+                  {{ofc.LocationName}}
+                </p>
+              </div>
+              <div class="col-4">
+                <p v-for="ofc in officesList.slice(Math.floor(officesList.length/3 * 2))" :key="ofc.LocationID">
                   <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
                   {{ofc.LocationName}}
                 </p>
