@@ -36,7 +36,7 @@
 
     <hr class="my-3"/>
 
-    <p class="mb-2">
+    <div class="mb-2">
 
       <div class="row mb-1">
 
@@ -220,6 +220,8 @@
 
       </div>
 
+      <md-progress-bar md-mode="indeterminate" v-if="isLoading"></md-progress-bar>
+
       <table class="table table-striped table-hover table-sm">
 
         <thead>
@@ -335,7 +337,7 @@
 
       </table>
 
-    </p>
+    </div>
   </div>
 </template>
 
@@ -393,7 +395,6 @@ function fuzzyTime(date) {
 
 export default {
   beforeMount() {
-
     this.refreshData();
 
   },
@@ -402,6 +403,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       pageNo: 1,
       itemsOnPage: 10,
       nameFilter: "",
@@ -432,6 +434,7 @@ export default {
   },
   methods: {
     async downloadGraphForSelectedAsCSV() {
+      this.isLoading = true;
       let userEmails = this.selectedUsers.map(u => u.email);  
       let postBody = {
         emails: userEmails,
@@ -447,6 +450,7 @@ export default {
         c++;
       })
       downloadCSV(fileTxt, 'encounters(graph).csv');
+      this.isLoading = false;
     },
     downloadSelectedAsCSV() {
       let tot = "Name,Status,Office,LastUpdated";
@@ -494,27 +498,23 @@ export default {
       });
 
     },
-    refreshData() {
+    async refreshData() {
 
-      let that = this;
+      this.isLoading = true;
       let officesSet = new Set();
 
       let apiurl = `/api/admin/get-all-users`;
-      this.$api.get(apiurl)
-        .then(userData => {
-          var users = userData.data;
-          users.sort((a, b) => (a.name < b.name) ? -1 : 1)
-          that.users = users;
-          that.users.forEach(u => {
-            let loc = u.location || 'unknown';
-            officesSet.add(loc);
-          });
-          this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
-          that.updateUsersInView();
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      let userData = await this.$api.get(apiurl);
+      var users = userData.data;
+      users.sort((a, b) => (a.name < b.name) ? -1 : 1)
+      this.users = users;
+      this.users.forEach(u => {
+        let loc = u.location || 'unknown';
+        officesSet.add(loc);
+      });
+      this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
+      this.updateUsersInView();
+      this.isLoading = false;
 
     },
     sendUpdateData() {
