@@ -71,6 +71,30 @@
       </div>
     </div>
 
+    <!-- Update User Location Modal -->
+    <div class="modal fade" id="updateUserLocationModal" tabindex="-1" role="dialog" aria-labelledby="updateUserLocationLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateUserLocationLabel">Update User Location</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div v-if="userToUpdLocFor !== null">
+              <b>{{ userToUpdLocFor.name }}</b>
+              <p>Current Location: {{ userToUpdLocFor.officeCode }}</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="updateUserLocation">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <h5 class="text-muted">Admin Dashboard</h5>
 
     <hr class="my-3"/>
@@ -233,7 +257,7 @@
             <span class="dropdown-item text-muted"><small><i>Applies to selected persons only</i></small></span>
 
             <div class="dropdown-divider"></div>
-            
+
             <span class="dropdown-item" data-toggle="modal" data-target="#graphDownloadModal">
               Download Interactions
             </span>
@@ -349,6 +373,9 @@
               {{ user.name }}
             </td>
             <td style="width: 20%">
+              <span data-toggle="modal" data-target="#updateUserLocationModal" @click="userToUpdLocFor = user" class="text-secondary">
+                <i class="fas fa-pen-square" style="cursor: pointer;"></i>
+              </span>
               {{ user.officeCode }}
             </td>
             <td style="width: 20%">
@@ -437,6 +464,7 @@ export default {
       officesList: [],
       usersInView: [],
       users: [],
+      userToUpdLocFor: null,
       incubationDays: 2,
       enumStatusMap: enumStatusMap,
       userUpdateData: {
@@ -546,10 +574,10 @@ export default {
     },
     async sendUpdateData() {
 
-      this.isLoading = true;
       this.userUpdateData.selectedUserIds = this.selectedUsers
                                                 .map(u => { return { userId: u.id }});
 
+      this.isLoading = true;
       let res = await this.$api.post("/api/admin/update-users", this.userUpdateData);
       let updatedUsers = res.data;
       updatedUsers.forEach(nu => {
@@ -567,6 +595,9 @@ export default {
       
       this.isLoading = false;
 
+    },
+    async updateUserLocation() {
+      console.log(this.userToUpdLocFor);
     },
     updInviewUserSelectedState(val) {
       this.usersInView.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);

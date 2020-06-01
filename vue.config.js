@@ -4,6 +4,7 @@ const PORT = process.env.PORT || 8080;
 
 module.exports = {
   devServer: {
+    progress: false,
     proxy: {
       "/api/": {
         target: `http://localhost:${PORT}/`,
@@ -13,5 +14,4 @@ module.exports = {
   },
   lintOnSave: false,
   runtimeCompiler: true,
-  progress: false
 };
