@@ -159,7 +159,7 @@
         <div class="mr-auto">
 
           <button id="actionDropdown" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Action
+            Mark Status
           </button>
           <div class="dropdown-menu" aria-labelledby="actionDropdown">
             <span class="dropdown-item text-muted"><small><i>Applies to selected persons only</i></small></span>
@@ -187,29 +187,17 @@
         </div>
 
         <div>
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text" id="incubationDays">Incubation days:</span>
-            </div>
-            <input
-              type="number"
-              min="1"
-              class="form-control"
-              style="width: 60px;"
-              v-model="incubationDays"
-              aria-label="Number of days to check for encounters"
-              aria-describedby="incubationDays"
-            />
+          <button id="downloadDropdown" type="button" class="btn btn-outline-secondary ml-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Download
+          </button>
+          <div class="dropdown-menu" aria-labelledby="downloadDropdown">            
+            <span class="dropdown-item" @click="downloadGraphForSelectedAsCSV()">
+              Download Selected Users Graph
+            </span>
+            <span class="dropdown-item" @click="downloadSelectedAsCSV()">
+              Download Selected
+            </span>
           </div>
-        </div>
-
-        <div>
-          <button type="button" class="btn btn-secondary btn-outline-tertiary ml-2" @click="downloadGraphForSelectedAsCSV();">
-            Download Selected Users Graph
-          </button>
-          <button type="button" class="btn btn-secondary btn-outline-tertiary ml-2" @click="downloadSelectedAsCSV();">
-            Download Selected
-          </button>
         </div>
 
       </div>
@@ -428,8 +416,9 @@ export default {
   },
   methods: {
     async downloadGraphForSelectedAsCSV() {
-      this.isLoading = true;
       let userEmails = this.selectedUsers.map(u => u.email);  
+      if (userEmails.length < 1) return;
+      this.isLoading = true;
       let postBody = {
         emails: userEmails,
         incubationDays: this.incubationDays
@@ -464,7 +453,7 @@ export default {
       if(this.nameFilter !== "") {
         let nfLower = this.nameFilter.toLowerCase();
         nameFilteredUsers = nameFilteredUsers.filter(u => u.name.toLowerCase().includes(nfLower));
-      };
+      }
 
       let st = (this.itemsOnPage * (this.pageNo - 1));
       let ed = (this.itemsOnPage * (this.pageNo));
