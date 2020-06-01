@@ -1,7 +1,7 @@
 <template>
   <div class="px-2 pb-4">
 
-    <!-- Modal -->
+    <!-- Status Update Modal -->
     <div class="modal fade" id="updateConfModal" tabindex="-1" role="dialog" aria-labelledby="updateConfModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -27,6 +27,45 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-secondary" @click="sendUpdateData">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graph Download Modal -->
+    <div class="modal fade" id="graphDownloadModal" tabindex="-1" role="dialog" aria-labelledby="graphDownloadModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="graphDownloadModalLabel">Download Logged Interactions</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="incubationDays">Incubation days:</span>
+              </div>
+              <input
+                type="number"
+                min="1"
+                class="form-control"
+                style="width: 60px;"
+                v-model="incubationDays"
+                aria-label="Number of days to check for encounters"
+                aria-describedby="incubationDays"
+              />
+              <p>Encounters will be checked for so many days.</p>
+            </div>
+            <b class="px-4">Persons selected: </b>
+            <ul>
+              <li v-for="usr in selectedUsers" :key="usr._id">{{ usr.name }}</li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="downloadGraphForSelectedAsCSV">Download</button>
           </div>
         </div>
       </div>
@@ -190,12 +229,16 @@
           <button id="downloadDropdown" type="button" class="btn btn-outline-secondary ml-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Download
           </button>
-          <div class="dropdown-menu" aria-labelledby="downloadDropdown">            
-            <span class="dropdown-item" @click="downloadGraphForSelectedAsCSV()">
-              Download Selected Users Graph
+          <div class="dropdown-menu" aria-labelledby="downloadDropdown">
+            <span class="dropdown-item text-muted"><small><i>Applies to selected persons only</i></small></span>
+
+            <div class="dropdown-divider"></div>
+            
+            <span class="dropdown-item" data-toggle="modal" data-target="#graphDownloadModal">
+              Download Interactions
             </span>
-            <span class="dropdown-item" @click="downloadSelectedAsCSV()">
-              Download Selected
+            <span class="dropdown-item" @click="downloadSelectedAsCSV">
+              Download Data
             </span>
           </div>
         </div>
@@ -422,7 +465,7 @@ export default {
       let postBody = {
         emails: userEmails,
         incubationDays: this.incubationDays
-      }
+      };
       let res = await this.$api.post(`/api/admin/graph`, postBody);
       let allGraphs = res.data;
       let fileTxt = "";
