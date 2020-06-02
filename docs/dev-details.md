@@ -17,6 +17,15 @@ The admin routes are special and accessible only to users marked as admin for th
 The routes utilize the utility methods stored in `/server/lib` for the graph basic logic.  
 
 ## Front End Setup
+Front end is made as a progressive web app using Vue framework.  
+It uses the following libraries:
+- [axios](https://github.com/axios/axios) for client side HTTP requests.  
+- [Vuex](https://vuex.vuejs.org/) for client-side data store.  
+- [VueQrcodeReader](https://www.npmjs.com/package/vue-qrcode-reader) for QR code support.  
+- [FontAwesome](https://fontawesome.com) for fonts and icons.  
+- [VueMaterial](https://vuematerial.io/) and [Bootstrap](https://getbootstrap.com) for themes and styles.  
+A custom defined auth plugin is a wrapper around Auth0 to manage user authentication and authorization in the app.  
+It's designed to allow being installed as a basic[Progressive Web App](https://en.wikipedia.org/wiki/Progressive_web_application).  
 
 ## Populate the .env file
 ### Update the port
