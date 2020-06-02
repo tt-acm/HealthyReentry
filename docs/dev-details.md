@@ -3,6 +3,18 @@
 This guide assumes you are familiar with the basic setup as described in the [README](../README.md).  
 
 ## Backend Setup
+The backend is a node app running an express server for the API.  
+Detailed information about the models ard routes are documented as swagger annotated code comments.  
+## Models 
+The information is represented via database 3 models stored in `/server/models`.  
+- Encounter
+- Status
+- User
+## Routes
+The front end triggers updates to stored data via REST calls made to the backend stored in `/server/routes`.  
+The routes serve or update information pertaining to specific models under similar named paths.  
+The admin routes are special and accessible only to users marked as admin for their organization.  
+The routes utilize the utility methods stored in `/server/lib` for the graph basic logic.  
 
 ## Front End Setup
 
