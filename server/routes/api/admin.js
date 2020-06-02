@@ -103,6 +103,16 @@ router.post("/update-users", async function(req, res) {
 
       savedStatus = await st.save();
 
+      // trigger graph update only if the post request was meant to update status
+      const triggerData = {
+        user: user,
+        statusEnum: statusEnum
+      };
+  
+      // dont holdup the response for current trigger to percolate
+      triggerUpdateQueue.push(triggerData);
+      triggerQueue();
+
     } else {
 
       const st = await Status.find({ "user": user._id })
@@ -111,17 +121,6 @@ router.post("/update-users", async function(req, res) {
       savedStatus = st[0];
 
     }
-
-    let statusEnum = parseInt(data.statusCodeToSet);
-
-    const triggerData = {
-      user: user,
-      statusEnum: statusEnum
-    };
-
-    // dont holdup the response for current trigger to percolate
-    triggerUpdateQueue.push(triggerData);
-    triggerQueue();
 
     const newUser = user.toObject();
     newUser.status = savedStatus;
