@@ -591,11 +591,6 @@ export default {
     },
     async sendUpdateData() {
 
-      console.log(this.selectedUsers);
-      console.log(this.userUpdateData);
-      
-      return;
-
       this.userUpdateData.selectedUserIds = this.selectedUsers
                                                 .map(u => { return { userId: u.id }});
 
@@ -610,6 +605,7 @@ export default {
 
       this.userUpdateData.statusCodeToSet = -1;
       this.userUpdateData.selectedUserIds = [];
+      this.userUpdateData.locationToSet = null;
 
       $(function () {
         $('#updateConfModal').modal('toggle');

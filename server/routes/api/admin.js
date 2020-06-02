@@ -76,6 +76,7 @@ router.post("/update-users", async function(req, res) {
 
   const data = req.body;
   const mustSetStatus = data.statusCodeToSet > -1 && data.statusCodeToSet < 5;
+  const mustSetLocation = data.locationToSet !== null;
   data.selectedUserIds = data.selectedUserIds || [];
 
   const savedData = [];
@@ -84,9 +85,13 @@ router.post("/update-users", async function(req, res) {
 
     let user = await User.findById(userData.userId);
 
-    await user.save();
+    if(mustSetLocation) {
+      user.location = data.locationToSet;
+      await user.save();
+    }
 
     let savedStatus;
+
     if (mustSetStatus) {
 
       let statusEnum = parseInt(data.statusCodeToSet);
