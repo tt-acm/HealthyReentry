@@ -77,7 +77,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="updateUserLocationLabel">Update User Location</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="updInviewUserSelectedState(false); clearUpdateData()">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -97,11 +97,16 @@
                     {{ ofc.LocationName }}
                   </p>
                 </div>
+                <p v-if="userUpdateData.locationToSet !== null">
+                  <small><i>
+                    Will be updated to: {{ userUpdateData.locationToSet }}
+                  </i></small>
+                </p>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-light" data-dismiss="modal" @click="updInviewUserSelectedState(false); clearUpdateData()">Close</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="sendUpdateData">Update</button>
           </div>
         </div>
@@ -389,7 +394,7 @@
               <span
                 data-toggle="modal"
                 data-target="#updateUserLocationModal"
-                @click="usersInView.forEach(u => u.selected = false); user.selected = true;"
+                @click="updInviewUserSelectedState(false); clearUpdateData(); user.selected = true;"
                 class="text-secondary">
                 <i class="fas fa-pen-square" style="cursor: pointer;"></i>
               </span>
@@ -603,12 +608,11 @@ export default {
         this.updateUsersInView();
       });
 
-      this.userUpdateData.statusCodeToSet = -1;
-      this.userUpdateData.selectedUserIds = [];
-      this.userUpdateData.locationToSet = null;
+      this.clearUpdateData();
+      this.updInviewUserSelectedState(false);
 
       $(function () {
-        $('#updateConfModal').modal('toggle');
+        $('#updateConfModal').modal('hide');
       });
       
       this.isLoading = false;
@@ -616,6 +620,11 @@ export default {
     },
     updInviewUserSelectedState(val) {
       this.usersInView.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);
+    },
+    async clearUpdateData() {
+      this.userUpdateData.statusCodeToSet = -1;
+      this.userUpdateData.selectedUserIds = [];
+      this.userUpdateData.locationToSet = null;
     },
     sortUsers(key, inAsc) {
       this.sortBy = key;
