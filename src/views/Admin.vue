@@ -83,8 +83,21 @@
           </div>
           <div class="modal-body">
             <div v-if="userToUpdLocFor !== null">
-              <b>{{ userToUpdLocFor.name }}</b>
-              <p>Current Location: {{ userToUpdLocFor.officeCode }}</p>
+              <h6>
+                <i :class="'fas fa-circle ' + userToUpdLocFor.status.css_key"></i>
+                {{ userToUpdLocFor.name }}
+              </h6>
+              <p>{{ userToUpdLocFor.email }}</p>
+              <div class="dropdown">
+                <button class="btn btn-secondary-outline dropdown-toggle" type="button" id="locDDMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{ userToUpdLocFor.officeCode }}
+                </button>
+                <div class="dropdown-menu overflow-auto mx-0" style="height:400px" aria-labelledby="locDDMenuButton">
+                  <p class="dropdown-item" v-for="ofc in officesList" :key="ofc.LocationID">
+                    {{ofc.LocationName}}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <div class="modal-footer">
