@@ -5,7 +5,7 @@ This guide assumes you are familiar with the basic setup as described in the [RE
 ## Backend Setup
 The backend is a node app running an express server for the API.  
 Detailed information about the models ard routes are documented as swagger annotated code comments.  
-## Models 
+## Models
 The information is represented via database 3 models stored in `/server/models`.  
 - Encounter
 - Status
@@ -22,6 +22,7 @@ It uses the following libraries:
 - [axios](https://github.com/axios/axios) for client side HTTP requests.  
 - [Vuex](https://vuex.vuejs.org/) for client-side data store.  
 - [VueQrcodeReader](https://www.npmjs.com/package/vue-qrcode-reader) for QR code support.  
+- [QRcode](https://www.npmjs.com/package/qrcode) for Generating QR code. 
 - [FontAwesome](https://fontawesome.com) for fonts and icons.  
 - [VueMaterial](https://vuematerial.io/) and [Bootstrap](https://getbootstrap.com) for themes and styles.  
 A custom defined auth plugin is a wrapper around Auth0 to manage user authentication and authorization in the app.  
