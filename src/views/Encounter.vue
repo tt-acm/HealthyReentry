@@ -31,7 +31,7 @@
 
   <div class="d-flex align-items-end">
     <b class="mt-3 mb-0">Your New Encounter(s):</b>
-    <a class="ml-1" href="https://app.gitbook.com/@core-studio/s/healthy-reentry/faq#what-counts-as-an-encounter-that-should-be-logged" target="blank">
+    <a class="ml-1" href="https://core-studio.gitbook.io/healthy-reentry/faq#what-counts-as-an-encounter-that-should-be-logged" target="blank">
       <md-icon class="md-size-1x m-0" md-src="/imgs/info-circle-solid-small.svg" ></md-icon>
     </a>
   </div>
@@ -80,15 +80,15 @@
 
 
   <div class="form-check my-2">
-    <input v-if="encountered.length > 1" class="form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1">
-    <input v-else class="form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1" disabled>
+    <input v-if="encountered.length > 1" class="mt-2 form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1">
+    <input v-else class="mt-2 form-check-input" type="checkbox" v-model="isGroup" id="defaultCheck1" disabled>
     <div class="d-flex align-items-end">
       <label class="form-check-label d-flex" for="defaultCheck1">
         Group
-        <a class="mb-0 ml-1" href="https://app.gitbook.com/@core-studio/s/healthy-reentry/faq#when-should-i-use-the-group-checkbox" target="blank">
-          <md-icon class="md-size-1x m-0" md-src="/imgs/info-circle-solid-small.svg" ></md-icon>
-        </a>
       </label>
+      <a class="mb-0 ml-1" href="https://core-studio.gitbook.io/healthy-reentry/faq#when-should-i-use-the-group-checkbox" target="blank">
+        <md-icon class="md-size-1x m-0" md-src="/imgs/info-circle-solid-small.svg" ></md-icon>
+      </a>
     </div>
 
   </div>
@@ -135,8 +135,8 @@
   <!-- Modal -->
   <md-dialog :md-active.sync="showDialog" :md-fullscreen="false">
       <md-dialog-title>Review Your Encounter</md-dialog-title>
-      <md-subheader class="mx-2 mb-3">
-        Review the name(s) and date listed below then click <b class="ml-1">Submit</b>. You will not be able to edit this once submitted. To edit, click <b class="ml-1">Go Back</b>.
+      <md-subheader class="mx-2 mb-0">
+        Review the details below then click <b class="ml-1 mr-0 px-0">Submit</b>. To edit, click <b class="ml-1 mr-0 px-0">Go Back</b>.
       </md-subheader>
       <md-content class="mx-4">
 
@@ -163,7 +163,7 @@
 
 
       <md-dialog-actions class="mx-4 my-2">
-        <md-button class="md-primary" @click="showDialog = false">Close</md-button>
+        <md-button class="md-primary" @click="showDialog = false">Go Back</md-button>
         <md-button class="md-primary md-raised" @click="showDialog = false;saveEncounters()">Submit</md-button>
       </md-dialog-actions>
     </md-dialog>
@@ -357,7 +357,7 @@ export default {
           const encountered = this.encountered.map(en=>en._id);
 
           if (res.data && res.data._id) {
-            if (res.data.email === this.user.email) {
+            if (res.data.email.toLowerCase() === this.user.email.toLowerCase()) {
               this.selfScan = true;
               this.camera = 'off';
             }

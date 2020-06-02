@@ -39,6 +39,17 @@ Vue.use(browserDetect);
 
 async function main() {
 
+
+  if('serviceWorker' in navigator){
+    try {
+      await navigator.serviceWorker.register('/sw.js');
+      console.log('service worker registered');
+    } catch(err) {
+      console.log('service worker not registered');
+      console.log(err);
+    }
+  }
+
   let resp = await Vue.prototype.$api.get('/api/auth0-secrets');
   let secrets = resp.data;
   let domain = secrets.AUTH0_DOMAIN;

@@ -97,7 +97,7 @@ export const useAuth0 = ({
       },
       /** Authenticates the user using the redirect method */
       loginWithRedirect(o) {
-        return this.auth0Client.loginWithRedirect(o);
+        return this.auth0Client.loginWithRedirect({connection: 'TT-SSO'});
       },
       /** Returns all the claims present in the ID token */
       getIdTokenClaims(o) {
@@ -123,6 +123,7 @@ export const useAuth0 = ({
       this.auth0Client = await createAuth0Client({
         domain: options.domain,
         client_id: options.clientId,
+        scope: 'https://adfs.thorntontomasetti.com/office',
         audience: options.audience,
         redirect_uri: redirectUri,
         cacheLocation: 'localstorage'

@@ -25,8 +25,8 @@
             </ul>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-tertiary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-tertiary" @click="sendUpdateData">Submit</button>
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" @click="sendUpdateData">Submit</button>
           </div>
         </div>
       </div>
@@ -42,17 +42,17 @@
 
         <div class="col-lg-3 col-md-6 mb-1">
 
-          <button class="btn btn-outline-tertiary dropdown-toggle" type="button" id="officeListMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button class="btn btn-outline-tertiary btn-secondary dropdown-toggle" type="button" id="officeListMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Office List
           </button>
           <div class="dropdown-menu p-2 custom-dd-size" aria-labelledby="officeListMenu">
 
             <div class="row">
               <div class="col-12 pl-3">
-                <button class="btn btn-outline-tertiary" type="button" @click="setOfficeFilterForAll(true); updateUsersInView();">
+                <button class="btn btn-outline-secondary" type="button" @click="setOfficeFilterForAll(true); updateUsersInView();">
                   Select All
                 </button>
-                <button class="btn btn-outline-tertiary" type="button" @click="setOfficeFilterForAll(false); updateUsersInView();">
+                <button class="btn btn-outline-secondary mx-2" type="button" @click="setOfficeFilterForAll(false); updateUsersInView();">
                   Select None
                 </button>
               </div>
@@ -60,25 +60,25 @@
 
             <hr />
 
-            <div class="row">
-              <div class="col-6">
-                <p v-for="ofc in officesList.slice(0, 15)" :key="ofc.LocationID" class="pl-4">
+            <div class="row overflow-auto mx-0" style="height:400px">
+              <div class="col">
+                <p v-for="ofc in officesList" :key="ofc.LocationID" class="pl-4">
                   <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
                   {{ofc.LocationName}}
                 </p>
               </div>
-              <div class="col-6">
+              <!-- <div class="col-6">
                 <p v-for="ofc in officesList.slice(15)" :key="ofc.LocationID">
                   <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
                   {{ofc.LocationName}}
                 </p>
-              </div>
+              </div> -->
             </div>
 
           </div>
 
           <small><i>
-          <span class="text-muted">
+          <span class="text-muted ml-3">
             <span v-if="allOfficesSelected">
               All offices selected
             </span>
@@ -158,7 +158,7 @@
 
         <!-- <div class="col-lg-11 col-sm-9"> -->
 
-          <button id="actionDropdown" type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button id="actionDropdown" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Action
           </button>
           <div class="dropdown-menu" aria-labelledby="actionDropdown">
@@ -176,18 +176,18 @@
               @click="userUpdateData.statusCodeToSet = 2;"
             ><i class="fas fa-circle fa-xs en_red"></i> &nbsp;&nbsp; Mark red</span>
 
-            <div class="dropdown-divider"></div>
+            <!-- <div class="dropdown-divider"></div> -->
 
-            <span class="dropdown-item" data-toggle="modal" data-target="#updateConfModal"
+            <!-- <span class="dropdown-item" data-toggle="modal" data-target="#updateConfModal"
               @click="userUpdateData.statusCodeToSet = 3;"
-            ><i class="fas fa-circle fa-xs en_blue"></i> &nbsp;&nbsp; Mark blue</span>
+            ><i class="fas fa-circle fa-xs en_blue"></i> &nbsp;&nbsp; Mark blue</span> -->
 
           </div>
 
         <!-- </div> -->
 
         <!-- <div class="col-lg-1 col-sm-3"> -->
-          <button type="button" class="btn btn-outline-tertiary ml-auto" @click="downloadSelectedAsCSV();">
+          <button type="button" class="btn  btn-secondary btn-outline-tertiary ml-auto" @click="downloadSelectedAsCSV();">
             Download
           </button>
         <!-- </div> -->
@@ -222,51 +222,63 @@
                 </span>
               </i></small>
               <br />
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'selected' ? '' : ' disabled')"
+                :class="(sortBy === 'selected' ? '' : ' disabled')"
                 @click="sortUsers('selected', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Select
             </th>
             <th style="width: 5%" class="text-center">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'status' ? '' : ' disabled')"
+                :class="(sortBy === 'statusCode' ? '' : ' disabled')"
                 @click="sortUsers('statusCode', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Status
             </th>
             <th style="width: 25%">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'name' ? '' : ' disabled')"
+                :class="(sortBy === 'name' ? '' : ' disabled')"
                 @click="sortUsers('name', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Name
             </th>
             <th style="width: 20%">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'officeCode' ? '' : ' disabled')"
+                :class="(sortBy === 'officeCode' ? '' : ' disabled')"
                 @click="sortUsers('officeCode', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Office
             </th>
             <th style="width: 20%">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'lastUpdated' ? '' : ' disabled')"
+                :class="(sortBy === 'lastUpdated' ? '' : ' disabled')"
                 @click="sortUsers('lastUpdated', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Last Updated
             </th>
             <th style="width: 15%">
-              <i
+              <span
                 style="cursor: pointer"
-                :class="'fas fa-caret-' + (sortAsc ? 'up' : 'down') + ' ' + (sortBy === 'dateOfConsent' ? '' : ' disabled')"
+                :class="(sortBy === 'dateOfConsent' ? '' : ' disabled')"
                 @click="sortUsers('dateOfConsent', !sortAsc)"
-              ></i>
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
               Consent Date
             </th>
           </tr>
@@ -274,12 +286,8 @@
 
         <tbody>
           <tr v-for="user in usersInView" :key="user.id">
-            <td style="width: 15%" class="text-center">
-              <i
-                style="cursor: pointer"
-                :class="'far ' + (user.selected ? 'fa-check-square' : 'fa-square')"
-                @click="user.selected = !user.selected"
-              ></i>
+            <td style="width: 15%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
+              {{ (user.selected) ? '&#9745;' : '&#9744;' }}
             </td>
             <td style="width: 5%" class="text-center">
               <i :class="'fas fa-circle ' + user.status.css_key"></i>
@@ -428,7 +436,7 @@ export default {
           status: status,
           statusCode: status.code,
           lastUpdatedFormatted: updateDate,
-          lastUpdated: hasStatus ? u.status.date : null,
+          lastUpdated: hasStatus ? new Date(u.status.date) : null,
           dateOfConsent: u.dateOfConsent ? new Date(u.dateOfConsent) : 0,
           dateOfConsentFormatted: u.dateOfConsent ? new Date(u.dateOfConsent).toDateString() : 'Not Available'
         };
@@ -440,6 +448,7 @@ export default {
 
       let that = this;
       let officesSet = new Set();
+      let officeArray = [];
 
       let apiurl = `/api/admin/get-all-users`;
       this.$api.get(apiurl)
@@ -449,8 +458,9 @@ export default {
           that.users = users;
           that.users.forEach(u => {
             let loc = u.location || 'unknown';
-            officesSet.add(loc);
+            if (!officeArray.includes(loc)) officeArray.push(loc);
           });
+          officeArray.sort().forEach(o=> officesSet.add(o));
           this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
           that.updateUsersInView();
         })

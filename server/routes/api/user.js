@@ -3,6 +3,7 @@ const fs = require('fs');
 const sgClient = require("../../lib/sgClient");
 
 const User = require('../../models/User');
+const Status = require('../../models/Status');
 const parseUser = require('../../util/parseUser');
 
 
@@ -16,7 +17,7 @@ router.post("/user-by-email", function(req, res) {
   }
 
   User.findOne({
-    "email": req.body.email
+    "email": req.body.email.toLowerCase()
   }, include)
       .exec(function(err, user) {
           if (err) {
@@ -151,25 +152,35 @@ router.post('/', async (req, res) => {
   if (!u.email) {
     return res.status(403).send();
   }
-  let user = await User.findOne({ email: String(u.email) });
+  let user = await User.findOne({ email: String(u.email).toLowerCase() });
   if (user) {
+    if (user.location !== u.location){
+      user.location = u.location;
+      user = await user.save();
+    }
     return res.json(user);
   }
 
-  var userName = u.name;
-  if (u.name && u.name.includes(',')) {
-    let nameCollection = u.name.replace(/\s/g,'').split(',');
-    if (nameCollection.length > 1) userName = nameCollection[nameCollection.length-1] + " " + nameCollection[0];
-  }
-
   user = new User({
-    name: userName,
+    name: u.name,
     email: u.email,
     location: u.location,
     picture: u.picture
   });
   user = await user.save();
-  return res.json(user);
+
+
+  var status = new Status({
+    status: 0,
+    user: user
+  });
+
+  status.save(async function (err, savedStatus) {
+    if (err) return res.status(500).send(err);
+
+    // return res.json(savedStatus);
+    return res.json(user);
+  });
 
 });
 

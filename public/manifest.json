@@ -1,0 +1,18 @@
+{
+  "name": "HealthyReentry",
+  "short_name": "HealthyReentry",
+  "theme_color": "#4489ff",
+  "lang": "en-US",
+  "background_color": "#4489ff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "imgs/logo-256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    }
+  ]
+}
