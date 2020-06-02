@@ -82,19 +82,19 @@
             </button>
           </div>
           <div class="modal-body">
-            <div v-if="userToUpdLocFor !== null">
+            <div v-if="selectedUsers.length > 0">
               <h6>
-                <i :class="'fas fa-circle ' + userToUpdLocFor.status.css_key"></i>
-                {{ userToUpdLocFor.name }}
+                <i :class="'fas fa-circle ' + selectedUsers[0].status.css_key"></i>
+                {{ selectedUsers[0].name }}
               </h6>
-              <p>{{ userToUpdLocFor.email }}</p>
+              <p>{{ selectedUsers[0].email }}</p>
               <div class="dropdown">
                 <button class="btn btn-secondary-outline dropdown-toggle" type="button" id="locDDMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {{ userToUpdLocFor.officeCode }}
+                  {{ selectedUsers[0].officeCode }}
                 </button>
                 <div class="dropdown-menu overflow-auto mx-0" style="height:400px" aria-labelledby="locDDMenuButton">
-                  <p class="dropdown-item" v-for="ofc in officesList" :key="ofc.LocationID">
-                    {{ofc.LocationName}}
+                  <p class="dropdown-item" v-for="ofc in officesList" :key="ofc.LocationID" @click="userUpdateData.locationToSet = ofc.LocationName">
+                    {{ ofc.LocationName }}
                   </p>
                 </div>
               </div>
@@ -102,7 +102,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="updateUserLocation">Update</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="sendUpdateData">Update</button>
           </div>
         </div>
       </div>
@@ -386,7 +386,11 @@
               {{ user.name }}
             </td>
             <td style="width: 20%">
-              <span data-toggle="modal" data-target="#updateUserLocationModal" @click="userToUpdLocFor = user" class="text-secondary">
+              <span
+                data-toggle="modal"
+                data-target="#updateUserLocationModal"
+                @click="usersInView.forEach(u => u.selected = false); user.selected = true;"
+                class="text-secondary">
                 <i class="fas fa-pen-square" style="cursor: pointer;"></i>
               </span>
               {{ user.officeCode }}
@@ -477,12 +481,12 @@ export default {
       officesList: [],
       usersInView: [],
       users: [],
-      userToUpdLocFor: null,
       incubationDays: 2,
       enumStatusMap: enumStatusMap,
       userUpdateData: {
         statusCodeToSet: -1,
-        selectedUserIds: []
+        selectedUserIds: [],
+        locationToSet: null
       }
     };
   },
@@ -587,6 +591,11 @@ export default {
     },
     async sendUpdateData() {
 
+      console.log(this.selectedUsers);
+      console.log(this.userUpdateData);
+      
+      return;
+
       this.userUpdateData.selectedUserIds = this.selectedUsers
                                                 .map(u => { return { userId: u.id }});
 
@@ -608,9 +617,6 @@ export default {
       
       this.isLoading = false;
 
-    },
-    async updateUserLocation() {
-      console.log(this.userToUpdLocFor);
     },
     updInviewUserSelectedState(val) {
       this.usersInView.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);
