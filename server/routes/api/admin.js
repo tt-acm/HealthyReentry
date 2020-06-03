@@ -194,7 +194,11 @@ router.post("/get-graph", async function(req, res) {
   }
   let graphs = [];
   for(let email of emailList) {
-    let graph = await eg(email, incubationDays); // TODO set each user's latest status date
+    let user = await User.findOne({"email": email});
+    let status = await Status.find({ "user": user._id })
+                             .sort({ date: -1 })
+                             .limit(1);
+    let graph = await eg(email, incubationDays, status[0].date);
     graphs.push(graph);
   }
   res.json(graphs);
