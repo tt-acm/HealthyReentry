@@ -194,7 +194,7 @@ router.post("/get-graph", async function(req, res) {
   }
   let graphs = [];
   for(let email of emailList) {
-    let graph = await eg(email, incubationDays);
+    let graph = await eg(email, incubationDays); // TODO set each user's latest status date
     graphs.push(graph);
   }
   res.json(graphs);

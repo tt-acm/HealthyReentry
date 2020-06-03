@@ -241,10 +241,14 @@ router.get("/find-frequent-encounters", function (req, res) {
  * @apiSuccess {Boolean} true
  * @apiError 500 Internal Server Error
  *
+ * (other declarations, and last)
+ * @deprecated We recommend using the new {@link trigger_updates} API for new
+ *             applications.
  */
+
 router.post("/get-graph", function (req, res) {
 
-    eg(req.user.email).then(function (graph) {
+    eg(req.user.email, 14, null).then(function (graph) {
 
         var headers = "Email, Number Of Direct Encounters, Degree of Separation , Status";
 
@@ -261,7 +265,7 @@ router.post("/get-graph", function (req, res) {
 
         ///EMAIL SERVICE
         // Admin List to Change
-        var title = "Healthy Reentry Alert - ALPHA TESTING";
+        var title = "Healthy Reentry Alert ";
         var thisHTML = "<div><p><strong>Attention:</strong><br><br>" + req.user.name + " reported their COVID_19 status as <i>" + req.body.status + ".</i><br><br>Attached are all of the employee’s encounters that have occurred within the last 14 days.</p></div>";
 
         var dateObj = new Date();
