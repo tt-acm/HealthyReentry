@@ -516,7 +516,7 @@ export default {
         emails: userEmails,
         incubationDays: this.incubationDays
       };
-      let res = await this.$api.post(`/api/admin/graph`, postBody);
+      let res = await this.$api.post(`/api/admin/get-graph`, postBody);
       let allGraphs = res.data;
       let fileTxt = "";
       let c = 0;

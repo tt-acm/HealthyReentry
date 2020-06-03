@@ -134,9 +134,7 @@ router.post("/update-users", async function(req, res) {
 });
 
 
-
-
-router.post("/graph", async function(req, res) {
+router.post("/get-graph", async function(req, res) {
   let emailList = req.body.emails;
   let incubationDays = parseInt(req.body.incubationDays);
   if (!emailList || emailList.length < 1 || !incubationDays) {
