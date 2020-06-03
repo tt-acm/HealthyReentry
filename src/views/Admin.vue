@@ -533,7 +533,7 @@ export default {
       let csv = this.selectedUsers
                     .map(u => `${u.name},${u.status.label},${u.officeCode},${String(this.moment(u.lastUpdated).format('lll')).replace(/\,/g, '')}`)
                     .reduce((tot, cur) => tot + "\n" + cur, tot);
-      downloadCSV(csv, 'encounters.csv');
+      downloadCSV(csv, `encounters_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
     updateUsersInView() {
 
