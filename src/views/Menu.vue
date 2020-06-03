@@ -15,8 +15,8 @@
           <!-- <button type="button" class="btn btn-lg btn-block btn-outline-primary text-center my-2">
           Report Your Health Status
         </button> -->
-          <md-button class="md-raised md-accent menu-button" style="background-color: #00A4A9;">
-            <h6 class="my-3 ">Report Your Health Status</h6>
+          <md-button class="md-raised md-accent menu-button">
+            <h6 class="my-3 text-white">Report Your Health Status</h6>
           </md-button>
         </router-link>
       </md-list-item>
@@ -26,8 +26,8 @@
           <!-- <button type="button" class="btn btn-lg btn-block btn-outline-primary text-center my-2">
           Record a TT Encounter
         </button> -->
-          <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;background-color: #00A4A9;">
-            <h6 class="mb-0">Record a TT Encounter</h6>
+          <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;">
+            <h6 class="mb-0 text-white">Record a TT Encounter</h6>
           </md-button>
         </router-link>
       </md-list-item>
@@ -37,8 +37,8 @@
           <!-- <button type="button" class="btn btn-lg btn-block btn-outline-primary text-center my-2">
           Display QR Code
         </button> -->
-          <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;background-color: #00A4A9;">
-            <h6 class="mb-0">Display QR Code</h6>
+          <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;">
+            <h6 class="mb-0 text-white">Display QR Code</h6>
           </md-button>
         </router-link>
       </md-list-item>
