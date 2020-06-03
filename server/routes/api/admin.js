@@ -3,6 +3,7 @@ const router = require('express').Router();
 const User = require('../../models/User');
 const Status = require('../../models/Status');
 
+const eg = require('../../lib/build_encounter_graph');
 const triggerUpdates = require('../../lib/trigger_updates');
 
 
@@ -39,6 +40,7 @@ router.get("/get-all-users", async function(req, res) {
     "_id": 1,
     "dateOfConsent": 1,
     "name": 1,
+    "email": 1,
     "location": 1
   }
 
@@ -74,6 +76,7 @@ router.post("/update-users", async function(req, res) {
 
   const data = req.body;
   const mustSetStatus = data.statusCodeToSet > -1 && data.statusCodeToSet < 5;
+  const mustSetLocation = data.locationToSet !== null;
   data.selectedUserIds = data.selectedUserIds || [];
 
   const savedData = [];
@@ -82,9 +85,13 @@ router.post("/update-users", async function(req, res) {
 
     let user = await User.findById(userData.userId);
 
-    await user.save();
+    if(mustSetLocation) {
+      user.location = data.locationToSet;
+      await user.save();
+    }
 
     let savedStatus;
+
     if (mustSetStatus) {
 
       let statusEnum = parseInt(data.statusCodeToSet);
@@ -96,6 +103,16 @@ router.post("/update-users", async function(req, res) {
 
       savedStatus = await st.save();
 
+      // trigger graph update only if the post request was meant to update status
+      const triggerData = {
+        user: user,
+        statusEnum: statusEnum
+      };
+  
+      // dont holdup the response for current trigger to percolate
+      triggerUpdateQueue.push(triggerData);
+      triggerQueue();
+
     } else {
 
       const st = await Status.find({ "user": user._id })
@@ -104,17 +121,6 @@ router.post("/update-users", async function(req, res) {
       savedStatus = st[0];
 
     }
-
-    let statusEnum = parseInt(data.statusCodeToSet);
-
-    const triggerData = {
-      user: user,
-      statusEnum: statusEnum
-    };
-
-    // dont holdup the response for current trigger to percolate
-    triggerUpdateQueue.push(triggerData);
-    triggerQueue();
 
     const newUser = user.toObject();
     newUser.status = savedStatus;
@@ -125,6 +131,24 @@ router.post("/update-users", async function(req, res) {
 
   res.json(savedData);
 
+});
+
+
+
+
+router.post("/graph", async function(req, res) {
+  let emailList = req.body.emails;
+  let incubationDays = parseInt(req.body.incubationDays);
+  if (!emailList || emailList.length < 1 || !incubationDays) {
+    res.status(400).send("Missing parameters.");
+    return;
+  }
+  let graphs = [];
+  for(let email of emailList) {
+    let graph = await eg(email, incubationDays);
+    graphs.push(graph);
+  }
+  res.json(graphs);
 });
 
 
