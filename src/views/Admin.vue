@@ -522,7 +522,8 @@ export default {
       let c = 0;
       allGraphs.forEach(graph => {
         let gCSV = graphToCsv(graph);
-        fileTxt += this.selectedUsers[c].name + "\r\n" + gCSV + "\r\n";
+        let u = this.selectedUsers[c];
+        fileTxt += `Name,${u.name}\r\nStatus,${u.status.label}\r\nUpdated,${u.lastUpdated}\r\n${gCSV}\r\n`;
         c++;
       });
       downloadCSV(fileTxt, `encounters(graph)_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
