@@ -1,7 +1,7 @@
 <template>
   <div class="px-2 pb-4">
 
-    <!-- Modal -->
+    <!-- Status Update Modal -->
     <div class="modal fade" id="updateConfModal" tabindex="-1" role="dialog" aria-labelledby="updateConfModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -32,11 +32,92 @@
       </div>
     </div>
 
+    <!-- Graph Download Modal -->
+    <div class="modal fade" id="graphDownloadModal" tabindex="-1" role="dialog" aria-labelledby="graphDownloadModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="graphDownloadModalLabel">Download Logged Interactions</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="incubationDays">Incubation days:</span>
+              </div>
+              <input
+                type="number"
+                min="1"
+                class="form-control"
+                style="width: 60px;"
+                v-model="incubationDays"
+                aria-label="Number of days to check for encounters"
+                aria-describedby="incubationDays"
+              />
+              <p>Encounters will be checked for so many days.</p>
+            </div>
+            <b class="px-4">Persons selected: </b>
+            <ul>
+              <li v-for="usr in selectedUsers" :key="usr._id">{{ usr.name }}</li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="downloadGraphForSelectedAsCSV">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update User Location Modal -->
+    <div class="modal fade" id="updateUserLocationModal" tabindex="-1" role="dialog" aria-labelledby="updateUserLocationLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateUserLocationLabel">Update User Location</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="updInviewUserSelectedState(false); clearUpdateData()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div v-if="selectedUsers.length > 0">
+              <h6>
+                <i :class="'fas fa-circle ' + selectedUsers[0].status.css_key"></i>
+                {{ selectedUsers[0].name }}
+              </h6>
+              <p>{{ selectedUsers[0].email }}</p>
+              <div class="dropdown">
+                <button class="btn btn-secondary-outline dropdown-toggle" type="button" id="locDDMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{ selectedUsers[0].officeCode }}
+                </button>
+                <div class="dropdown-menu overflow-auto mx-0" style="height:400px" aria-labelledby="locDDMenuButton">
+                  <p class="dropdown-item" v-for="ofc in officesList" :key="ofc.LocationID" @click="userUpdateData.locationToSet = ofc.LocationName">
+                    {{ ofc.LocationName }}
+                  </p>
+                </div>
+                <p v-if="userUpdateData.locationToSet !== null">
+                  <small><i>
+                    Will be updated to: {{ userUpdateData.locationToSet }}
+                  </i></small>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal" @click="updInviewUserSelectedState(false); clearUpdateData()">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="sendUpdateData">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <h5 class="text-muted">Admin Dashboard</h5>
 
     <hr class="my-3"/>
 
-    <p class="mb-2">
+    <div class="mb-2">
 
       <div class="row mb-1">
 
@@ -156,10 +237,10 @@
 
       <div class="d-flex mb-2">
 
-        <!-- <div class="col-lg-11 col-sm-9"> -->
+        <div class="mr-auto">
 
           <button id="actionDropdown" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Action
+            Mark Status
           </button>
           <div class="dropdown-menu" aria-labelledby="actionDropdown">
             <span class="dropdown-item text-muted"><small><i>Applies to selected persons only</i></small></span>
@@ -184,15 +265,29 @@
 
           </div>
 
-        <!-- </div> -->
+        </div>
 
-        <!-- <div class="col-lg-1 col-sm-3"> -->
-          <button type="button" class="btn  btn-secondary btn-outline-tertiary ml-auto" @click="downloadSelectedAsCSV();">
+        <div>
+          <button id="downloadDropdown" type="button" class="btn btn-outline-secondary ml-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Download
           </button>
-        <!-- </div> -->
+          <div class="dropdown-menu" aria-labelledby="downloadDropdown">
+            <span class="dropdown-item text-muted"><small><i>Applies to selected persons only</i></small></span>
+
+            <div class="dropdown-divider"></div>
+
+            <span class="dropdown-item" data-toggle="modal" data-target="#graphDownloadModal">
+              Download Interactions
+            </span>
+            <span class="dropdown-item" @click="downloadSelectedAsCSV">
+              Download Data
+            </span>
+          </div>
+        </div>
 
       </div>
+
+      <md-progress-bar md-mode="indeterminate" v-if="isLoading"></md-progress-bar>
 
       <table class="table table-striped table-hover table-sm">
 
@@ -296,6 +391,13 @@
               {{ user.name }}
             </td>
             <td style="width: 20%">
+              <span
+                data-toggle="modal"
+                data-target="#updateUserLocationModal"
+                @click="updInviewUserSelectedState(false); clearUpdateData(); user.selected = true;"
+                class="text-secondary">
+                <i class="fas fa-pen-square" style="cursor: pointer;"></i>
+              </span>
               {{ user.officeCode }}
             </td>
             <td style="width: 20%">
@@ -309,7 +411,7 @@
 
       </table>
 
-    </p>
+    </div>
   </div>
 </template>
 
@@ -317,6 +419,17 @@
 
 <script>
 import enumStatusMap from "../../server/util/enumStatusMap.js";
+import graphToCsv from "../../server/util/csvUtils.js";
+
+function downloadCSV(content, fileName) {
+  let dlTrigger = document.createElement('a');
+  dlTrigger.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+  dlTrigger.setAttribute('download', fileName);
+  dlTrigger.style.display = 'none';
+  document.body.appendChild(dlTrigger);
+  dlTrigger.click();
+  document.body.removeChild(dlTrigger);
+}
 
 // ref: https://stackoverflow.com/questions/7641791/javascript-library-for-human-friendly-relative-date-formatting
 function fuzzyTime(date) {
@@ -356,7 +469,6 @@ function fuzzyTime(date) {
 
 export default {
   beforeMount() {
-
     this.refreshData();
 
   },
@@ -365,6 +477,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       pageNo: 1,
       itemsOnPage: 10,
       nameFilter: "",
@@ -373,10 +486,12 @@ export default {
       officesList: [],
       usersInView: [],
       users: [],
+      incubationDays: 2,
       enumStatusMap: enumStatusMap,
       userUpdateData: {
         statusCodeToSet: -1,
-        selectedUserIds: []
+        selectedUserIds: [],
+        locationToSet: null
       }
     };
   },
@@ -393,18 +508,32 @@ export default {
     }
   },
   methods: {
+    async downloadGraphForSelectedAsCSV() {
+      let userEmails = this.selectedUsers.map(u => u.email);  
+      if (userEmails.length < 1) return;
+      this.isLoading = true;
+      let postBody = {
+        emails: userEmails,
+        incubationDays: this.incubationDays
+      };
+      let res = await this.$api.post(`/api/admin/graph`, postBody);
+      let allGraphs = res.data;
+      let fileTxt = "";
+      let c = 0;
+      allGraphs.forEach(graph => {
+        let gCSV = graphToCsv(graph);
+        fileTxt += this.selectedUsers[c].name + "\r\n" + gCSV + "\r\n";
+        c++;
+      })
+      downloadCSV(fileTxt, 'encounters(graph).csv');
+      this.isLoading = false;
+    },
     downloadSelectedAsCSV() {
       let tot = "Name,Status,Office,LastUpdated";
       let csv = this.selectedUsers
                     .map(u => `${u.name},${u.status.label},${u.officeCode},${String(this.moment(u.lastUpdated).format('lll')).replace(/\,/g, '')}`)
                     .reduce((tot, cur) => tot + "\n" + cur, tot);
-      let dlTrigger = document.createElement('a');
-      dlTrigger.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
-      dlTrigger.setAttribute('download', 'encounters.csv');
-      dlTrigger.style.display = 'none';
-      document.body.appendChild(dlTrigger);
-      dlTrigger.click();
-      document.body.removeChild(dlTrigger);
+      downloadCSV(csv, 'encounters.csv');
     },
     updateUsersInView() {
 
@@ -417,7 +546,7 @@ export default {
       if(this.nameFilter !== "") {
         let nfLower = this.nameFilter.toLowerCase();
         nameFilteredUsers = nameFilteredUsers.filter(u => u.name.toLowerCase().includes(nfLower));
-      };
+      }
 
       let st = (this.itemsOnPage * (this.pageNo - 1));
       let ed = (this.itemsOnPage * (this.pageNo));
@@ -432,6 +561,7 @@ export default {
           id: u._id,
           selected: false,
           name: u.name,
+          email: u.email,
           officeCode: u.location,
           status: status,
           statusCode: status.code,
@@ -444,62 +574,57 @@ export default {
       });
 
     },
-    refreshData() {
+    async refreshData() {
 
-      let that = this;
+      this.isLoading = true;
       let officesSet = new Set();
-      let officeArray = [];
 
       let apiurl = `/api/admin/get-all-users`;
-      this.$api.get(apiurl)
-        .then(userData => {
-          var users = userData.data;
-          users.sort((a, b) => (a.name < b.name) ? -1 : 1)
-          that.users = users;
-          that.users.forEach(u => {
-            let loc = u.location || 'unknown';
-            if (!officeArray.includes(loc)) officeArray.push(loc);
-          });
-          officeArray.sort().forEach(o=> officesSet.add(o));
-          this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
-          that.updateUsersInView();
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      let userData = await this.$api.get(apiurl);
+      var users = userData.data;
+      users.sort((a, b) => (a.name < b.name) ? -1 : 1)
+      this.users = users;
+      this.users.forEach(u => {
+        let loc = u.location || 'unknown';
+        officesSet.add(loc);
+      });
+      this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
+      this.officesList.sort((a, b) => a.LocationName < b.LocationName ? -1 : 1);
+      this.updateUsersInView();
+      this.isLoading = false;
 
     },
-    sendUpdateData() {
+    async sendUpdateData() {
 
       this.userUpdateData.selectedUserIds = this.selectedUsers
                                                 .map(u => { return { userId: u.id }});
 
-      let that = this;
+      this.isLoading = true;
+      let res = await this.$api.post("/api/admin/update-users", this.userUpdateData);
+      let updatedUsers = res.data;
+      updatedUsers.forEach(nu => {
+        let idx = this.users.findIndex(u => u._id === nu._id);
+        this.users[idx] = nu;
+        this.updateUsersInView();
+      });
 
-      this.$api.post("/api/admin/update-users", this.userUpdateData)
-        .then(updatedUsers => {
-
-          updatedUsers.forEach(nu => {
-            let idx = this.users.findIndex(u => u._id === nu._id);
-            that.users[idx] = nu;
-            that.updateUsersInView();
-          });
-
-          that.userUpdateData.statusCodeToSet = -1;
-          that.userUpdateData.selectedUserIds = [];
-
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      this.clearUpdateData();
+      this.updInviewUserSelectedState(false);
 
       $(function () {
-        $('#updateConfModal').modal('toggle');
+        $('#updateConfModal').modal('hide');
       });
+      
+      this.isLoading = false;
 
     },
     updInviewUserSelectedState(val) {
       this.usersInView.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);
+    },
+    async clearUpdateData() {
+      this.userUpdateData.statusCodeToSet = -1;
+      this.userUpdateData.selectedUserIds = [];
+      this.userUpdateData.locationToSet = null;
     },
     sortUsers(key, inAsc) {
       this.sortBy = key;

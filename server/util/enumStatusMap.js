@@ -29,4 +29,4 @@ const enumStatusMap = [
   ];
 
 
-  module.exports = enumStatusMap;
+module.exports = enumStatusMap;
