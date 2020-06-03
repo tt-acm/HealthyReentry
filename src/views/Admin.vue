@@ -524,8 +524,8 @@ export default {
         let gCSV = graphToCsv(graph);
         fileTxt += this.selectedUsers[c].name + "\r\n" + gCSV + "\r\n";
         c++;
-      })
-      downloadCSV(fileTxt, 'encounters(graph).csv');
+      });
+      downloadCSV(fileTxt, `encounters(graph)_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
       this.isLoading = false;
     },
     downloadSelectedAsCSV() {
