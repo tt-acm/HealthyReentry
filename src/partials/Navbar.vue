@@ -3,7 +3,7 @@
     <md-toolbar class="md-primary" id="appHeader">
       <a class="md-title" @click="login()" href="#!">
         <span>Healthy Reentry</span>
-        <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
+        <!-- <small style="color:lightblue;margin-left:4px"><i>beta</i></small> -->
       </a>
       <!-- <a  href="/">
         <span>Healthy Reentry</span>
