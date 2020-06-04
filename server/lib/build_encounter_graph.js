@@ -43,11 +43,10 @@ const getAllUsers = function() {
 
 }
 
-function getAllEncounters(incubationPeriod, statusDate) {
+function getAllEncounters(incubationPeriod) {
 
     return new Promise(function (resolve, reject) {
         var checkDate = new Date();
-        if(statusDate) checkDate = new Date(statusDate);      
         var pastDate = checkDate.getDate() - incubationPeriod;
         checkDate.setDate(pastDate);
 
@@ -121,15 +120,15 @@ function buildEncounterGraph(users, encounters) {
 
 }
 
-function findEncounterTree(user, incubationPeriod, statusDate) {//incubation period 2 days if status reported Orange vs 14 days for Red.
-    // date input for the date of status last reported date.
+function findEncounterTree(user, incubationPeriod) {//incubation period 2 days if status reported Orange vs 14 days for Red.
+    // TODO : Add another date input for the date of last reported date.
     // Function to find up to n'th degree encounters of user
 
     return new Promise(function (resolve, reject) {
         const n = 3;
         getAllUsers()
         .then(function (users) {
-            getAllEncounters(incubationPeriod, statusDate)
+            getAllEncounters(incubationPeriod)
             .then(function (encounters) {
                 buildEncounterGraph(users, encounters)
                 .then(function (g) {
