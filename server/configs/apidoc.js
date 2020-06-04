@@ -26,8 +26,8 @@ const swaggerOptions = {
   customJs: '/swagger/customization.js'
 };
 
-function setup(app) {
-  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerOptions));
+function setup(router) {
+  router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerOptions));
 }
 
 

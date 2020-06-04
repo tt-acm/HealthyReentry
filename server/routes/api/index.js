@@ -3,6 +3,8 @@ const router = require('express').Router();
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 
+const swaggerAPIDocSetup = require('../../configs/apidoc');
+
 const User = require('../../models/User');
 
 
@@ -59,6 +61,11 @@ router.use('/user', [checkJwt, errHandler, addUserToReq], require('./user'));
 router.use('/admin', [checkJwt, errHandler, addUserToReq], require('./admin'));
 router.use('/encounters', [checkJwt, errHandler, addUserToReq], require('./encounters'));
 router.use('/status', [checkJwt, errHandler, addUserToReq], require('./status'));
+
+
+
+
+swaggerAPIDocSetup.setup(router);
 
 
 
