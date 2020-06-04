@@ -172,7 +172,7 @@
     </md-dialog>
 
     <!-- Notifications -->
-    <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="userAdded" md-persistent style="margin-bottom:55px; background-color: gray">
+    <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="userAdded" md-persistent style="margin-bottom:55px; background-color: #004050">
       <span> Encounter added.</span>
     </md-snackbar>
     <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="dupUser" md-persistent style="margin-bottom:55px; background-color: orange">
@@ -181,7 +181,7 @@
     <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="selfScan" md-persistent style="margin-bottom:55px; background-color: orange">
       <span> Cannot add yourself as an encounter.</span>
     </md-snackbar>
-    <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="scanSucceed" md-persistent style="margin-bottom:55px; background-color: gray">
+    <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="scanSucceed" md-persistent style="margin-bottom:55px; background-color: #004050">
       <span> QR code scanned successfully.</span>
     </md-snackbar>
 
