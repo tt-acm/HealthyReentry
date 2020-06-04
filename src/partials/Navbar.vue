@@ -15,10 +15,10 @@
         <div v-if="$auth.isAuthenticated && $auth.userDB" style="margin-top:2px;">
           <md-menu md-size="small" md-align-trigger>
             <md-button class="md-icon-button" style="width=32px" md-menu-trigger>
-              <md-avatar style="transform: scale(0.8);">
-                <!-- <img src="https://gravatar.com/avatar/4dacc85086497a31cf2c646031d2cb01?d=retro" alt="Avatar"> -->
+              <!-- <md-avatar style="transform: scale(0.8);">
                 <img :src="$auth.userDB.picture" alt="Avatar">
-              </md-avatar>
+              </md-avatar> -->
+              <md-icon class="far fa-user"></md-icon>
             </md-button>
 
             <md-menu-content>
