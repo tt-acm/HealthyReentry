@@ -145,13 +145,16 @@
 
   <!-- Button trigger modal -->
   <md-list>
-    <md-list-item class="py-0 mx-auto">
-      <md-button class="md-primary md-raised" @click="showDialog=!showDialog" :disabled="disableSubmit" id="nextBtn" style="width:240px">
+    <md-list-item class="mx-auto">
+      <!-- <md-button class="md-primary md-raised" @click="showDialog=!showDialog" :disabled="disableSubmit" id="nextBtn" style="width:240px">
         <h6 class="mb-0">Next</h6>
-      </md-button>
+      </md-button> -->
+      <button type="button" class="btn btn-lg btn-block text-white md-accent" @click="showDialog=!showDialog" :disabled="disableSubmit" id="nextBtn" style="width:240px">
+        Next
+      </button>
     </md-list-item>
 
-    <md-list-item class="mx-auto py-0">
+    <md-list-item class="mx-auto">
       <router-link :to="{ name: 'menu' }">
         <p class="text-muted">Back</p>
       </router-link>
@@ -203,7 +206,7 @@
 
     <md-dialog-actions class="mx-4 my-2">
       <md-button class="md-primary" @click="showDialog=false">Go Back</md-button>
-      <md-button class="md-primary md-raised" @click="showDialog=false; submitEncounter()">Submit</md-button>
+      <md-button class="md-accent md-raised text-white" @click="showDialog=false; submitEncounter()">Submit</md-button>
     </md-dialog-actions>
   </md-dialog>
 

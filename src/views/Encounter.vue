@@ -117,14 +117,17 @@
 
   <br>
   <md-list>
-    <md-list-item class="py-0 mx-auto">
+    <md-list-item class="mx-auto">
       <md-tooltip md-direction="top" v-if="disableSubmitUser">Please select at least one encounter.</md-tooltip>
-      <md-button class="md-primary md-raised" @click="showDialog=!showDialog" :disabled="disableSubmitUser" id="nextBtn" style="width:240px">
+      <!-- <md-button class="md-primary md-raised" @click="showDialog=!showDialog" :disabled="disableSubmitUser" id="nextBtn" style="width:240px">
         <h6 class="mb-0">Next</h6>
-      </md-button>
+      </md-button> -->
+      <button type="button" class="btn btn-lg btn-block text-white md-accent" @click="showDialog=!showDialog" :disabled="disableSubmitUser" id="nextBtn" style="width:240px">
+        Next
+      </button>
     </md-list-item>
 
-    <md-list-item class="mx-auto py-0">
+    <md-list-item class="mx-auto">
       <md-button class="md-primary mx-auto">
         <router-link :to="{ name: 'menu' }"> <p class="text-muted mb-0">Back</p> </router-link>
       </md-button>
@@ -164,7 +167,7 @@
 
       <md-dialog-actions class="mx-4 my-2">
         <md-button class="md-primary" @click="showDialog = false">Go Back</md-button>
-        <md-button class="md-primary md-raised" @click="showDialog = false;saveEncounters()">Submit</md-button>
+        <md-button class="md-accent md-raised text-white" @click="showDialog = false;saveEncounters()">Submit</md-button>
       </md-dialog-actions>
     </md-dialog>
 

@@ -12,7 +12,7 @@
       <div class="d-flex align-items-center"style="margin-left:auto;margin-right:4px;">
         <a class="px-1 mr-3" href="https://core-studio.gitbook.io/healthy-reentry/testing-guidence/guide" target="blank" style ="color: rgb(180,193,209);"><i class="far fa-question-circle"></i></a>
 
-        <div v-if="$auth.isAuthenticated && $auth.userDB" class="md-accent" style="margin-top:2px;">
+        <div v-if="$auth.isAuthenticated && $auth.userDB" style="margin-top:2px;">
           <md-menu md-size="small" md-align-trigger>
             <md-button class="md-icon-button" style="width=32px" md-menu-trigger>
               <md-avatar style="transform: scale(0.8);">
