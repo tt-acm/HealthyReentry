@@ -5,16 +5,15 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 
 const sgClient = require('@sendgrid/mail');
-// sgClient.setApiKey(process.env.SENDGRID_API_KEY);
-sgClient.setApiKey('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');
+sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 var sender = process.env.SENDGRID_EMAIL;
 
 const fs = require('fs');
-const reminderContent = fs.readFileSync("./server/assets/email_templates/reminderTemplate.html").toString("utf-8");
+var reminderContent = fs.readFileSync("./server/assets/email_templates/reminderTemplate.html").toString("utf-8");
+reminderContent += "<h3><a href='" + process.env.VUE_APP_URL + "'>Healthy Reentry</a></h3></div>"
 
-console.log("reminderContent", reminderContent);
 
-MongoClient.connect('mongodb+srv://core-hr:JbTeNFkRYJ6Kbffo@core-healthyreentry-pro.ggnfp.mongodb.net/healthyreentry?retryWrites=true&w=majority',{useUnifiedTopology: true}).then(function (db) {
+MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(function (db) {
     console.log("CONNECTED TO DB");
     checkUsersStatus(db);
 
@@ -84,8 +83,7 @@ function checkUsersStatus(client_db) {
 sendEmail = (toEmails) => {
     console.log("emails", toEmails)
     const mailOptions = {
-        // to: toEmails,
-        to: "hsun@thorntontomasetti.com",
+        to: toEmails,
         from: "healthyreentry-notifications@thorntontomasetti.com",
         subject: "Please report your status",
         html: reminderContent
