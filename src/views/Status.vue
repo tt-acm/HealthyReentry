@@ -205,7 +205,7 @@
 
 
     <md-dialog-actions class="mx-4 my-2">
-      <md-button class="md-primary" @click="showDialog=false">Go Back</md-button>
+      <md-button @click="showDialog=false">Go Back</md-button>
       <md-button class="md-accent md-raised text-white" @click="showDialog=false; submitEncounter()">Submit</md-button>
     </md-dialog-actions>
   </md-dialog>
