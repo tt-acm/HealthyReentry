@@ -9,7 +9,7 @@
 
   <!-- Notifications -->
   <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showDisclosureMsg" md-persistent class="px-2" style="margin-bottom:55px; background-color: #004050">
-    <span> Your consent has been submitted. A copy of the disclosure and consent has been sent to your TT email for reference (keep an eye out for an email from healthyreentry-notifications@thorntontomasetti.com).</span>
+    <span> Your consent has been submitted. A copy of the disclosure and consent has been sent to your {{companyInitials}} email for reference (keep an eye out for an email from {{sender}}).</span>
   </md-snackbar>
   <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showStatusMsg" md-persistent style="margin-bottom:55px; background-color: #004050">
     <span> Status successfully recorded.</span>
@@ -38,6 +38,8 @@ export default {
       showDisclosureMsg: false,
       showStatusMsg: false,
       showEncounterMsg: false,
+      companyInitials: process.env.VUE_APP_COMPANY_INITIALS,
+      sender:process.env.SENDGRID_EMAIL 
     };
   },
   mounted() {

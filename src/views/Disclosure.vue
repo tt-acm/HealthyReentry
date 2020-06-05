@@ -52,7 +52,7 @@
           </p>
 
           <small>
-            Note: Using the application is not in any way a condition of your employment at Thornton Tomasetti.
+            Note: Using the application is not in any way a condition of your employment at {{company}}.
             However, it is your duty to report infectious disease to the firm. On the grounds of containing the virus and for the safety of other employees, we require disclosure. If you choose not to report using the app, contact Lizette Agostini
             directly.
           </small>
@@ -104,7 +104,8 @@ export default {
     return {
       consentBool: false,
       showDialog: true,
-      fullScreen: false
+      fullScreen: false,
+      company: process.env.VUE_APP_COMPANY
     };
   },
   methods: {
