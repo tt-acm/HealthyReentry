@@ -154,7 +154,7 @@ router.post("/add-many", function (req, res) {
 
             if (encounters.length === numEncounters) {
                 Encounter.insertMany(encounters, function (err, docs) {
-                    console.log(docs);
+                    // console.log(docs);
                     if (err) {
                         console.log("error in insert Many", err);
                         resolve(res.status(500).send());

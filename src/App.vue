@@ -8,13 +8,13 @@
   </md-content>
 
   <!-- Notifications -->
-  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showDisclosureMsg" md-persistent class="px-2" style="margin-bottom:55px; background-color: gray">
+  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showDisclosureMsg" md-persistent class="px-2" style="margin-bottom:55px; background-color: #004050">
     <span> Your consent has been submitted. A copy of the disclosure and consent has been sent to your TT email for reference (keep an eye out for an email from healthyreentry-notifications@thorntontomasetti.com).</span>
   </md-snackbar>
-  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showStatusMsg" md-persistent style="margin-bottom:55px; background-color: gray">
+  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showStatusMsg" md-persistent style="margin-bottom:55px; background-color: #004050">
     <span> Status successfully recorded.</span>
   </md-snackbar>
-  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showEncounterMsg" md-persistent style="margin-bottom:55px; background-color: gray">
+  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showEncounterMsg" md-persistent style="margin-bottom:55px; background-color: #004050">
     <span> Encounter submitted successfully.</span>
   </md-snackbar>
 
@@ -41,11 +41,6 @@ export default {
     };
   },
   mounted() {
-    // $.get("https://s3-us-west-2.amazonaws.com/core-weblibrary/libraries/core-logo.svg.html", function(data) {
-    //   console.log("data", data);
-    //   $("#core-logo-import").html(data);
-    // });
-    // console.log("window.jquery", window);
   },
   methods: {
     login() {

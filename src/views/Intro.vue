@@ -3,6 +3,7 @@
     <div class="row mt-4 home-intro">
       <div class="col">
         <div>
+          <img src="/imgs/logo-256.png" alt="healthy reentry logo" style="margin-bottom: 30px">
           <!-- <h3>Welcome to Encounter!</h3> -->
           <p>At Thornton Tomasetti, our first priority – now and always – is the health and safety of our employees.
             <br>
