@@ -32,16 +32,17 @@ export const useAuth0 = ({
         jwt: null,
         auth0Client: null,
         popupOpen: false,
-        error: null
+        error: null,
+        defaultAuth: {}
       };
     },
     methods: {
       /** Authenticates the user using a popup window */
-      async loginWithPopup(o) {
+      async loginWithPopup() {
         this.popupOpen = true;
 
         try {
-          await this.auth0Client.loginWithPopup(o);
+          await this.auth0Client.loginWithPopup(this.defaultAuth);
         } catch (e) {
           // eslint-disable-next-line
           console.error(e);
@@ -96,8 +97,8 @@ export const useAuth0 = ({
         }
       },
       /** Authenticates the user using the redirect method */
-      loginWithRedirect(o) {
-        return this.auth0Client.loginWithRedirect({connection: 'TT-SSO'});
+      loginWithRedirect() {
+        return this.auth0Client.loginWithRedirect(this.defaultAuth);
       },
       /** Returns all the claims present in the ID token */
       getIdTokenClaims(o) {
@@ -119,6 +120,7 @@ export const useAuth0 = ({
     },
     /** Use this lifecycle method to instantiate the SDK client */
     async created() {
+      this.defaultAuth = options.defaultAuth;
       // Create a new instance of the SDK client using members of the given options object
       this.auth0Client = await createAuth0Client({
         domain: options.domain,

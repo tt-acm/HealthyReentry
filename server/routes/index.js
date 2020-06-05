@@ -3,13 +3,15 @@ const router = require('express').Router();
 
 const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN;
 const AUTH0_CLIENT_ID = process.env.AUTH0_CLIENT_ID;
+const DEFAULT_AUTH_CONN = (process.env.DEFAULT_AUTH_CONN)
+                        ? {connection: process.env.DEFAULT_AUTH_CONN} : {};
 
 
-// these aren't really secrets
-router.get('/api/auth0-secrets', function(req, res) {
+router.get('/api/auth0-config', function(req, res) {
   const creds = {
     AUTH0_DOMAIN: AUTH0_DOMAIN,
-    AUTH0_CLIENT_ID: AUTH0_CLIENT_ID
+    AUTH0_CLIENT_ID: AUTH0_CLIENT_ID,
+    DEFAULT_AUTH_CONN: DEFAULT_AUTH_CONN
   };
   res.json(creds);
 });
