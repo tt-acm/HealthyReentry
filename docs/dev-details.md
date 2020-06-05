@@ -5,6 +5,8 @@ This guide assumes you are familiar with the basic setup as described in the [RE
 ## Backend Setup
 The backend is a node app running an express server for the API.  
 Detailed information about the models ard routes are documented as swagger annotated code comments.  
+This can accessed in dev mode by going to `/api/docs/` at the application server.  
+To enable dev mode add `NODE_ENV=development` to the environment variables.  
 ## Models
 The information is represented via database 3 models stored in `/server/models`.  
 - Encounter
