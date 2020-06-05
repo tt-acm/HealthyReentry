@@ -1,14 +1,20 @@
 // heroku scheduler script for email reminders for the users who hasn't updated the status last 7 days
-// heroku scheduler runs every day 
+// heroku scheduler runs every day
 
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 
 const sgClient = require('@sendgrid/mail');
-sgClient.setApiKey(process.env.SENDGRID_API_KEY); 
+// sgClient.setApiKey(process.env.SENDGRID_API_KEY);
+sgClient.setApiKey('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');
 var sender = process.env.SENDGRID_EMAIL;
 
-MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(function (db) {
+const fs = require('fs');
+const reminderContent = fs.readFileSync("./server/assets/email_templates/reminderTemplate.html").toString("utf-8");
+
+console.log("reminderContent", reminderContent);
+
+MongoClient.connect('mongodb+srv://core-hr:JbTeNFkRYJ6Kbffo@core-healthyreentry-pro.ggnfp.mongodb.net/healthyreentry?retryWrites=true&w=majority',{useUnifiedTopology: true}).then(function (db) {
     console.log("CONNECTED TO DB");
     checkUsersStatus(db);
 
@@ -19,7 +25,7 @@ MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(funct
 
 function checkUsersStatus(client_db) {
     let db = client_db.db();
-    // get all users 
+    // get all users
     // for each user check status date greater than 7 days
     let counter = 0;
 
@@ -78,10 +84,12 @@ function checkUsersStatus(client_db) {
 sendEmail = (toEmails) => {
     console.log("emails", toEmails)
     const mailOptions = {
-        to: toEmails,
-        from: sender,
+        // to: toEmails,
+        to: "hsun@thorntontomasetti.com",
+        from: "healthyreentry-notifications@thorntontomasetti.com",
         subject: "Please report your status",
-        text: "This is a friendly reminder that you haven't reported your status last 7 days, please sign in the Healthy Reentry app and submit your status."
+        html: reminderContent
+        // text: "This is a friendly reminder that you haven't reported your status last 7 days, please sign in the Healthy Reentry app and submit your status."
     };
 
     sgClient.sendMultiple(mailOptions, function (err) {
