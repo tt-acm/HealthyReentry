@@ -54,6 +54,7 @@ async function main() {
   let authConfig = resp.data;
   let domain = authConfig.AUTH0_DOMAIN;
   let clientId = authConfig.AUTH0_CLIENT_ID;
+  let scope = authConfig.SCOPE;
   let defaultAuth = authConfig.DEFAULT_AUTH_CONN;
 
   Vue.use(Auth0Plugin, {
