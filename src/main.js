@@ -33,6 +33,15 @@ Vue.use(VueQrcodeReader);
 
 Vue.prototype.moment = moment;
 
+function displayNotification() {
+  if (Notification.permission == 'granted') {
+    navigator.serviceWorker.getRegistration().then(function(reg) {
+      reg.showNotification('Your credit card details have been shared with a stranger');
+    });
+  }
+}
+
+
 
 import browserDetect from "vue-browser-detect-plugin";
 Vue.use(browserDetect);
@@ -44,6 +53,15 @@ async function main() {
     try {
       await navigator.serviceWorker.register('/sw.js');
       console.log('service worker registered');
+
+      Notification.requestPermission(function(status) {
+        console.log('Notification permission status:', status);
+      });
+
+
+      setTimeout(() => displayNotification(), 4000);
+
+
     } catch(err) {
       console.log('service worker not registered');
       console.log(err);
