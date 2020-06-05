@@ -208,7 +208,6 @@ export default {
   beforeMount() {
     this.$api.get("/api/user/get-all").then(all => {
 
-      console.log("getalluser", all);
 
       const arrayToObject = (array) =>
         array.reduce((obj, item) => {
@@ -230,7 +229,6 @@ export default {
       Vue.set(this, "encountersToday", mostEncountered.data.filter(u=>u.encounteredToday===true));
 
       if (this.$route.params.scannedUser) {
-        console.log("coming here");
         this.searchUserByEmail(this.$route.params.scannedUser);
       }
     });
@@ -308,7 +306,6 @@ export default {
   }),
   methods: {
     nameSelected() {
-      console.log("got selected");
       if (this.selectedEmployee) {
         var u = this.userDictionary[this.selectedEmployee];
         if (this.encountered.length === 0){
