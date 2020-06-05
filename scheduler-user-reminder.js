@@ -9,8 +9,8 @@ sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 var sender = process.env.SENDGRID_EMAIL;
 
 const fs = require('fs');
-var reminderContent = fs.readFileSync("./server/assets/email_templates/reminderTemplate.html").toString("utf-8");
-reminderContent += "<h3><a href='" + process.env.VUE_APP_URL + "'>Healthy Reentry</a></h3></div>"
+var reminderTemplate = fs.readFileSync("./server/assets/email_templates/reminderTemplate.html").toString("utf-8");
+let reminderContent = reminderTemplate.replace(new RegExp('<PRODUCTION_URL>', 'g'), process.env.VUE_APP_URL);
 
 
 MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(function (db) {
