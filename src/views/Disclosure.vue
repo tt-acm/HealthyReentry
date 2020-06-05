@@ -58,7 +58,7 @@
           </small>
 
           <div class="form-check mt-4 ml-1">
-            <input class="form-check-input" type="checkbox" id="defaultCheck1" @click="consentBool=!consentBool" v-model="consentBool">
+            <input class="form-check-input" type="checkbox" id="defaultCheck1" v-model="consentBool">
             <label class="form-check-label" for="defaultCheck1">
               I agree with the terms listed above.
             </label>
@@ -72,10 +72,16 @@
       </md-dialog-content>
 
       <md-dialog-actions>
-        <md-button class="md-primary text-muted" @click="showDialog = false">
+        <!-- <md-button class="md-primary text-muted" @click="showDialog = false">
           <router-link :to="{ name: 'home' }"> <p class="mb-0 text-muted">Close</p> </router-link>
-        </md-button>
-        <md-button class="md-primary" @click="showDialog = false;submit()" :disabled="!consentBool">Submit</md-button>
+        </md-button> -->
+        <button type="button" class="btn btn-md text-white" @click="showDialog = false">
+          <router-link :to="{ name: 'home' }"> <p class="mb-0 text-muted">Close</p> </router-link>
+        </button>
+        <button type="button" class="btn btn-md text-white md-accent" @click="showDialog = false;submit()" :disabled="!consentBool">
+          Submit
+        </button>
+        <!-- <md-button class="md-primary text-white" @click="showDialog = false;submit()" :disabled="!consentBool">Submit</md-button> -->
       </md-dialog-actions>
     </md-dialog>
   </md-content>

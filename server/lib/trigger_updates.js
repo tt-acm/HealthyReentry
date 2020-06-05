@@ -7,6 +7,7 @@ var moment = require("moment");
 
 const sgClient = require("../lib/sgClient");
 const eg = require('../lib/build_encounter_graph');
+const nodeToCsvLine = require("../util/csvUtils.js").nodeToCsvLine;
 
 const variables = require("../util/variables");
 const enumStatusMap = require("../util/enumStatusMap");
@@ -20,12 +21,6 @@ const adminTemplate = fs.readFileSync("./server/assets/email_templates/adminTemp
 const adminTemplate_byHR = fs.readFileSync("server/assets/email_templates/adminTemplate_byHR.html").toString("utf-8");
 const userConfTemplate = fs.readFileSync("./server/assets/email_templates/userConfTemplate.html").toString("utf-8");
 const adminUpdateTemplate = fs.readFileSync("./server/assets/email_templates/adminUpdateTemplate.html").toString("utf-8");
-
-function nodeToCsvLine(node) {
-  let status = enumStatusMap.filter(i => i.code === node.status)[0];
-  if (node['statusLastUpdated'] !== "N/A") return `${node.name},${node.email},${node['number_of_encounters']},${node['degree-of-separation']},${status.label},${String(moment(node['statusLastUpdated']).format('lll')).replace(/\,/g, '')}\r\n`;
-  else return `${node.name},${node.email},${node['number_of_encounters']},${node['degree-of-separation']},${status.label},${node['statusLastUpdated']}\r\n`;
-}
 
 
 // Status route report --- user report

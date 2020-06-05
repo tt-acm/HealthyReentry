@@ -18,9 +18,9 @@ import './css/app.scss';
 
 import VueMaterial from 'vue-material'
 // import { MdButton, MdContent, MdTabs } from 'vue-material/dist/components'
-import 'vue-material/dist/vue-material.min.css'
+// import 'vue-material/dist/vue-material.min.css'
 // import 'vue-material/dist/vue-material.css'
-import 'vue-material/dist/theme/default.css'
+// import 'vue-material/dist/theme/default.css'
 // import 'vue-material/dist/components/index.css'
 
 window.$ = window.jQuery = require('jquery');

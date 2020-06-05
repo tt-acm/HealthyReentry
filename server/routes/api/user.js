@@ -154,7 +154,7 @@ router.post('/', async (req, res) => {
   }
   let user = await User.findOne({ email: String(u.email).toLowerCase() });
   if (user) {
-    if (user.location !== u.location){
+    if (user.location === "N/A" && u.location){
       user.location = u.location;
       user = await user.save();
     }

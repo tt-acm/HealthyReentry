@@ -12,34 +12,34 @@
     <md-list v-if="user" id="controlButtons">
       <md-list-item>
         <router-link class="mx-auto" :to="{ name: 'status', params: { id: user._id}}">
-          <!-- <button type="button" class="btn btn-lg btn-block btn-outline-primary text-center my-2">
-          Report Your Health Status
-        </button> -->
-          <md-button class="md-raised md-accent menu-button" style="background-color: #00A4A9;">
-            <h6 class="my-3 ">Report Your Health Status</h6>
-          </md-button>
+          <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
+            Report Your Status
+          </button>
+          <!-- <md-button class="md-raised md-accent menu-button">
+            <h6 class="my-3 text-white">Report Your Health Status</h6>
+          </md-button> -->
         </router-link>
       </md-list-item>
 
       <md-list-item>
         <router-link class="mx-auto" :to="{ name: 'encounter', params: { id: user._id}}">
-          <!-- <button type="button" class="btn btn-lg btn-block btn-outline-primary text-center my-2">
+          <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
           Record a TT Encounter
-        </button> -->
-          <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;background-color: #00A4A9;">
-            <h6 class="mb-0">Record a TT Encounter</h6>
-          </md-button>
+        </button>
+          <!-- <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;">
+            <h6 class="mb-0 text-white">Record a TT Encounter</h6>
+          </md-button> -->
         </router-link>
       </md-list-item>
 
       <md-list-item>
         <router-link class="mx-auto" :to="{ name: 'displayqr', params: { id: user._id}}">
-          <!-- <button type="button" class="btn btn-lg btn-block btn-outline-primary text-center my-2">
+          <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
           Display QR Code
-        </button> -->
-          <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;background-color: #00A4A9;">
-            <h6 class="mb-0">Display QR Code</h6>
-          </md-button>
+        </button>
+          <!-- <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;">
+            <h6 class="mb-0 text-white">Display QR Code</h6>
+          </md-button> -->
         </router-link>
       </md-list-item>
       <!-- </div> -->
@@ -90,7 +90,7 @@ export default {
 
       // window.$("#mainControls").css("transform", 'translateY(' + (screen.height /7) + 'px)');
       // window.$("#controlButtons").css("transform", 'translatex(-8px)');
-      window.$(".menu-button").css("width", buttonWidth + 'px');
+      window.$(".btn-lg").css("width", buttonWidth + 'px');
       window.$("#statusCard").css("width", buttonWidth + 'px');
 
       // window.$("#statusCard").css("max-width", buttonWidth + 'px');

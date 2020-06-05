@@ -77,7 +77,6 @@ function checkUsersStatus(client_db) {
 
 sendEmail = (toEmails) => {
     console.log("emails", toEmails)
-    toEmails.push("eertugrul@thorntontomasetti.com"); //TEST this is to check the heroku scheduler while beta testing and remove this line UTC 12.00pm
     if(toEmails.length === 0) return;
     const mailOptions = {
         to: toEmails,

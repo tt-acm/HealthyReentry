@@ -2,7 +2,7 @@
 <div>
   <!-- <div class="d-flex"> -->
   <h4 class="text-muted">Report Your Health Status</h4>
-  <p v-if="latestStatusDate" class="ml-auto mt-auto mb-0"> <b>Last Updated on:</b> {{showDisplayDate(new Date(latestStatusDate))}} as {{status[latestStatus.status]}}</p>
+  <p v-if="latestStatus" class="ml-auto mt-auto mb-0"> <b>Last Updated on:</b> {{showDisplayDate(new Date(latestStatus.date))}} as {{status[latestStatus.status]}}</p>
   <!-- </div> -->
 
   <!-- <hr class="mt-2 mb-0" /> -->
@@ -145,13 +145,16 @@
 
   <!-- Button trigger modal -->
   <md-list>
-    <md-list-item class="py-0 mx-auto">
-      <md-button class="md-primary md-raised" @click="showDialog=!showDialog" :disabled="disableSubmit" id="nextBtn" style="width:240px">
+    <md-list-item class="mx-auto">
+      <!-- <md-button class="md-primary md-raised" @click="showDialog=!showDialog" :disabled="disableSubmit" id="nextBtn" style="width:240px">
         <h6 class="mb-0">Next</h6>
-      </md-button>
+      </md-button> -->
+      <button type="button" class="btn btn-lg btn-block text-white md-accent" @click="showDialog=!showDialog" :disabled="disableSubmit" id="nextBtn" style="width:240px">
+        Next
+      </button>
     </md-list-item>
 
-    <md-list-item class="mx-auto py-0">
+    <md-list-item class="mx-auto">
       <router-link :to="{ name: 'menu' }">
         <p class="text-muted">Back</p>
       </router-link>
@@ -203,7 +206,7 @@
 
     <md-dialog-actions class="mx-4 my-2">
       <md-button class="md-primary" @click="showDialog=false">Go Back</md-button>
-      <md-button class="md-primary md-raised" @click="showDialog=false; submitEncounter()">Submit</md-button>
+      <md-button class="md-accent md-raised text-white" @click="showDialog=false; submitEncounter()">Submit</md-button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -236,7 +239,6 @@ export default {
             }
           }
         }
-        this.latestStatusDate = String(new Date(curStatus.date)).split(" ").slice(1, 4).join("/");
       } else {
         this.selectedStatus = 0; //default to green
       }
@@ -268,7 +270,6 @@ export default {
       latestStatus: {
         status: 0
       },
-      latestStatusDate: null,
       enableBlue: false,
       disableSubmit: false,
       status: ["Green - No Signs or Symptoms",
