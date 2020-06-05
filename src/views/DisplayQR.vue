@@ -16,7 +16,7 @@
 
   <md-list>
     <md-list-item class="mx-auto py-0">
-      <md-button class="md-primary mx-auto">
+      <md-button class="mx-auto">
         <router-link :to="{ name: 'menu' }"> <p class="text-muted mb-0">Back</p> </router-link>
       </md-button>
     </md-list-item>

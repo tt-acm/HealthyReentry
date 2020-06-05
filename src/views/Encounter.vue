@@ -128,7 +128,7 @@
     </md-list-item>
 
     <md-list-item class="mx-auto">
-      <md-button class="md-primary mx-auto">
+      <md-button class="mx-auto">
         <router-link :to="{ name: 'menu' }"> <p class="text-muted mb-0">Back</p> </router-link>
       </md-button>
     </md-list-item>
@@ -166,7 +166,7 @@
 
 
       <md-dialog-actions class="mx-4 my-2">
-        <md-button class="md-primary" @click="showDialog = false">Go Back</md-button>
+        <md-button @click="showDialog = false">Go Back</md-button>
         <md-button class="md-accent md-raised text-white" @click="showDialog = false;saveEncounters()">Submit</md-button>
       </md-dialog-actions>
     </md-dialog>
