@@ -96,6 +96,12 @@ router.post("/update-users", async function(req, res) {
 
       let statusEnum = parseInt(data.statusCodeToSet);
 
+      const latestStatus = await Status.find({ "user": userData.userId })
+                             .sort({ date: -1 })
+                             .limit(1);
+      var ls;
+      if (latestStatus && latestStatus.length > 0) ls = latestStatus[0];
+
       const st = new Status({
         status: statusEnum,
         user: user
@@ -108,10 +114,10 @@ router.post("/update-users", async function(req, res) {
         user: user,
         statusEnum: statusEnum
       };
-  
+
       // dont holdup the response for current trigger to percolate
       triggerUpdateQueue.push(triggerData);
-      triggerQueue();
+      triggerQueue(ls);
 
     } else {
 
@@ -156,12 +162,12 @@ router.post("/graph", async function(req, res) {
 
 const triggerUpdateQueue = [];
 
-async function triggerQueue() {
-  
+async function triggerQueue(ls) {
+
   while(triggerUpdateQueue.length > 0) {
     let triggerData = triggerUpdateQueue.shift();
 
-    let success = await triggerUpdates(triggerData, true);
+    let success = await triggerUpdates(triggerData, true, ls);
     if (!success) {
       console.log('Trigger failed for following data');
       console.log(triggerData);

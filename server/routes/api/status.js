@@ -7,23 +7,41 @@ const triggerUpdates = require('../../lib/trigger_updates');
 
 router.post("/report", function (req, res) {
 
-  var status = new Status({
-    status: req.body.status,
-    user: req.user
-  });
+  //First, search for latest status
+  Status.find({
+      "user": req.user._id
+    }).sort({
+      date: -1
+    }).limit(1)
+    .exec(function (err, statuses) {
+      if (err) return res.status(500).send(err);
 
-  status.save(async function (err, savedStatus) {
+      var latestStatus;
+      if (statuses && statuses.length > 0) {
+        latestStatus = {
+          status: statuses[0].status,
+          date: statuses[0].date
+        };
+      }
 
-    const triggerData = {
-      user: req.user,
-      statusEnum: status.status
-    };
-    
-    // no await
-    triggerUpdates(triggerData);
-    
-    if (!err) return res.json(savedStatus);
-    else return res.status(500).send(err);
+      var status = new Status({
+        status: req.body.status,
+        user: req.user
+      });
+
+      status.save(async function (err, savedStatus) {
+
+        const triggerData = {
+          user: req.user,
+          statusEnum: status.status
+        };
+
+        // no await
+        triggerUpdates(triggerData, false, latestStatus);
+
+        if (!err) return res.json(savedStatus);
+        else return res.status(500).send(err);
+      });
   });
 
 });
