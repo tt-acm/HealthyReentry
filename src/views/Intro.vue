@@ -39,10 +39,6 @@ export default {
   methods: {
     login() {
       if (this.$auth.isAuthenticated === false) this.$auth.loginWithRedirect();
-      // console.log("this.$auth", this.$auth);
-      // console.log(this.$route.fullPath);
-      // this.$auth.loginWithRedirect();
-      //
     }
   }
 };

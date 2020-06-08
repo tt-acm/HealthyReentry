@@ -47,9 +47,6 @@ export default {
   name: 'Navbar',
   methods: {
     login() {
-      // console.log(this.$route.fullPath);
-      // this.$auth.loginWithRedirect();
-      // this.$auth.loginWithRedirect({ appState: { targetUrl: this.$route.fullPath }});
       if (this.$auth.isAuthenticated === false) this.$auth.loginWithRedirect();
       else this.$router.replace("/menu");
     },
