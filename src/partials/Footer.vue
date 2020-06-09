@@ -23,21 +23,12 @@
 </template>
 
 <script>
-import $ from 'jquery'
 export default {
   name: 'Footer',
     data() {
     return {
       companyLogo: process.env.VUE_APP_COMPANY_LOGO,
     };
-  },
-  mounted() {
-    //  console.log(process.env.VUE_APP_COMPANY_LOGO);
-    // $.get(process.env.VUE_APP_COMPANY_LOGO, function(data) {
-    //   // $("#core-logo-import").html(data);
-    //   console.log("data", data);
-    //   this.logoContent = data;
-    // });
   },
   methods: {
   }
