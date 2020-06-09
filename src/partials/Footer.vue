@@ -8,7 +8,7 @@
         </div>
         <div class="md-layout-item md-large-size-90 md-medium-size-90 md-small-size-55 md-xsmall-size-100">
           <a href="http://core.thorntontomasetti.com" id="core-logo-import" target="_blank">
-            <md-icon md-src="/imgs/CORE.svg" style="width:300px" />
+            <!-- <md-icon md-src="companyLogo" style="width:300px" /> -->
           </a>
         </div>
         <div class="md-layout-item md-xsmall-hide">
@@ -22,8 +22,20 @@
 </template>
 
 <script>
+import $ from 'jquery'
 export default {
   name: 'Footer',
+    data() {
+    return {
+      companyLogo: process.env.VUE_APP_COMPANY_LOGO,
+    };
+  },
+  mounted() {
+     console.log(process.env.VUE_APP_COMPANY_LOGO);
+    $.get(process.env.VUE_APP_COMPANY_LOGO, function(data) {
+      $("#core-logo-import").html(data);
+    });
+  },
   methods: {
   }
 }
