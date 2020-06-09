@@ -18,21 +18,22 @@ var content = fs.readFileSync("./server/assets/email_templates/officeDirectorsRe
 
 
 let directors = {
-    //"Aberdeen": "", 
+    "Aberdeen": "jaevans@thorntontomasetti.com", 
     "Albuquerque": "dtennant@thorntontomasetti.com",
     "Atlanta": ["twhisenhunt@thorntontomasetti.com","molender@thorntontomasetti.com"],
     "Austin": "jwesevich@thorntontomasetti.com",
     "Beijing":"pfu@thorntontomasetti.com",
     "Boston": ["ldavey@thorntontomasetti.com","bvollenweider@thorntontomasetti.com"],
-    // "Bristol": "", 
+    "Bristol": "nmisselbrook@thorntontomasetti.com", 
     "Chicago": "dweihing@thorntontomasetti.com",
-    // "Copenhagen": "",
-    // "Cupertino": "",
+    "Copenhagen": "learl@thorntontomasetti.com",
+    "Cupertino": "kdebus@thorntontomasetti.com",
     "Dallas": "jelliott@thorntontomasetti.com",
     "Denver": "jdandrea@thorntontomasetti.com",
-    //"Dubai": "",
+    "Dubai": "kkrall@thorntontomasetti.com",
     "Edinburgh": "nmisselbrook@thorntontomasetti.com",
     "Fort Lauderdale": "molender@thorntontomasetti.com",
+    "Halifax": ["rbehboudi@thorntontomasetti.com","mwesolowsky@thorntontomasetti.com"],
     "Ho Chi Minh City": "cdang@thorntontomasetti.com",
     "Hong Kong": "ctam@thorntontomasetti.com",
     "Houston": ["jelliott@thorntontomasetti.com", "jwesevich@thorntontomasetti.com"],
@@ -41,22 +42,21 @@ let directors = {
     "Los Angeles": "seisenreich@thorntontomasetti.com",
     "Miami": "bmalmsten@thorntontomasetti.com",
     "Milwaukee": "jperonto@thorntontomasetti.com",
-    "Mississauga": "rbehboudi@thorntontomasetti.com",
+    "Mississauga": ["rbehboudi@thorntontomasetti.com","mwesolowsky@thorntontomasetti.com"],
     "Moscow": "lzborovsky@thorntontomasetti.com",
     "Mumbai": "akadakia@thorntontomasetti.com",
     "New York": ["jfeuerborn@thorntontomasetti.com","sschneider@thorntontomasetti.com", "egottlieb@thorntontomasetti.com"],
     "Newark": "cchristoforou@thorntontomasetti.com",
-    "Ottawa": "mwesolowsky@thorntontomasetti.com",
+    "Ottawa": ["rbehboudi@thorntontomasetti.com","mwesolowsky@thorntontomasetti.com"],
     "Perth": "anelson@thorntontomasetti.com",
     "Philadelphia": "mcoggin@thorntontomasetti.com",
-    //"Phoenix": "",
+    "Phoenix": "rbaxter@thorntontomasetti.com",
     "Portland": ["mpulaski@thorntontomasetti.com","pbecker@thorntontomasetti.com"],
     "Romsey": "gheward@thorntontomasetti.com",
     "San Diego": "klegenza@thorntontomasetti.com",
     'San Francisco': ["tcurtis@thorntontomasetti.com","bshen@thorntontomasetti.com"],
     "Santa Clara": "kdebus@thorntontomasetti.com",
     "Seattle": "gbriggs@thorntontomasetti.com",
-    // 'Stockholm': "",
     "Tampa": "DFusco@thorntontomasetti.com",
     "Toronto": "cminerva@thorntontomasetti.com",
     "Warrington": "pwoelke@thorntontomasetti.com",
@@ -64,12 +64,7 @@ let directors = {
     "West Hartford": "ebaumgartner@thorntontomasetti.com",
     'Wellington': "pwrona@thorntontomasetti.com",
     "Shanghai": "yzhu@thorntontomasetti.com",
-
-    // "Halifax": "",
-    // "Sydney": "",
-    // 'York': "",
-    // "Victoria":
-
+    "Sydney": "anelson@thorntontomasetti.com"
 }
 
 
@@ -100,6 +95,7 @@ MongoClient.connect(url, {
 
             // 1. employees who have signed up for the app, 
             const usersbyOffice = allUsers.filter(u => u.location === key);
+           // if(usersbyOffice.length === 0 ) return; ... //TODO test this one
             console.log("usersbyOffice", usersbyOffice.length);
             let csvHeader = "Name,Email\r\n";
             let csv = csvHeader;
@@ -124,7 +120,7 @@ MongoClient.connect(url, {
             // 3. the number of app users in your office with a health status of Red and/or Orange.
             const usersStatusOrange = usersbyOffice.filter(u => u.status.status === 1);
             const usersStatusRed = usersbyOffice.filter(u => u.status.status === 2);
-            let csv3 = "Orange,Red, Total Signups\r\n";
+            let csv3 = "Orange,Red,Total App Signups in Office\r\n";
             var numberOfOrange = usersStatusOrange.length;
             var numberOfRed = usersStatusRed.length;
             var total =  usersbyOffice.length;
