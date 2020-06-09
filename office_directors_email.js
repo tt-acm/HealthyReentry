@@ -16,7 +16,6 @@ var url = process.env.MONGO_URL;
 const fs = require('fs');
 var content = fs.readFileSync("./server/assets/email_templates/officeDirectorsReport.html").toString("utf-8");
 
-
 let directors = {
     "Aberdeen": "jaevans@thorntontomasetti.com", 
     "Albuquerque": "dtennant@thorntontomasetti.com",
@@ -27,7 +26,6 @@ let directors = {
     "Bristol": "nmisselbrook@thorntontomasetti.com", 
     "Chicago": "dweihing@thorntontomasetti.com",
     "Copenhagen": "learl@thorntontomasetti.com",
-    "Cupertino": "kdebus@thorntontomasetti.com",
     "Dallas": "jelliott@thorntontomasetti.com",
     "Denver": "jdandrea@thorntontomasetti.com",
     "Dubai": "kkrall@thorntontomasetti.com",
@@ -95,8 +93,8 @@ MongoClient.connect(url, {
 
             // 1. employees who have signed up for the app, 
             const usersbyOffice = allUsers.filter(u => u.location === key);
-           // if(usersbyOffice.length === 0 ) return; ... //TODO test this one
             console.log("usersbyOffice", usersbyOffice.length);
+            if(usersbyOffice.length === 0 ) return;     
             let csvHeader = "Name,Email\r\n";
             let csv = csvHeader;
 
