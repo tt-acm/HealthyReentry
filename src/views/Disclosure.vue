@@ -9,7 +9,7 @@
         <md-content class="p-3">
           <p class="mb-2">
             We respect your privacy. As we continue to monitor COVID-19 and its impact on our people and offices, it is important that designated members of our Talent Team are aware of COVID-19 related cases at our firm. To protect all of our
-            employees, the Healthy Reentry application will allow you to securely and confidentially record:
+            employees, the {{appName}} application will allow you to securely and confidentially record:
           </p>
           <p class="text-muted mb-2">
             1. your personal COVID-19 status through a series of colors (green, orange and red).
@@ -52,7 +52,7 @@
           </p>
 
           <small>
-            Note: Using the application is not in any way a condition of your employment at Thornton Tomasetti.
+            Note: Using the application is not in any way a condition of your employment at {{company}}.
             However, it is your duty to report infectious disease to the firm. On the grounds of containing the virus and for the safety of other employees, we require disclosure. If you choose not to report using the app, contact Lizette Agostini
             directly.
           </small>
@@ -104,7 +104,9 @@ export default {
     return {
       consentBool: false,
       showDialog: true,
-      fullScreen: false
+      fullScreen: false,
+      company: process.env.VUE_APP_COMPANY,
+      appName: process.env.VUE_APP_NAME
     };
   },
   methods: {

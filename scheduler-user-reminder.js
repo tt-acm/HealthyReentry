@@ -82,6 +82,7 @@ function checkUsersStatus(client_db) {
 
 sendEmail = (toEmails) => {
     console.log("emails", toEmails)
+    if(toEmails.length === 0) return;
     const mailOptions = {
         to: toEmails,
         from: sender,
