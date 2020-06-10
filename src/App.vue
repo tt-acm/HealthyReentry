@@ -43,11 +43,6 @@ export default {
     };
   },
   mounted() {
-    // $.get("https://s3-us-west-2.amazonaws.com/core-weblibrary/libraries/core-logo.svg.html", function(data) {
-    //   console.log("data", data);
-    //   $("#core-logo-import").html(data);
-    // });
-    // console.log("window.jquery", window);
   },
   methods: {
     login() {

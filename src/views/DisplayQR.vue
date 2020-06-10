@@ -16,7 +16,7 @@
 
   <md-list>
     <md-list-item class="mx-auto py-0">
-      <md-button class="md-primary mx-auto">
+      <md-button class="mx-auto">
         <router-link :to="{ name: 'menu' }"> <p class="text-muted mb-0">Back</p> </router-link>
       </md-button>
     </md-list-item>
@@ -53,7 +53,7 @@ export default {
     // const largeScreenScale = 10;
     // const viewScale = Math.trunc((screen.width-30)/ 29) > largeScreenScale? largeScreenScale : Math.trunc((screen.width-30)/ 29);
 
-    QRCode.toCanvas(document.getElementById('canvas'), "https://encounter.thorntontomasetti.com/encounter/" + this.user.email, {"scale": viewScale}, function (error) {
+    QRCode.toCanvas(document.getElementById('canvas'), process.env.VUE_APP_URL + "encounter/" + this.user.email, {"scale": viewScale}, function (error) {
       if (error) console.error(error)
       console.log('success!');
     })

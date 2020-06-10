@@ -8,6 +8,11 @@ const sgClient = require('@sendgrid/mail');
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 var sender = process.env.SENDGRID_EMAIL;
 
+const fs = require('fs');
+var reminderTemplate = fs.readFileSync("./server/assets/email_templates/reminderTemplate.html").toString("utf-8");
+let reminderContent = reminderTemplate.replace(new RegExp('<PRODUCTION_URL>', 'g'), process.env.VUE_APP_URL);
+
+
 MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(function (db) {
     console.log("CONNECTED TO DB");
     checkUsersStatus(db);
@@ -82,7 +87,8 @@ sendEmail = (toEmails) => {
         to: toEmails,
         from: sender,
         subject: "Please report your status",
-        text: "This is a friendly reminder that you haven't reported your status last 7 days, please sign in the " + process.env.VUE_APP_NAME + " app and submit your status."
+        html: reminderContent
+        // text: "This is a friendly reminder that you haven't reported your status last 7 days, please sign in the Healthy Reentry app and submit your status."
     };
 
     sgClient.sendMultiple(mailOptions, function (err) {

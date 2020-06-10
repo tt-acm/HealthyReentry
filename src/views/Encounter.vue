@@ -128,7 +128,7 @@
     </md-list-item>
 
     <md-list-item class="mx-auto">
-      <md-button class="md-primary mx-auto">
+      <md-button class="mx-auto">
         <router-link :to="{ name: 'menu' }"> <p class="text-muted mb-0">Back</p> </router-link>
       </md-button>
     </md-list-item>
@@ -166,7 +166,7 @@
 
 
       <md-dialog-actions class="mx-4 my-2">
-        <md-button class="md-primary" @click="showDialog = false">Go Back</md-button>
+        <md-button @click="showDialog = false">Go Back</md-button>
         <md-button class="md-accent md-raised text-white" @click="showDialog = false;saveEncounters()">Submit</md-button>
       </md-dialog-actions>
     </md-dialog>
@@ -208,7 +208,6 @@ export default {
   beforeMount() {
     this.$api.get("/api/user/get-all").then(all => {
 
-      console.log("getalluser", all);
 
       const arrayToObject = (array) =>
         array.reduce((obj, item) => {
@@ -230,7 +229,6 @@ export default {
       Vue.set(this, "encountersToday", mostEncountered.data.filter(u=>u.encounteredToday===true));
 
       if (this.$route.params.scannedUser) {
-        console.log("coming here");
         this.searchUserByEmail(this.$route.params.scannedUser);
       }
     });
@@ -308,7 +306,6 @@ export default {
   }),
   methods: {
     nameSelected() {
-      console.log("got selected");
       if (this.selectedEmployee) {
         var u = this.userDictionary[this.selectedEmployee];
         if (this.encountered.length === 0){
