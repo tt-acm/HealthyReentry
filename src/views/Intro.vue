@@ -3,8 +3,9 @@
     <div class="row mt-4 home-intro">
       <div class="col">
         <div>
+          <img src="/imgs/logo-256.png" alt="healthy reentry logo" style="margin-bottom: 30px">
           <!-- <h3>Welcome to Encounter!</h3> -->
-          <p>At Thornton Tomasetti, our first priority – now and always – is the health and safety of our employees.
+          <p>At {{company}}, our first priority – now and always – is the health and safety of our employees.
             <br>
             <br>
             The COVID-19 outbreak has challenged us to find creative ways to <b>best protect our employees.</b>
@@ -19,7 +20,7 @@
             </md-button>
           <!-- </router-link> -->
           <!-- <a class="btn btn-primary" href="/users/login-tt">Get Started</a> -->
-          <div><a class="btn btn-link" href="https://core-studio.gitbook.io/healthy-reentry/testing-guidence/guide" target="_blank">Directions</a> </div>
+          <div><a class="btn btn-link" :href="url" target="_blank">Directions</a> </div>
 
         </div>
       </div>
@@ -28,20 +29,18 @@
 </template>
 <script>
 export default {
-  // props: ["user"],
+
   created() {
   },
-  data() {
-    return {
-    };
-  },
+  data() { 
+    return { 
+        url: process.env.VUE_APP_DOC_URL, 
+        company: process.env.VUE_APP_COMPANY
+    }
+},
   methods: {
     login() {
       if (this.$auth.isAuthenticated === false) this.$auth.loginWithRedirect();
-      // console.log("this.$auth", this.$auth);
-      // console.log(this.$route.fullPath);
-      // this.$auth.loginWithRedirect();
-      //
     }
   }
 };

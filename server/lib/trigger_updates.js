@@ -27,12 +27,16 @@ const adminUpdateTemplate = fs.readFileSync("./server/assets/email_templates/adm
 // Admin route update status -- admin report -boolean -admin true
 // get graph here...
 // user.id and statusEnum
-async function triggerUpdates(triggerData, byAdmin) {
+async function triggerUpdates(triggerData, byAdmin, currentStatus) {
 
 
   try {
 
     byAdmin = !!byAdmin;
+    var alertAdmin = true;
+    if (currentStatus && triggerData) {
+      if (currentStatus.status > triggerData.statusEnum || currentStatus.status == triggerData.statusEnum) alertAdmin = false;
+    }
 
     let d = new Date();
     let formattedDate = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
@@ -48,7 +52,7 @@ async function triggerUpdates(triggerData, byAdmin) {
     let adminUpdateContent = adminUpdateTemplate.replace('<STATUS_LABEL>', status.label);
 
     let csvHeader = "Name,Email,Number Of Direct Encounters,Degree of Separation,Status,Status Last Updated\r\n";
-    let sub = "Healthy Reentry Alert";
+    let sub = process.env.VUE_APP_NAME + " Alert";
 
     sub = "Your status color has been changed";
 
@@ -82,10 +86,12 @@ async function triggerUpdates(triggerData, byAdmin) {
       // let formattedDate = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
       let attachment = new Buffer(csv).toString('base64');
       let filename = `Encounter_${formattedDate}_${status.label}_${user.name}.csv`;
-      if (byAdmin) {
-        await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
-      } else {
-        await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent, attachment, filename); //user changed their status themselves
+      if (alertAdmin) {
+        if (byAdmin) {
+          await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
+        } else {
+          await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent, attachment, filename); //user changed their status themselves
+        }
       }
 
       // inform every direct contact
@@ -128,10 +134,12 @@ async function triggerUpdates(triggerData, byAdmin) {
       // let formattedDate = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
       let filename = `Encounter_${formattedDate}_${status.label}_${user.name}.csv`;
       let attachment = new Buffer(csv).toString('base64');
-      if (byAdmin) {
-        await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
-      } else {
-        await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent, attachment, filename);
+      if (alertAdmin) {
+        if (byAdmin) {
+          await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
+        } else {
+          await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent, attachment, filename);
+        }
       }
       // inform every second degree contact
       if (emails.length > 0) await sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
@@ -159,7 +167,7 @@ function sendEmail(subject, toEmails, content, attachment, filename) {
     const mailOptions = {
       to: toEmails,
       from: process.env.SENDGRID_EMAIL,
-      subject: subject || "Healthy Reentry Alert - TESTING",
+      subject: subject || process.env.VUE_APP_NAME + " - TESTING",
       text: " ",
       html: content
     };

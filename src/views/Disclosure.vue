@@ -9,7 +9,7 @@
         <md-content class="p-3">
           <p class="mb-2">
             We respect your privacy. As we continue to monitor COVID-19 and its impact on our people and offices, it is important that designated members of our Talent Team are aware of COVID-19 related cases at our firm. To protect all of our
-            employees, the Healthy Reentry application will allow you to securely and confidentially record:
+            employees, the {{appName}} application will allow you to securely and confidentially record:
           </p>
           <p class="text-muted mb-2">
             1. your personal COVID-19 status through a series of colors (green, orange and red).
@@ -52,13 +52,13 @@
           </p>
 
           <small>
-            Note: Using the application is not in any way a condition of your employment at Thornton Tomasetti.
+            Note: Using the application is not in any way a condition of your employment at {{company}}.
             However, it is your duty to report infectious disease to the firm. On the grounds of containing the virus and for the safety of other employees, we require disclosure. If you choose not to report using the app, contact Lizette Agostini
             directly.
           </small>
 
           <div class="form-check mt-4 ml-1">
-            <input class="form-check-input" type="checkbox" id="defaultCheck1" @click="consentBool=!consentBool" v-model="consentBool">
+            <input class="form-check-input" type="checkbox" id="defaultCheck1" v-model="consentBool">
             <label class="form-check-label" for="defaultCheck1">
               I agree with the terms listed above.
             </label>
@@ -72,10 +72,16 @@
       </md-dialog-content>
 
       <md-dialog-actions>
-        <md-button class="md-primary text-muted" @click="showDialog = false">
+        <!-- <md-button class="md-primary text-muted" @click="showDialog = false">
           <router-link :to="{ name: 'home' }"> <p class="mb-0 text-muted">Close</p> </router-link>
-        </md-button>
-        <md-button class="md-primary" @click="showDialog = false;submit()" :disabled="!consentBool">Submit</md-button>
+        </md-button> -->
+        <button type="button" class="btn btn-md text-white" @click="showDialog = false">
+          <router-link :to="{ name: 'home' }"> <p class="mb-0 text-muted">Close</p> </router-link>
+        </button>
+        <button type="button" class="btn btn-md text-white md-accent" @click="showDialog = false;submit()" :disabled="!consentBool">
+          Submit
+        </button>
+        <!-- <md-button class="md-primary text-white" @click="showDialog = false;submit()" :disabled="!consentBool">Submit</md-button> -->
       </md-dialog-actions>
     </md-dialog>
   </md-content>
@@ -98,7 +104,9 @@ export default {
     return {
       consentBool: false,
       showDialog: true,
-      fullScreen: false
+      fullScreen: false,
+      company: process.env.VUE_APP_COMPANY,
+      appName: process.env.VUE_APP_NAME
     };
   },
   methods: {

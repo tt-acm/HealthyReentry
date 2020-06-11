@@ -1,12 +1,17 @@
 // heroku scheduler script for email reminders for the users who hasn't updated the status last 7 days
-// heroku scheduler runs every day 
+// heroku scheduler runs every day
 
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
 
 const sgClient = require('@sendgrid/mail');
-sgClient.setApiKey(process.env.SENDGRID_API_KEY); 
+sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 var sender = process.env.SENDGRID_EMAIL;
+
+const fs = require('fs');
+var reminderTemplate = fs.readFileSync("./server/assets/email_templates/reminderTemplate.html").toString("utf-8");
+let reminderContent = reminderTemplate.replace(new RegExp('<PRODUCTION_URL>', 'g'), process.env.VUE_APP_URL);
+
 
 MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(function (db) {
     console.log("CONNECTED TO DB");
@@ -19,7 +24,7 @@ MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(funct
 
 function checkUsersStatus(client_db) {
     let db = client_db.db();
-    // get all users 
+    // get all users
     // for each user check status date greater than 7 days
     let counter = 0;
 
@@ -77,11 +82,13 @@ function checkUsersStatus(client_db) {
 
 sendEmail = (toEmails) => {
     console.log("emails", toEmails)
+    if(toEmails.length === 0) return;
     const mailOptions = {
         to: toEmails,
         from: sender,
         subject: "Please report your status",
-        text: "This is a friendly reminder that you haven't reported your status last 7 days, please sign in the Healthy Reentry app and submit your status."
+        html: reminderContent
+        // text: "This is a friendly reminder that you haven't reported your status last 7 days, please sign in the Healthy Reentry app and submit your status."
     };
 
     sgClient.sendMultiple(mailOptions, function (err) {
