@@ -193,24 +193,24 @@ function sendEmail(toEmail, location, attachment, attachment2, attachment3) {
     const mailOptions = {
         to: toEmail,
         from: sender,
-        subject: "Healty Reentry Weekly Report for " + location,
+        subject: "Healthy Reentry – Weekly Report for " + location,
         html: content
     };
 
     if (attachment) {
         mailOptions.attachments = [{
                 "content": attachment,
-                "filename": "EmployeesWhoSignedup.csv",
+                "filename": "Employees Who Signed up.csv",
                 "type": "text/csv"
             },
             {
                 "content": attachment2,
-                "filename": "EmployeesWhoHaveNotUpdated7Days.csv",
+                "filename": "Employees Who Have Not Updated in 7 Days.csv",
                 "type": "text/csv"
             },
             {
                 "content": attachment3,
-                "filename": "BreakdownbyHealthStatus.csv",
+                "filename": "Breakdown by Health Status.csv",
                 "type": "text/csv"
             }
             
