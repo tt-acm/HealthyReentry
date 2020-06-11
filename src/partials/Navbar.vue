@@ -2,15 +2,11 @@
   <div>
     <md-toolbar class="md-primary" id="appHeader">
       <a class="md-title" @click="login()" href="#!">
-        <span>Healthy Reentry</span>
+        <span>{{appName}}</span>
         <!-- <small style="color:lightblue;margin-left:4px"><i>beta</i></small> -->
       </a>
-      <!-- <a  href="/">
-        <span>Healthy Reentry</span>
-        <small style="color:lightblue;margin-left:4px"><i>beta</i></small>
-      </a> -->
       <div class="d-flex align-items-center"style="margin-left:auto;margin-right:4px;">
-        <a class="px-1 mr-3" href="https://core-studio.gitbook.io/healthy-reentry/testing-guidence/guide" target="blank" style ="color: rgb(180,193,209);"><i class="far fa-question-circle"></i></a>
+        <a class="px-1 mr-3" :href="url" target="blank" style ="color: rgb(180,193,209);"><i class="far fa-question-circle"></i></a>
 
         <div v-if="$auth.isAuthenticated && $auth.userDB" style="margin-top:2px;">
           <md-menu md-size="small" md-align-trigger>
@@ -45,11 +41,16 @@
 <script>
 export default {
   name: 'Navbar',
+  created() {
+  },
+  data() {
+    return {
+      appName: process.env.VUE_APP_NAME,
+      url: process.env.VUE_APP_DOC_URL
+    };
+  },
   methods: {
     login() {
-      // console.log(this.$route.fullPath);
-      // this.$auth.loginWithRedirect();
-      // this.$auth.loginWithRedirect({ appState: { targetUrl: this.$route.fullPath }});
       if (this.$auth.isAuthenticated === false) this.$auth.loginWithRedirect();
       else this.$router.replace("/menu");
     },

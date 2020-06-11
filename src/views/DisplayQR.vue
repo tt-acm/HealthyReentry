@@ -5,7 +5,7 @@
     <!-- <hr class="my-2"/> -->
     <div class="card mt-2">
       <div class="card-body bg-info p-2 text-white">
-        <p class="mb-0">Show your below QR code to a TT employee in order for them to locate your name in the app. When done, click <b>Back</b> to return to the homepage.</p>
+        <p class="mb-0">Show your below QR code to a {{companyInitials}} employee in order for them to locate your name in the app. When done, click <b>Back</b> to return to the homepage.</p>
       </div>
     </div>
   </div>
@@ -53,14 +53,15 @@ export default {
     // const largeScreenScale = 10;
     // const viewScale = Math.trunc((screen.width-30)/ 29) > largeScreenScale? largeScreenScale : Math.trunc((screen.width-30)/ 29);
 
-    QRCode.toCanvas(document.getElementById('canvas'), "https://encounter.thorntontomasetti.com/encounter/" + this.user.email, {"scale": viewScale}, function (error) {
+    QRCode.toCanvas(document.getElementById('canvas'), process.env.VUE_APP_URL + "encounter/" + this.user.email, {"scale": viewScale}, function (error) {
       if (error) console.error(error)
       console.log('success!');
     })
   },
   data() {
     return {
-      user: null
+      user: null,
+      companyInitials: process.env.VUE_APP_COMPANY_INITIALS
     };
   },
   // computed: Vuex.mapState({
