@@ -52,7 +52,7 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
     let adminUpdateContent = adminUpdateTemplate.replace('<STATUS_LABEL>', status.label);
 
     let csvHeader = "Name,Email,Number Of Direct Encounters,Degree of Separation,Status,Status Last Updated\r\n";
-    let sub = "Healthy Reentry Alert";
+    let sub = process.env.VUE_APP_NAME + " Alert";
 
     sub = "Your status color has been changed";
 
@@ -167,7 +167,7 @@ function sendEmail(subject, toEmails, content, attachment, filename) {
     const mailOptions = {
       to: toEmails,
       from: process.env.SENDGRID_EMAIL,
-      subject: subject || "Healthy Reentry Alert - TESTING",
+      subject: subject || process.env.VUE_APP_NAME + " - TESTING",
       text: " ",
       html: content
     };

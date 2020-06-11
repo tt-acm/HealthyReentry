@@ -5,7 +5,7 @@
     <!-- <hr class="my-2"/> -->
     <div class="card mt-2">
       <div class="card-body bg-info p-2 text-white">
-        <p class="mb-0">Show your below QR code to a TT employee in order for them to locate your name in the app. When done, click <b>Back</b> to return to the homepage.</p>
+        <p class="mb-0">Show your below QR code to a {{companyInitials}} employee in order for them to locate your name in the app. When done, click <b>Back</b> to return to the homepage.</p>
       </div>
     </div>
   </div>
@@ -60,7 +60,8 @@ export default {
   },
   data() {
     return {
-      user: null
+      user: null,
+      companyInitials: process.env.VUE_APP_COMPANY_INITIALS
     };
   },
   // computed: Vuex.mapState({
