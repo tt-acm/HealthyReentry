@@ -282,6 +282,9 @@
             <span class="dropdown-item" @click="downloadSelectedAsCSV">
               Download Data
             </span>
+            <span class="dropdown-item" @click="downloadOfficeStats">
+              Download Office Stats
+            </span>
           </div>
         </div>
 
@@ -534,6 +537,16 @@ export default {
                     .map(u => `${u.name},${u.status.label},${u.officeCode},${String(this.moment(u.lastUpdated).format('lll')).replace(/\,/g, '')}`)
                     .reduce((tot, cur) => tot + "\n" + cur, tot);
       downloadCSV(csv, 'encounters.csv');
+    },
+    downloadOfficeStats() {
+      let csv = "Office,Orange,Red,Total Signups\r\n";
+      this.officesList.forEach(o => {
+        let locUsers = this.users.filter(u => u.location === o.LocationName);
+        let rCount = locUsers.filter(u => u.status.status === 2).length;
+        let oCount = locUsers.filter(u => u.status.status === 1).length;
+        csv += `${o.LocationName},${oCount},${rCount},${locUsers.length}\r\n`;
+      }),
+      downloadCSV(csv, `office-stats_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
     updateUsersInView() {
 
