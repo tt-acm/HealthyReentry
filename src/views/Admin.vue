@@ -519,16 +519,17 @@ export default {
         emails: userEmails,
         incubationDays: this.incubationDays
       };
-      let res = await this.$api.post(`/api/admin/graph`, postBody);
+      let res = await this.$api.post(`/api/admin/get-graph`, postBody);
       let allGraphs = res.data;
       let fileTxt = "";
       let c = 0;
       allGraphs.forEach(graph => {
         let gCSV = graphToCsv(graph);
-        fileTxt += this.selectedUsers[c].name + "\r\n" + gCSV + "\r\n";
+        let u = this.selectedUsers[c];
+        fileTxt += `Name,${u.name}\r\nStatus,${u.status.label}\r\nUpdated,${u.lastUpdated}\r\n${gCSV}\r\n`;
         c++;
-      })
-      downloadCSV(fileTxt, 'encounters(graph).csv');
+      });
+      downloadCSV(fileTxt, `encounters(graph)_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
       this.isLoading = false;
     },
     downloadSelectedAsCSV() {
@@ -536,7 +537,7 @@ export default {
       let csv = this.selectedUsers
                     .map(u => `${u.name},${u.status.label},${u.officeCode},${String(this.moment(u.lastUpdated).format('lll')).replace(/\,/g, '')}`)
                     .reduce((tot, cur) => tot + "\n" + cur, tot);
-      downloadCSV(csv, 'encounters.csv');
+      downloadCSV(csv, `encounters_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
     downloadOfficeStats() {
       let csv = "Office,Orange,Red,Total Signups\r\n";

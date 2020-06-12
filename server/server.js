@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-const swaggerAPIDocSetup = require('./configs/apidoc');
 
 const DIR = 'dist';
 const PORT = process.env.PORT || 8080;
@@ -48,8 +47,6 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use("/", require('./routes'));
-
-swaggerAPIDocSetup.setup(app);
 
 const base = path.join(__dirname, '../');
 const indexFilePath = path.join(base, '/dist/index.html');
