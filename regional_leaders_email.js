@@ -105,7 +105,7 @@ MongoClient.connect(url, {
             let attachment2 = Buffer.from(csv2).toString('base64');
             let attachment3 = Buffer.from(csv3).toString('base64');
 
-            sendEmail("eertugrul@thorntontomasetti.com", key, attachment, attachment2, attachment3);
+            sendEmail(email, key, attachment, attachment2, attachment3);
 
         });
 
