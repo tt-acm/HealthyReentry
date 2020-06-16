@@ -26,49 +26,6 @@ router.use(function (req, res, next) {
 /**
  * @swagger
  * path:
- *  /api/admin/get-all-users:
- *    get:
- *      summary: Get all users from the database.
- *      tags: [Admin]
- *      produces:
- *       - application/json
- *      responses:
- *        200:
- *          description: All stored users.
- *        500:
- *          description: Server error.
- */
-router.get("/get-all-users", async function(req, res) {
-
-  const ret = [];
-
-  let include = {
-    "_id": 1,
-    "dateOfConsent": 1,
-    "name": 1,
-    "email": 1,
-    "location": 1
-  }
-
-  const users = await User.find({}, include).exec();
-
-  for(let u of users) {
-    let nu = u.toObject();
-    const st = await Status.find({ "user": nu._id })
-                           .sort({ date: -1 })
-                           .limit(1);
-    nu.status = st[0];
-    ret.push(nu)
-  }
-
-  res.json(ret);
-
-});
-
-
-/**
- * @swagger
- * path:
  *  /api/admin/get-users/{skip}/{limit}:
  *    get:
  *      summary: Get users from the database.
@@ -123,6 +80,33 @@ router.get("/get-users/:skip/:limit", async function(req, res) {
   }
 
   ret.reverse();
+
+  res.json(ret);
+
+});
+
+
+/**
+ * @swagger
+ * path:
+ *  /api/admin/get-total-users-stats:
+ *    get:
+ *      summary: Get stats about total users in the database.
+ *      tags: [Admin]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: Stats on stored users.
+ *        500:
+ *          description: Server error.
+ */
+router.get("/get-total-users-stats", async function(req, res) {
+
+  const ret = {};
+
+  const users = await User.find({}).exec();
+  ret.total = users.length;
 
   res.json(ret);
 
