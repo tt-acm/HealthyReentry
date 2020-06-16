@@ -189,10 +189,10 @@
             </div>
             <select class="form-control" v-model="itemsOnPage" @change="setItemsOnPage(itemsOnPage)">
               <option>10</option>
-              <option>20</option>
-              <option>50</option>
-              <option>100</option>
-              <option>{{ users.length }}</option>
+              <option v-if="20 < totalUsersCount">20</option>
+              <option v-if="50 < totalUsersCount">50</option>
+              <option v-if="100 < totalUsersCount">100</option>
+              <option>{{ totalUsersCount }}</option>
             </select>
           </div>
 
@@ -222,9 +222,9 @@
             </div>
             <div class="input-group-append">
               <span
-                :style="'cursor: ' + (((pageNo) * itemsOnPage >= users.length) ? 'not-allowed' : 'pointer') "
+                :style="'cursor: ' + (((pageNo) * itemsOnPage >= totalUsersCount) ? 'not-allowed' : 'pointer') "
                 @click="setPageNo(pageNo+1)"
-                :class="'input-group-text ' + (((pageNo) * itemsOnPage >= users.length) ? 'disabled' : '') "
+                :class="'input-group-text ' + (((pageNo) * itemsOnPage >= totalUsersCount) ? 'disabled' : '') "
                 id="pageNav"
               ><i class="fas fa-chevron-right"></i></span>
             </div>
@@ -489,6 +489,7 @@ export default {
       officesList: [],
       usersInView: [],
       users: [],
+      totalUsersCount: 0,
       incubationDays: 2,
       enumStatusMap: enumStatusMap,
       userUpdateData: {
@@ -589,6 +590,8 @@ export default {
       this.isLoading = true;
       let officesSet = new Set();
 
+      this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
+
       let apiurl = `/api/admin/get-users/${(this.pageNo-1)*this.itemsOnPage}/${this.itemsOnPage}`;
       let userData = await this.$api.get(apiurl);
       var users = userData.data;
@@ -646,8 +649,8 @@ export default {
         ?  i : 0;
       });
     },
-      if (newNo < 1 || ((newNo-1) * this.itemsOnPage) > this.users.length) return;
     async setPageNo(newNo) {
+      if (newNo < 1 || ((newNo-1) * this.itemsOnPage) > this.totalUsersCount) return;
       this.pageNo = parseInt(newNo);
       await this.refreshData();
       this.updateUsersInView();
