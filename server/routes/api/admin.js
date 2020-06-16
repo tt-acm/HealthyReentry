@@ -36,13 +36,21 @@ router.use(function (req, res, next) {
  *          description: Number of users to skip from the start.
  *          schema:
  *            type: integer
- *        - in: path
- *          name: body
+ *            example: 20
+ *        - in: body
+ *          name: limit
  *          description: Number of users to return after skipping `skip` number of users.
  *          schema:
  *            type: integer
+ *            example: 10
+ *        - in: body
+ *          name: nameSearch
+ *          description: Text to use to for searching by name. Does case-insensitive 'contains' matching.
+ *          schema:
+ *            type: string
+ *            example: joh
  *      produces:
- *       - application/json
+ *       - application/json:
  *      responses:
  *        200:
  *          description: Returns users from the database, sorted alphabetically with pagination applied.
@@ -65,9 +73,7 @@ router.post("/get-users-by-filters", async function(req, res) {
     "location": 1
   }
 
-  let baseFind = (nameSearch) ? User.find({name: {'$regex': nameSearch, '$options': 'i'}}, include) : User.find({}, include);
-
-  const users = await baseFind
+  const users = await User.find({name: {'$regex': nameSearch, '$options': 'i'}}, include)
                           .sort({ name: 1})
                           .skip(skip)
                           .limit(limit)
