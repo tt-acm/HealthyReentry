@@ -175,9 +175,9 @@
           <input
             type="text"
             class="form-control"
-            placeholder="Filter by name"
-            v-model="nameFilter"
-            @keyup="updateUsersInView"
+            placeholder="Search by name"
+            v-model="nameSearch"
+            @keyup="refreshData"
             />
         </div>
 
@@ -483,7 +483,7 @@ export default {
       isLoading: false,
       pageNo: 1,
       itemsOnPage: 10,
-      nameFilter: "",
+      nameSearch: "",
       sortBy: null,
       sortAsc: true,
       officesList: [],
@@ -557,13 +557,7 @@ export default {
                             .map(o => o.LocationName);
       let officeFilteredUsers = this.users.filter(u => officeArr.includes(u.location));
 
-      let nameFilteredUsers = officeFilteredUsers;
-      if(this.nameFilter !== "") {
-        let nfLower = this.nameFilter.toLowerCase();
-        nameFilteredUsers = nameFilteredUsers.filter(u => u.name.toLowerCase().includes(nfLower));
-      }
-
-      this.usersInView = nameFilteredUsers.map(u => {
+      this.usersInView = officeFilteredUsers.map(u => {
         let hasStatus = u.status && u.status.status !== null && u.status.status !== undefined;
         let code = (hasStatus) ? u.status.status : -1;
         let status = enumStatusMap.filter(i => i.code === code)[0];
@@ -594,7 +588,8 @@ export default {
 
       let postData = {
         skip: (this.pageNo-1)*this.itemsOnPage,
-        limit: this.itemsOnPage
+        limit: this.itemsOnPage,
+        nameSearch: this.nameSearch
       };
 
       let userData = await this.$api.post('/api/admin/get-users-by-filters', postData);
