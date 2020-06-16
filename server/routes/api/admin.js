@@ -26,18 +26,18 @@ router.use(function (req, res, next) {
 /**
  * @swagger
  * path:
- *  /api/admin/get-users/{skip}/{limit}:
- *    get:
+ *  /api/admin/get-users-by-filters:
+ *    post:
  *      summary: Get users from the database.
  *      tags: [Admin]
  *      parameters:
- *        - in: path
+ *        - in: body
  *          name: skip
  *          description: Number of users to skip from the start.
  *          schema:
  *            type: integer
  *        - in: path
- *          name: limit
+ *          name: body
  *          description: Number of users to return after skipping `skip` number of users.
  *          schema:
  *            type: integer
@@ -49,10 +49,10 @@ router.use(function (req, res, next) {
  *        500:
  *          description: Server error.
  */
-router.get("/get-users/:skip/:limit", async function(req, res) {
+router.post("/get-users-by-filters", async function(req, res) {
 
-  let skip = parseInt(req.params.skip);
-  let limit = parseInt(req.params.limit);
+  let skip = req.body.skip;
+  let limit = req.body.limit;
 
   const ret = [];
 

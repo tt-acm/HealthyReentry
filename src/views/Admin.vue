@@ -592,8 +592,12 @@ export default {
 
       this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
 
-      let apiurl = `/api/admin/get-users/${(this.pageNo-1)*this.itemsOnPage}/${this.itemsOnPage}`;
-      let userData = await this.$api.get(apiurl);
+      let postData = {
+        skip: (this.pageNo-1)*this.itemsOnPage,
+        limit: this.itemsOnPage
+      };
+
+      let userData = await this.$api.post('/api/admin/get-users-by-filters', postData);
       var users = userData.data;
       users.sort((a, b) => (a.name < b.name) ? -1 : 1)
       this.users = users;
