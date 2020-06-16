@@ -562,11 +562,7 @@ export default {
         nameFilteredUsers = nameFilteredUsers.filter(u => u.name.toLowerCase().includes(nfLower));
       }
 
-      let st = (this.itemsOnPage * (this.pageNo - 1));
-      let ed = (this.itemsOnPage * (this.pageNo));
-      let pageFilteredUsers = nameFilteredUsers.slice(st, ed);
-
-      this.usersInView = pageFilteredUsers.map(u => {
+      this.usersInView = nameFilteredUsers.map(u => {
         let hasStatus = u.status && u.status.status !== null && u.status.status !== undefined;
         let code = (hasStatus) ? u.status.status : -1;
         let status = enumStatusMap.filter(i => i.code === code)[0];
@@ -593,7 +589,7 @@ export default {
       this.isLoading = true;
       let officesSet = new Set();
 
-      let apiurl = `/api/admin/get-all-users`;
+      let apiurl = `/api/admin/get-users/${(this.pageNo-1)*this.itemsOnPage}/${this.itemsOnPage}`;
       let userData = await this.$api.get(apiurl);
       var users = userData.data;
       users.sort((a, b) => (a.name < b.name) ? -1 : 1)
@@ -650,14 +646,16 @@ export default {
         ?  i : 0;
       });
     },
-    setPageNo(newNo) {
       if (newNo < 1 || ((newNo-1) * this.itemsOnPage) > this.users.length) return;
+    async setPageNo(newNo) {
       this.pageNo = parseInt(newNo);
+      await this.refreshData();
       this.updateUsersInView();
     },
-    setItemsOnPage(newNo) {
+    async setItemsOnPage(newNo) {
       if (newNo < 1) return;
       this.itemsOnPage = parseInt(newNo);
+      await this.refreshData();
       this.updateUsersInView();
     },
     setOfficeFilterForAll(val) {
