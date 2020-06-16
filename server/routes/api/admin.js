@@ -69,6 +69,58 @@ router.get("/get-all-users", async function(req, res) {
 /**
  * @swagger
  * path:
+ *  /api/admin/get-users/:startIdx/:offset:
+ *    get:
+ *      summary: Get users from the database.
+ *      tags: [Admin]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: All stored users.
+ *        500:
+ *          description: Server error.
+ */
+router.get("/get-users/:skip/:limit", async function(req, res) {
+
+  let skip = parseInt(req.params.skip);
+  let limit = parseInt(req.params.limit);
+
+  const ret = [];
+
+  let include = {
+    "_id": 1,
+    "dateOfConsent": 1,
+    "name": 1,
+    "email": 1,
+    "location": 1
+  }
+
+  const users = await User.find({}, include)
+                          .sort({ name: 1})
+                          .skip(skip)
+                          .limit(limit)
+                          .exec();
+
+  for(let u of users) {
+    let nu = u.toObject();
+    const st = await Status.find({ "user": nu._id })
+                           .sort({ date: -1 })
+                           .limit(1);
+    nu.status = st[0];
+    ret.push(nu)
+  }
+
+  ret.reverse();
+
+  res.json(ret);
+
+});
+
+
+/**
+ * @swagger
+ * path:
  *  /api/admin/update-users:
  *    post:
  *      summary: Updates multiple users at the same time.
