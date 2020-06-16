@@ -69,15 +69,26 @@ router.get("/get-all-users", async function(req, res) {
 /**
  * @swagger
  * path:
- *  /api/admin/get-users/:startIdx/:offset:
+ *  /api/admin/get-users/{skip}/{limit}:
  *    get:
  *      summary: Get users from the database.
  *      tags: [Admin]
+ *      parameters:
+ *        - in: path
+ *          name: skip
+ *          description: Number of users to skip from the start.
+ *          schema:
+ *            type: integer
+ *        - in: path
+ *          name: limit
+ *          description: Number of users to return after skipping `skip` number of users.
+ *          schema:
+ *            type: integer
  *      produces:
  *       - application/json
  *      responses:
  *        200:
- *          description: All stored users.
+ *          description: Returns users from the database, sorted alphabetically with pagination applied.
  *        500:
  *          description: Server error.
  */
