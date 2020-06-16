@@ -105,8 +105,7 @@ router.get("/get-total-users-stats", async function(req, res) {
 
   const ret = {};
 
-  const users = await User.find({}).exec();
-  ret.total = users.length;
+  ret.total = await User.count({}).exec();
 
   res.json(ret);
 
