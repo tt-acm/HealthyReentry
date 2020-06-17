@@ -143,17 +143,22 @@
 
             <div class="row overflow-auto mx-0" style="height:400px">
               <div class="col">
-                <p v-for="ofc in officesList" :key="ofc.LocationID" class="pl-4">
-                  <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
-                  {{ofc.LocationName}}
-                </p>
+
+
+                <div v-for="region in regions" :key="region.name">
+                  
+                    <div class="pl-0">
+                      {{ region.name }}
+                    </div>
+
+                    <div v-for="ofc in region.offices" :key="ofc.LocationID" class="pl-4">
+                      <input class="form-check-input" type="checkbox" v-model="ofc.selected">
+                      {{ofc.LocationName}}
+                    </div>
+
+                </div>
+                
               </div>
-              <!-- <div class="col-6">
-                <p v-for="ofc in officesList.slice(15)" :key="ofc.LocationID">
-                  <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="updateUsersInView">
-                  {{ofc.LocationName}}
-                </p>
-              </div> -->
             </div>
 
           </div>
@@ -422,7 +427,7 @@
 
 <script>
 import enumStatusMap from "../../server/util/enumStatusMap.js";
-import regions from "../../server/util/officeList.js";
+import storedRegions from "../../server/util/officeList.js";
 import graphToCsv from "../../server/util/csvUtils.js";
 
 function downloadCSV(content, fileName) {
@@ -474,7 +479,6 @@ function fuzzyTime(date) {
 export default {
   beforeMount() {
     this.refreshData();
-
   },
   created() {},
   mounted() {
@@ -487,6 +491,7 @@ export default {
       nameSearch: "",
       sortBy: null,
       sortAsc: true,
+      regions: [],
       officesList: [],
       usersInView: [],
       users: [],
@@ -603,6 +608,13 @@ export default {
       });
       this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
       this.officesList.sort((a, b) => a.LocationName < b.LocationName ? -1 : 1);
+      Object.keys(storedRegions).forEach(region => {
+        this.regions.push({
+          name: region,
+          childrenSelectStatus: 2,
+          offices: storedRegions[region].map(o => { return { LocationName:o, selected: true } })
+        });
+      });
       this.updateUsersInView();
       this.isLoading = false;
 
