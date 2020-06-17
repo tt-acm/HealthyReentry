@@ -422,6 +422,7 @@
 
 <script>
 import enumStatusMap from "../../server/util/enumStatusMap.js";
+import regions from "../../server/util/officeList.js";
 import graphToCsv from "../../server/util/csvUtils.js";
 
 function downloadCSV(content, fileName) {

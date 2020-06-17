@@ -3,6 +3,7 @@
 
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectId;
+const regions = require('./server/util/officeList');
 
 var moment = require('moment');
 moment().format();
@@ -23,15 +24,6 @@ let leaders = {
     "Midwest": "fehsan@thorntontomasetti.com",
     "Europe": "pthompson@thorntontomasetti.com",
     "Pacific Rim": "yzhu@thorntontomasetti.com"
-}
-
-let regions = {
-    "East": ["Boston", "Halifax", "Mississauga", "New York", "Newark", "Ottawa", "Portland", "Toronto", "West Hartford"],
-    "West": ["Los Angeles", "San Diego", "Santa Clara", "San Francisco", "Seattle", "Wellington"],
-    "Mid-Atlantic and South": ["Albuquerque", "Atlanta", "Austin", "Fort Lauderdale", "Houston", "Dallas", "Philadelphia", "Miami", "Tampa", "Washington"],
-    "Midwest": ["Chicago", "Denver", "Kansas City", "Milwaukee", "Phoenix"],
-    "Europe": ["Aberdeen", "Bristol", "Copenhagen", "Edinburgh", "London", "Perth", "Romsey", "Sydney", "Warrington"],
-    "Pacific Rim": ["Beijing", "Ho Chi Minh City", "Hong Kong", "Shanghai"]
 }
 
 
