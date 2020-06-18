@@ -72,16 +72,20 @@ router.post("/get-users-by-filters", async function(req, res) {
     "name": 1,
     "email": 1,
     "location": 1
-  }
+  };
 
-  const users = await User.find({
-                                  name: {'$regex': nameSearch, '$options': 'i'},
-                                  location: {$in: offices}
-                                }, include)
-                          .sort({ name: 1})
-                          .skip(skip)
-                          .limit(limit)
-                          .exec();
+  let findQuery = !(Array.isArray(offices) && offices.length > 0)
+                ? User.find({ name: {'$regex': nameSearch, '$options': 'i'} }, include)
+                : User.find({
+                    name: {'$regex': nameSearch, '$options': 'i'},
+                    location: {$in: offices}
+                  }, include);
+
+  const users = await findQuery
+                      .sort({ name: 1})
+                      .skip(skip)
+                      .limit(limit)
+                      .exec();
 
   for(let u of users) {
     let nu = u.toObject();
