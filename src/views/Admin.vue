@@ -147,8 +147,24 @@
 
                 <div v-for="region in regions" :key="region.name">
                   
-                    <div class="pl-0">
+                    <div class="pt-2">
+                      <i class="fas fa-angle-right"></i>
                       {{ region.name }}
+                      <small><i>
+                        (
+                        <span
+                          style="cursor: pointer;"
+                          @click="setRegionSelection(region.name, true)"
+                        >All</span>
+                      </i></small>
+                      |
+                      <small><i>
+                        <span
+                          style="cursor: pointer;"
+                          @click="setRegionSelection(region.name, false)"
+                        >None</span>
+                        )
+                      </i></small>
                     </div>
 
                     <div v-for="ofc in region.offices" :key="ofc.LocationID" class="pl-4">
@@ -642,6 +658,9 @@ export default {
       
       this.isLoading = false;
 
+    },
+    setRegionSelection(name, val) {
+      this.regions.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
     },
     updInviewUserSelectedState(val) {
       this.usersInView.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);
