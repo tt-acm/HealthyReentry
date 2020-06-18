@@ -27,6 +27,24 @@ router.get("/login", function(req, res, next) {
 }, function(req, res) {
   var returnTo = req.session.returnTo;
   var redirectPath = process.env.LOCAL_BUILD? process.env.VUE_APP_LOCALFRONTEND_URL : "http://" + req.headers.host;
+  
+  function finish() {
+    return res.redirect(returnTo || redirectPath);
+  }
+
+  function logout(rejectErr) {
+    if (req.user) req.logout();
+    reject(rejectErr || "User not a match. Logged out.");
+  }
+
+  function login(user) {
+    req.logIn(user, function(err) {
+      console.log("errs", err);
+      if (err) logout();
+      finish();
+    });
+  }
+
   // if already logged in, go from whence we came
   console.log("req.user", req.user);
   if (req.user && !req.query.token) {
@@ -77,22 +95,7 @@ router.get("/login", function(req, res, next) {
       }
 
 
-      function finish() {
-        return res.redirect(returnTo || redirectPath);
-      }
 
-      function logout(rejectErr) {
-        if (req.user) req.logout();
-        reject(rejectErr || "User not a match. Logged out.");
-      }
-
-      function login(user) {
-        req.logIn(user, function(err) {
-          console.log("errs", err);
-          if (err) logout();
-          finish();
-        });
-      }
     }).catch(function(err) {
       req.flash("errors", err);
       res.status("403");
