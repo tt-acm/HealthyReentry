@@ -62,6 +62,7 @@ router.post("/get-users-by-filters", async function(req, res) {
   let skip = req.body.skip;
   let limit = req.body.limit;
   let nameSearch = req.body.nameSearch;
+  let offices = req.body.offices;
 
   const ret = [];
 
@@ -73,7 +74,10 @@ router.post("/get-users-by-filters", async function(req, res) {
     "location": 1
   }
 
-  const users = await User.find({name: {'$regex': nameSearch, '$options': 'i'}}, include)
+  const users = await User.find({
+                                  name: {'$regex': nameSearch, '$options': 'i'},
+                                  location: {$in: offices}
+                                }, include)
                           .sort({ name: 1})
                           .skip(skip)
                           .limit(limit)

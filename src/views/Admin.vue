@@ -628,12 +628,18 @@ export default {
       };
       this.regions.push(oth);
 
+      let selectedLocations = [];
+      this.regions.forEach(r => {
+        selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
+      });
+
       this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
 
       let postData = {
         skip: (this.pageNo-1)*this.itemsOnPage,
         limit: this.itemsOnPage,
-        nameSearch: this.nameSearch
+        nameSearch: this.nameSearch,
+        offices: selectedLocations
       };
 
       let userData = await this.$api.post('/api/admin/get-users-by-filters', postData);
