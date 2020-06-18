@@ -48,9 +48,9 @@ router.get("/login", function(req, res, next) {
   // if already logged in, go from whence we came
   console.log("req.user", req.user);
   if (req.user && !req.query.token) {
-    login(req.user);
+    // login(req.user);
     // return res.redirect("back");
-    // return res.redirect('/menu');
+    return res.redirect('/menu');
   }
   // if valid token or other authentication, log in here
   if (req.query.token) {
