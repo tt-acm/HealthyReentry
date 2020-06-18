@@ -446,6 +446,17 @@ import enumStatusMap from "../../server/util/enumStatusMap.js";
 import storedRegions from "../../server/util/officeList.js";
 import graphToCsv from "../../server/util/csvUtils.js";
 
+function isInStoredRegions(location) {
+  for(let region in storedRegions) {
+    for(let loc of storedRegions[region]) {
+      if (loc === location) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 function downloadCSV(content, fileName) {
   let dlTrigger = document.createElement('a');
   dlTrigger.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
@@ -605,6 +616,17 @@ export default {
 
       this.isLoading = true;
       let officesSet = new Set();
+      Object.keys(storedRegions).forEach(region => {
+        this.regions.push({
+          name: region,
+          offices: storedRegions[region].map(o => { return { LocationName:o, selected: true } })
+        });
+      });
+      let oth = {
+        name: "Other",
+        offices: []
+      };
+      this.regions.push(oth);
 
       this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
 
@@ -620,17 +642,13 @@ export default {
       this.users = users;
       this.users.forEach(u => {
         let loc = u.location || 'unknown';
+        if (!isInStoredRegions(loc)) {
+          oth.offices.push({ LocationName:loc, selected: true });
+        }
         officesSet.add(loc);
       });
       this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
       this.officesList.sort((a, b) => a.LocationName < b.LocationName ? -1 : 1);
-      Object.keys(storedRegions).forEach(region => {
-        this.regions.push({
-          name: region,
-          childrenSelectStatus: 2,
-          offices: storedRegions[region].map(o => { return { LocationName:o, selected: true } })
-        });
-      });
       this.updateUsersInView();
       this.isLoading = false;
 
