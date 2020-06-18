@@ -32,15 +32,15 @@ export default {
 
   created() {
   },
-  data() { 
-    return { 
-        url: process.env.VUE_APP_DOC_URL, 
+  data() {
+    return {
+        url: process.env.VUE_APP_DOC_URL,
         company: process.env.VUE_APP_COMPANY
     }
 },
   methods: {
     login() {
-      if (this.$auth.isAuthenticated === false) this.$auth.loginWithRedirect();
+      window.location.href= (process.env.VUE_APP_LOCALBACKEND_URL || "") + "/login"
     }
   }
 };
