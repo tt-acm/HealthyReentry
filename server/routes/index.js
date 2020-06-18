@@ -27,7 +27,6 @@ router.get("/login", function(req, res, next) {
 }, function(req, res) {
   var returnTo = req.session.returnTo;
   var redirectPath = process.env.LOCAL_BUILD? process.env.VUE_APP_LOCALFRONTEND_URL : "http://" + req.headers.host;
-  redirectPath = redirectPath + "/menu";
 
   function finish() {
     return res.redirect(returnTo || redirectPath);
