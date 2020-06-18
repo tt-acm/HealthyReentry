@@ -28,8 +28,10 @@ router.get("/login", function(req, res, next) {
   var returnTo = req.session.returnTo;
   var redirectPath = process.env.LOCAL_BUILD? process.env.VUE_APP_LOCALFRONTEND_URL : "http://" + req.headers.host;
   // if already logged in, go from whence we came
+  console.log("req.user", req.user);
   if (req.user && !req.query.token) {
-    return res.redirect("back");
+    login(user);
+    // return res.redirect("back");
     // return res.redirect('/menu');
   }
   // if valid token or other authentication, log in here
