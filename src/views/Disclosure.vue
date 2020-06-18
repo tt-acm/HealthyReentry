@@ -114,7 +114,6 @@ export default {
       // console.log("submitting");
       this.$api.get("/api/user/consent-signed").then(consent => {
         this.$emit("disclosureMsg");
-        this.$auth.userDB = consent.data;
         this.$router.push({ name: 'menu' });
       });
 

@@ -10,17 +10,35 @@ const Encounter = require('../../models/Encounter');
 
 
 /**
- * @api {post} /api/encounters/add-one
- * @apiName Encounters
- * @apiDescription adding an encounter to database
- * @apiGroup encounters
- *
- * @apiSuccess {Object} true;
- * @apiError 500 Internal Server Error
- *
- * @apiParam {date} date - date of the encounter if null use today's date
- * @apiParam {string} id - encountered user's id ( use id or email)
- * @apiParam {string} email- encuntered user's email ( use id or email)
+ * @swagger
+ * path:
+ *  /api/encounters/add-one:
+ *    post:
+ *      summary: Submit a new encounter to database.
+ *      tags: [Encounters]
+ *      parameters:
+ *        - in: body
+ *          name: date
+ *          description: Date of the encounter; uses current date if null.
+ *          schema:
+ *            type: date
+ *        - in: body
+ *          name: id
+ *          description: Encountered user's id (use id or email).
+ *          schema:
+ *            type: string
+ *        - in: body
+ *          name: email
+ *          description: Encountered user's email (use id or email).
+ *          schema:
+ *            type: string
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: The newly created encounter.
+ *        500:
+ *          description: Server error.
  */
 router.post("/add-one", function (req, res) {
 
@@ -60,17 +78,38 @@ router.post("/add-one", function (req, res) {
 
 
 /**
- * @api {post} /api/encounters/add-many
- * @apiName Encounters
- * @apiDescription adding many encounters to database, can be group encounters
- * @apiGroup encounters
- *
- * @apiSuccess {Object} true;
- * @apiError 500 Internal Server Error
- *
- * @apiParam {date} date - date of the encounter if null use today's date
- * @apiParam {String[]} ids - user ids ( not include the sender)
- * @apiParam {boolean} isGroup - if true it is group encounters (combinations), if false only with the sender
+ * @swagger
+ * path:
+ *  /api/encounters/add-many:
+ *    post:
+ *      summary: Submit multiple encounters to database, can be group encounters.
+ *      tags: [Encounters]
+ *      parameters:
+ *        - in: body
+ *          name: date
+ *          description: Date of the encounter; uses current date if null.
+ *          schema:
+ *            type: date
+ *        - in: body
+ *          name: ids
+ *          description: User ids for logging the encounters excluding the sender.
+ *          schema:
+ *            type: list
+ *            items:
+ *              type: string
+ *        - in: body
+ *          name: isGroup
+ *          description: If true it is considered as a group encounters which add all combinations of 
+ *                       encounters within the group. If false add encounter only with the sender.
+ *          schema:
+ *            type: boolean
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: The newly created encounter.
+ *        500:
+ *          description: Server error.
  */
 router.post("/add-many", function (req, res) {
 
@@ -183,6 +222,22 @@ router.post("/add-many", function (req, res) {
  * @apiError 500 Internal Server Error
  *
  */
+/**
+ * @swagger
+ * path:
+ *  /api/encounters/find-frequent-encounters:
+ *    get:
+ *      summary: Get current user's frequent encounters.
+ *      tags: [Encounters]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: List of current user's encounters in the past 7 days, with a flag
+ *                       indicating if the encounter was today.
+ *        500:
+ *          description: Server error.
+ */
 router.get("/find-frequent-encounters", function (req, res) {
     //https://docs.mongodb.com/manual/tutorial/query-arrays/
 
@@ -233,14 +288,20 @@ router.get("/find-frequent-encounters", function (req, res) {
 
 
 /**
- * @api {get} /api/encounters/get graph
- * @apiName Encounters
- * @apiDescription get graphs of all encounters and send email to admin and notify downstream contacts
- * @apiGroup encounters
- *
- * @apiSuccess {Boolean} true
- * @apiError 500 Internal Server Error
- *
+ * @swagger
+ * path:
+ *  /api/encounters/get-graph:
+ *    get:
+ *      summary: Get graphs of all encounters for current user, send email to admin and 
+ *               notify downstream contacts.
+ *      tags: [Encounters]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: JSON representing graph interactions.
+ *        500:
+ *          description: Server error.
  */
 router.post("/get-graph", function (req, res) {
 

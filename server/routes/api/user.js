@@ -7,6 +7,21 @@ const Status = require('../../models/Status');
 const parseUser = require('../../util/parseUser');
 
 
+/**
+ * @swagger
+ * path:
+ *  /api/user/user-by-email:
+ *    get:
+ *      summary: Get user by email address.
+ *      tags: [Users]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: Stored user.
+ *        500:
+ *          description: Server error.
+ */
 router.post("/user-by-email", function(req, res) {
 
   // returns only email, profile name, and _id
@@ -28,6 +43,21 @@ router.post("/user-by-email", function(req, res) {
 });
 
 
+/**
+ * @swagger
+ * path:
+ *  /api/user/consent-signed:
+ *    get:
+ *      summary: Method to update database with user's consent accpetance date.
+ *      tags: [Users]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: Updated user.
+ *        500:
+ *          description: Server error.
+ */
 router.get("/consent-signed", function (req, res) {
   User.findById(req.user.id)
     .exec(function (err, user) {
@@ -103,7 +133,21 @@ router.get("/consent-signed", function (req, res) {
 });
 
 
-//get all users
+/**
+ * @swagger
+ * path:
+ *  /api/user/get-all:
+ *    get:
+ *      summary: Get all users except current logged in user.
+ *      tags: [Users]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: List of users.
+ *        500:
+ *          description: Server error.
+ */
 router.get("/get-all", function (req, res) {
 
   // returns only email, profile name, and _id
@@ -129,7 +173,7 @@ router.get("/get-all", function (req, res) {
 /**
  * @swagger
  * path:
- *  /api/user/:
+ *  /api/user:
  *    post:
  *      summary: Create a new user. Returns existing user of same name if found.
  *      tags: [Users]

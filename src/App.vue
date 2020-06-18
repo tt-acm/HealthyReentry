@@ -39,20 +39,12 @@ export default {
       showStatusMsg: false,
       showEncounterMsg: false,
       companyInitials: process.env.VUE_APP_COMPANY_INITIALS,
-      sender:process.env.SENDGRID_EMAIL 
+      sender:process.env.SENDGRID_EMAIL
     };
   },
   mounted() {
   },
   methods: {
-    login() {
-      this.$auth.loginWithRedirect();
-    },
-    logout() {
-      this.$auth.logout({
-        returnTo: window.location.origin
-      });
-    },
     statusMsg: function(alerts) { this.showStatusMsg = true; },
     disclosureMsg: function() { this.showDisclosureMsg = true; },
     encounterMsg: function() { this.showEncounterMsg = true; },

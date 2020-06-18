@@ -31,12 +31,12 @@
 </template>
 <script>
 import QRCode  from 'qrcode';
+import Vuex from 'vuex';
 // import store from "store/index.js";
 
 export default {
   // props: ["user"],
   created() {
-    if (this.$auth.userDB) this.user = this.$auth.userDB;
   },
   mounted() {
     // $(window).on('load',function(){
@@ -60,13 +60,12 @@ export default {
   },
   data() {
     return {
-      user: null,
       companyInitials: process.env.VUE_APP_COMPANY_INITIALS
     };
   },
-  // computed: Vuex.mapState({
-  //   user: state => state.user,
-  // }),
+  computed: Vuex.mapState({
+    user: state => state.user,
+  }),
   methods: {
 
   }
