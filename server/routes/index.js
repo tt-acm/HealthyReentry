@@ -71,7 +71,7 @@ router.get("/login", function(req, res, next) {
           // return res.json(savedStatus);
           // return res.json(user);
           login(user);
-        });        
+        });
       }
 
 
@@ -104,7 +104,7 @@ router.get("/login", function(req, res, next) {
       return res.redirect(req.originalUrl.split("?")[0]);
     } else {
       // redirect to login external
-      var returnPath = qs.escape("http://" + req.headers.host + req.originalUrl);
+      var returnPath = qs.escape("https://" + req.headers.host + req.originalUrl);
       console.log("returnPath", returnPath);
       var redirectPath = process.env.CORE_SSO_URL + "/user/authenticate/" + returnPath;
       if (process.env.CORE_SSO_TT_ONLY) redirectPath += "?tt-only=true";
