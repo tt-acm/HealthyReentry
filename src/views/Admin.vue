@@ -154,21 +154,21 @@
                         (
                         <span
                           style="cursor: pointer;"
-                          @click="setRegionSelection(region.name, true)"
+                          @click="setRegionSelection(region.name, true); refreshData()"
                         >All</span>
                       </i></small>
                       |
                       <small><i>
                         <span
                           style="cursor: pointer;"
-                          @click="setRegionSelection(region.name, false)"
+                          @click="setRegionSelection(region.name, false); refreshData()"
                         >None</span>
                         )
                       </i></small>
                     </div>
 
                     <div v-for="ofc in region.offices" :key="ofc.LocationID" class="pl-4">
-                      <input class="form-check-input" type="checkbox" v-model="ofc.selected">
+                      <input class="form-check-input" type="checkbox" v-model="ofc.selected" @click="refreshData">
                       {{ofc.LocationName}}
                     </div>
 
