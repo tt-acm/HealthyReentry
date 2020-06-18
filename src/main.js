@@ -55,7 +55,7 @@ async function main() {
       // }
       // session.clearAlerts();
       //
-      // if (to.name === 'NotFound') return next();
+      if (to.name === 'home' || to.name ==='NotFound') return next();
 
       function routeUserFunction(user) {
         //authenticated
@@ -80,7 +80,7 @@ async function main() {
       }).catch(() => {
           store.commit('setUser', null);
           // keepGoing();
-          return next();
+          return next("/");
       })
   });
 
