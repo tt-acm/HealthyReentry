@@ -142,7 +142,7 @@
 
             <div class="row">
               <div class="col-12 pl-3">
-                <button class="btn btn-outline-secondary" type="button" @click="setOfficeFilterForAll(true); refreshData();">
+                <button class="btn btn-outline-secondary" type="button" @click="setOfficeFilterForAll(true); refreshData(true);">
                   Select All
                 </button>
                 <button class="btn btn-outline-secondary mx-2" type="button" @click="setOfficeFilterForAll(false); refreshData();">
@@ -165,21 +165,21 @@
                         (
                         <span
                           style="cursor: pointer;"
-                          @click="setRegionSelection(region.name, true); refreshData()"
+                          @click="setRegionSelection(region.name, true); refreshData();"
                         >All</span>
                       </i></small>
                       |
                       <small><i>
                         <span
                           style="cursor: pointer;"
-                          @click="setRegionSelection(region.name, false); refreshData()"
+                          @click="setRegionSelection(region.name, false); refreshData();"
                         >None</span>
                         )
                       </i></small>
                     </div>
 
                     <div v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
-                      <input class="form-check-input" type="checkbox" v-model="ofc.selected" @click="refreshData">
+                      <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="refreshData();">
                       {{ofc.LocationName}}
                     </div>
 
@@ -288,12 +288,6 @@
             <span class="dropdown-item" data-toggle="modal" data-target="#updateConfModal"
               @click="userUpdateData.statusCodeToSet = 2;"
             ><i class="fas fa-circle fa-xs en_red"></i> &nbsp;&nbsp; Mark red</span>
-
-            <!-- <div class="dropdown-divider"></div> -->
-
-            <!-- <span class="dropdown-item" data-toggle="modal" data-target="#updateConfModal"
-              @click="userUpdateData.statusCodeToSet = 3;"
-            ><i class="fas fa-circle fa-xs en_blue"></i> &nbsp;&nbsp; Mark blue</span> -->
 
           </div>
 
@@ -613,8 +607,9 @@ export default {
 
       this.isLoading = true;
 
-      let selectedLocations = [];
+      let selectedLocations = null;
       if(!ignoreOfcFilters) {
+        selectedLocations = [];
         this.regions.forEach(r => {
           selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
         });
@@ -622,7 +617,7 @@ export default {
 
       this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
 
-      let oth = this.regions.filter(r => r.name === "Other")[0];
+      // let oth = this.regions.filter(r => r.name === "Other")[0];
 
       let postData = {
         skip: (this.pageNo-1)*this.itemsOnPage,

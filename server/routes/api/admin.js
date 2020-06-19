@@ -74,7 +74,7 @@ router.post("/get-users-by-filters", async function(req, res) {
     "location": 1
   };
 
-  let findQuery = !(Array.isArray(offices) && offices.length > 0)
+  let findQuery = !Array.isArray(offices)
                 ? User.find({ name: {'$regex': nameSearch, '$options': 'i'} }, include)
                 : User.find({
                     name: {'$regex': nameSearch, '$options': 'i'},
