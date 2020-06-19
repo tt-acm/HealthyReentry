@@ -93,9 +93,21 @@
                   {{ selectedUsers[0].officeCode }}
                 </button>
                 <div class="dropdown-menu overflow-auto mx-0" style="height:400px" aria-labelledby="locDDMenuButton">
-                  <p class="dropdown-item" v-for="ofc in officesList" :key="ofc.LocationID" @click="userUpdateData.locationToSet = ofc.LocationName">
-                    {{ ofc.LocationName }}
-                  </p>
+
+                  <div class="dropdown-item">
+
+                    <div v-for="region in regions" :key="region.name">
+
+                      <div v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
+                        <p @click="userUpdateData.locationToSet = ofc.LocationName">
+                          {{ ofc.LocationName }}
+                        </p>
+                      </div>
+
+                    </div>
+
+                  </div>
+
                 </div>
                 <p v-if="userUpdateData.locationToSet !== null">
                   <small><i>
@@ -130,10 +142,10 @@
 
             <div class="row">
               <div class="col-12 pl-3">
-                <button class="btn btn-outline-secondary" type="button" @click="setOfficeFilterForAll(true); updateUsersInView();">
+                <button class="btn btn-outline-secondary" type="button" @click="setOfficeFilterForAll(true); refreshData();">
                   Select All
                 </button>
-                <button class="btn btn-outline-secondary mx-2" type="button" @click="setOfficeFilterForAll(false); updateUsersInView();">
+                <button class="btn btn-outline-secondary mx-2" type="button" @click="setOfficeFilterForAll(false); refreshData();">
                   Select None
                 </button>
               </div>
@@ -143,7 +155,6 @@
 
             <div class="row overflow-auto mx-0" style="height:400px">
               <div class="col">
-
 
                 <div v-for="region in regions" :key="region.name">
                   
@@ -167,7 +178,7 @@
                       </i></small>
                     </div>
 
-                    <div v-for="ofc in region.offices" :key="ofc.LocationID" class="pl-4">
+                    <div v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
                       <input class="form-check-input" type="checkbox" v-model="ofc.selected" @click="refreshData">
                       {{ofc.LocationName}}
                     </div>
@@ -404,7 +415,7 @@
         </thead>
 
         <tbody>
-          <tr v-for="user in usersInView" :key="user.id">
+          <tr v-for="user in users" :key="user.id">
             <td style="width: 15%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
               {{ (user.selected) ? '&#9745;' : '&#9744;' }}
             </td>
@@ -445,17 +456,6 @@
 import enumStatusMap from "../../server/util/enumStatusMap.js";
 import storedRegions from "../../server/util/officeList.js";
 import graphToCsv from "../../server/util/csvUtils.js";
-
-function isInStoredRegions(location) {
-  for(let region in storedRegions) {
-    for(let loc of storedRegions[region]) {
-      if (loc === location) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
 
 function downloadCSV(content, fileName) {
   let dlTrigger = document.createElement('a');
@@ -505,10 +505,20 @@ function fuzzyTime(date) {
 
 export default {
   beforeMount() {
-    this.refreshData();
+    this.refreshData(true);
   },
   created() {},
   mounted() {
+    Object.keys(storedRegions).forEach(region => {
+      this.regions.push({
+        name: region,
+        offices: storedRegions[region].map(o => { return { LocationName:o, selected: true } })
+      });
+    });
+    this.regions.push({
+      name: "Other",
+      offices: []
+    });
   },
   data() {
     return {
@@ -519,8 +529,6 @@ export default {
       sortBy: null,
       sortAsc: true,
       regions: [],
-      officesList: [],
-      usersInView: [],
       users: [],
       totalUsersCount: 0,
       incubationDays: 2,
@@ -534,19 +542,41 @@ export default {
   },
   computed: {
     officesSelectedCount() {
-      return this.officesList.reduce((a, c) => a + (c.selected ? 1 : 0), 0);
+      let i = 0;
+      this.regions.forEach(r => {
+        r.offices.forEach(o => {
+          if (o.selected) i++;
+        })
+      })
+      return i;
     },
     allOfficesSelected() {
-      return this.officesList.every(o => o.selected);
+      let ret = true;
+      this.regions.forEach(r => {
+        r.offices.forEach(o => {
+          if (!o.selected) ret = false;
+        })
+      })
+      return ret;
     },
     selectedUsers() {
-      return this.usersInView
+      return this.users
                   .filter(u => u.selected);
     }
   },
   methods: {
+    isInRegions(location) {
+      for(let region of this.regions) {
+        for(let loc of region.offices) {
+          if (loc === location) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
     async downloadGraphForSelectedAsCSV() {
-      let userEmails = this.selectedUsers.map(u => u.email);  
+      let userEmails = this.users.map(u => u.email);  
       if (userEmails.length < 1) return;
       this.isLoading = true;
       let postBody = {
@@ -575,22 +605,44 @@ export default {
     },
     downloadOfficeStats() {
       let csv = "Office,Orange,Red,Total Signups\r\n";
-      this.officesList.forEach(o => {
-        let locUsers = this.users.filter(u => u.location === o.LocationName);
-        let rCount = locUsers.filter(u => u.status.status === 2).length;
-        let oCount = locUsers.filter(u => u.status.status === 1).length;
-        csv += `${o.LocationName},${oCount},${rCount},${locUsers.length}\r\n`;
-      }),
       downloadCSV(csv, `office-stats_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
-    updateUsersInView() {
+    async refreshData(ignoreOfcFilters) {
 
-      let officeArr = this.officesList
-                            .filter(o => o.selected)
-                            .map(o => o.LocationName);
-      let officeFilteredUsers = this.users.filter(u => officeArr.includes(u.location));
+      ignoreOfcFilters = !!ignoreOfcFilters;
 
-      this.usersInView = officeFilteredUsers.map(u => {
+      this.isLoading = true;
+
+      let selectedLocations = [];
+      if(!ignoreOfcFilters) {
+        this.regions.forEach(r => {
+          selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
+        });
+      }
+
+      this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
+
+      let oth = this.regions.filter(r => r.name === "Other")[0];
+
+      let postData = {
+        skip: (this.pageNo-1)*this.itemsOnPage,
+        limit: this.itemsOnPage,
+        nameSearch: this.nameSearch,
+        offices: selectedLocations
+      };
+
+      let userData = await this.$api.post('/api/admin/get-users-by-filters', postData);
+      let users = userData.data;
+
+      // users.forEach(u => {
+      //   let loc = u.location || 'unknown';
+      //   if (!this.isInRegions(loc)) {
+      //     oth.offices.push({ LocationName:loc, selected: true });
+      //   }
+      // });
+
+
+      this.users = users.map(u => {
         let hasStatus = u.status && u.status.status !== null && u.status.status !== undefined;
         let code = (hasStatus) ? u.status.status : -1;
         let status = enumStatusMap.filter(i => i.code === code)[0];
@@ -611,51 +663,7 @@ export default {
         return user;
       });
 
-    },
-    async refreshData() {
 
-      this.isLoading = true;
-      let officesSet = new Set();
-      Object.keys(storedRegions).forEach(region => {
-        this.regions.push({
-          name: region,
-          offices: storedRegions[region].map(o => { return { LocationName:o, selected: true } })
-        });
-      });
-      let oth = {
-        name: "Other",
-        offices: []
-      };
-      this.regions.push(oth);
-
-      let selectedLocations = [];
-      this.regions.forEach(r => {
-        selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
-      });
-
-      this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
-
-      let postData = {
-        skip: (this.pageNo-1)*this.itemsOnPage,
-        limit: this.itemsOnPage,
-        nameSearch: this.nameSearch,
-        offices: selectedLocations
-      };
-
-      let userData = await this.$api.post('/api/admin/get-users-by-filters', postData);
-      var users = userData.data;
-      users.sort((a, b) => (a.name < b.name) ? -1 : 1)
-      this.users = users;
-      this.users.forEach(u => {
-        let loc = u.location || 'unknown';
-        if (!isInStoredRegions(loc)) {
-          oth.offices.push({ LocationName:loc, selected: true });
-        }
-        officesSet.add(loc);
-      });
-      this.officesList = Array.from(officesSet).map(o => { return { LocationName:o, selected: true } });
-      this.officesList.sort((a, b) => a.LocationName < b.LocationName ? -1 : 1);
-      this.updateUsersInView();
       this.isLoading = false;
 
     },
@@ -670,7 +678,7 @@ export default {
       updatedUsers.forEach(nu => {
         let idx = this.users.findIndex(u => u._id === nu._id);
         this.users[idx] = nu;
-        this.updateUsersInView();
+        this.refreshData();
       });
 
       this.clearUpdateData();
@@ -687,7 +695,7 @@ export default {
       this.regions.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
     },
     updInviewUserSelectedState(val) {
-      this.usersInView.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);
+      this.users.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);
     },
     async clearUpdateData() {
       this.userUpdateData.statusCodeToSet = -1;
@@ -698,7 +706,7 @@ export default {
       this.sortBy = key;
       this.sortAsc = inAsc;
       let i = this.sortAsc ? 1 : -1;
-      this.usersInView.sort((a, b) => {
+      this.users.sort((a, b) => {
         return (a[this.sortBy] < b[this.sortBy])
         ? -i : (a[this.sortBy] > b[this.sortBy])
         ?  i : 0;
@@ -708,16 +716,16 @@ export default {
       if (newNo < 1 || ((newNo-1) * this.itemsOnPage) > this.totalUsersCount) return;
       this.pageNo = parseInt(newNo);
       await this.refreshData();
-      this.updateUsersInView();
     },
     async setItemsOnPage(newNo) {
       if (newNo < 1) return;
       this.itemsOnPage = parseInt(newNo);
       await this.refreshData();
-      this.updateUsersInView();
     },
     setOfficeFilterForAll(val) {
-      this.officesList.forEach(o => o.selected = val);
+      this.regions.forEach(r => {
+        this.setRegionSelection(r.name, val);
+      });
     }
   }
 };
