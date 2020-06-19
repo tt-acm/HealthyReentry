@@ -562,7 +562,7 @@ export default {
     isInRegions(location) {
       for(let region of this.regions) {
         for(let loc of region.offices) {
-          if (loc === location) {
+          if (loc.LocationName === location) {
             return true;
           }
         }
@@ -617,7 +617,7 @@ export default {
 
       this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
 
-      // let oth = this.regions.filter(r => r.name === "Other")[0];
+      let oth = this.regions.filter(r => r.name === "Other")[0];
 
       let postData = {
         skip: (this.pageNo-1)*this.itemsOnPage,
@@ -629,12 +629,12 @@ export default {
       let userData = await this.$api.post('/api/admin/get-users-by-filters', postData);
       let users = userData.data;
 
-      // users.forEach(u => {
-      //   let loc = u.location || 'unknown';
-      //   if (!this.isInRegions(loc)) {
-      //     oth.offices.push({ LocationName:loc, selected: true });
-      //   }
-      // });
+      users.forEach(u => {
+        let loc = u.location || 'N/A';
+        if (!this.isInRegions(loc)) {
+          oth.offices.push({ LocationName:loc, selected: true });
+        }
+      });
 
 
       this.users = users.map(u => {
