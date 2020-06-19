@@ -3,7 +3,6 @@ import App from '@/App.vue';
 import axios from 'axios';
 Vue.prototype.$api = axios.create();
 
-import { Auth0Plugin } from "./auth";
 import router from '@/router';
 import store from '@/store';
 
@@ -50,17 +49,39 @@ async function main() {
     }
   }
 
-  let resp = await Vue.prototype.$api.get('/api/auth0-config');
-  let authConfig = resp.data;
-  let domain = authConfig.AUTH0_DOMAIN;
-  let clientId = authConfig.AUTH0_CLIENT_ID;
-  let scope = authConfig.SCOPE;
-  let defaultAuth = authConfig.DEFAULT_AUTH_CONN;
+  router.beforeEach((to, from, next) => {
+      // if (to.meta && to.meta.title) {
+      //     document.title = to.meta.title(to);
+      // }
+      // session.clearAlerts();
+      //
 
-  Vue.use(Auth0Plugin, {
-    domain,
-    clientId,
-    defaultAuth
+      function routeUserFunction(user) {
+        //authenticated
+        if (user.dateOfConsent) {//consent signed
+          if (to.name === "home" || to.name === "disclosure") return next("/menu");//route signed user to menu
+          else return next();
+        }
+        else{//authenticated, but haven't signed consent
+          if (to.name === "disclosure") return next();
+          else return next("/disclosure");//route signed user to sign
+        }
+
+      }
+
+      Vue.prototype.$api.get("/api/session").then(session => {
+        if (session.data.user) {
+          store.commit('setUser', session.data.user);
+          routeUserFunction(session.data.user);
+        }
+        else return next('/');
+          // keepGoing();
+      }).catch(() => {
+          store.commit('setUser', null);
+          // keepGoing();
+          if (to.name === 'home' || to.name ==='NotFound') return next();
+          return next("/");
+      })
   });
 
   Vue.config.productionTip = false;

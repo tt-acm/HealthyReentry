@@ -3,8 +3,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+var session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
+var passport = require('./configs/passport');
 const path = require('path');
-const swaggerAPIDocSetup = require('./configs/apidoc');
 
 const DIR = 'dist';
 const PORT = process.env.PORT || 8080;
@@ -39,6 +41,22 @@ app.use('*', ensureSecure);
 app.use(express.static(DIR));
 
 app.use(cookieParser());
+
+app.use(session({
+        secret: process.env.SESSION_SECRET,
+        store:  new MongoDBStore({
+          uri: mongoURI,
+          collection: 'sessions',
+        }),
+        resave: true,
+        saveUninitialized: true
+    }));
+
+    // Initialize passport and also allow it to read
+    // the request session information.
+    app.use(passport.initialize());
+    app.use(passport.session());
+
 app.use(bodyParser.json({
   limit: '500mb'
 }));
@@ -48,8 +66,6 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use("/", require('./routes'));
-
-swaggerAPIDocSetup.setup(app);
 
 const base = path.join(__dirname, '../');
 const indexFilePath = path.join(base, '/dist/index.html');

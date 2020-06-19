@@ -24,13 +24,19 @@ router.use(function (req, res, next) {
 
 
 /**
- * @api {get} /api/admin/get-all-users
- * @apiName Encounters
- * @apiDescription get all registered users
- * @apiGroup admin
- *
- * @apiSuccess {object[]} users - list of registered users
- * @apiError 500 Internal Server Error
+ * @swagger
+ * path:
+ *  /api/admin/get-all-users:
+ *    get:
+ *      summary: Get all users from the database.
+ *      tags: [Admin]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: All stored users.
+ *        500:
+ *          description: Server error.
  */
 router.get("/get-all-users", async function(req, res) {
 
@@ -61,16 +67,33 @@ router.get("/get-all-users", async function(req, res) {
 
 
 /**
- * @api {post} /api/admin/update-users
- * @apiName Encounters
- * @apiDescription updates multiple users at the same time
- * @apiGroup admin
- *
- * @apiSuccess {object[]} users - list of updated users
- * @apiError 500 Internal Server Error
- *
- * @apiParam {Number} statusCodeToSet - status code to set for all users (use -1 to skip)
- * @apiParam {object[]} selectedUserIds - list of users ids as object to apply the changes to
+ * @swagger
+ * path:
+ *  /api/admin/update-users:
+ *    post:
+ *      summary: Updates multiple users at the same time.
+ *      tags: [Admin]
+ *      parameters:
+ *        - in: body
+ *          name: statusCodeToSet
+ *          description: Status code to set for all users (use -1 to skip).
+ *          schema:
+ *            type: integer
+ *            enum: [-1, 0, 1, 2]
+ *        - in: body
+ *          name: selectedUserIds
+ *          description: List of users ids as object to apply the changes to.
+ *          schema:
+ *            type: list
+ *            items:
+ *              type: string
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: All updated users.
+ *        500:
+ *          description: Server error.
  */
 router.post("/update-users", async function(req, res) {
 
@@ -140,9 +163,35 @@ router.post("/update-users", async function(req, res) {
 });
 
 
-
-
-router.post("/graph", async function(req, res) {
+/**
+ * @swagger
+ * path:
+ *  /api/admin/get-graph:
+ *    post:
+ *      summary: Get the interaction graph for users with given email ids.
+ *      tags: [Admin]
+ *      parameters:
+ *        - in: body
+ *          name: incubationDays
+ *          description: Number of days from user's last status update to check for encounters.
+ *          schema:
+ *            type: integer
+ *        - in: body
+ *          name: emails
+ *          description: List of user email addresses.
+ *          schema:
+ *            type: list
+ *            items:
+ *              type: string
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: JSON representing graph interactions.
+ *        500:
+ *          description: Server error.
+ */
+router.post("/get-graph", async function(req, res) {
   let emailList = req.body.emails;
   let incubationDays = parseInt(req.body.incubationDays);
   if (!emailList || emailList.length < 1 || !incubationDays) {
