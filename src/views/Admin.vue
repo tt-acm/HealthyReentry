@@ -498,21 +498,23 @@ function fuzzyTime(date) {
 }
 
 export default {
-  beforeMount() {
-    this.refreshData(true);
-  },
   created() {},
-  mounted() {
+  async mounted() {
     Object.keys(storedRegions).forEach(region => {
       this.regions.push({
         name: region,
         offices: storedRegions[region].map(o => { return { LocationName:o, selected: true } })
       });
     });
-    this.regions.push({
+    let resp = await this.$api.get("/api/admin/get-uncategorized-offices");
+    let uncategorizedLocations = resp.data;
+    let oth = {
       name: "Other",
       offices: []
-    });
+    };
+    oth.offices = uncategorizedLocations.map(l => { return {LocationName: l, selected: true} });
+    this.regions.push(oth);
+    this.refreshData(true);
   },
   data() {
     return {
@@ -559,16 +561,6 @@ export default {
     }
   },
   methods: {
-    isInRegions(location) {
-      for(let region of this.regions) {
-        for(let loc of region.offices) {
-          if (loc.LocationName === location) {
-            return true;
-          }
-        }
-      }
-      return false;
-    },
     async downloadGraphForSelectedAsCSV() {
       let userEmails = this.users.map(u => u.email);  
       if (userEmails.length < 1) return;
@@ -615,9 +607,8 @@ export default {
         });
       }
 
-      this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
 
-      let oth = this.regions.filter(r => r.name === "Other")[0];
+      this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
 
       let postData = {
         skip: (this.pageNo-1)*this.itemsOnPage,
@@ -628,13 +619,6 @@ export default {
 
       let userData = await this.$api.post('/api/admin/get-users-by-filters', postData);
       let users = userData.data;
-
-      users.forEach(u => {
-        let loc = u.location || 'N/A';
-        if (!this.isInRegions(loc)) {
-          oth.offices.push({ LocationName:loc, selected: true });
-        }
-      });
 
 
       this.users = users.map(u => {

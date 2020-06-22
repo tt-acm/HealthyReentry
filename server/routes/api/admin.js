@@ -139,7 +139,7 @@ router.get("/get-uncategorized-offices", async function(req, res) {
 
   locs.forEach(l => unknownOffices.add(l.location));
   let ret = Array.from(unknownOffices);
-  unknownOffices.sort();
+  ret.sort();
 
   res.json(ret);
 });
