@@ -8,4 +8,4 @@ let regions = {
   "Pacific Rim": ["Beijing", "Ho Chi Minh City", "Hong Kong", "Shanghai"]
 }
 
-export default regions;
+module.exports = regions;

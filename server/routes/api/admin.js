@@ -5,6 +5,7 @@ const Status = require('../../models/Status');
 
 const eg = require('../../lib/build_encounter_graph');
 const triggerUpdates = require('../../lib/trigger_updates');
+const storedRegions = require('../../util/officeList');
 
 
 
@@ -97,6 +98,31 @@ router.post("/get-users-by-filters", async function(req, res) {
   }
 
   ret.reverse();
+
+  res.json(ret);
+
+});
+
+
+
+router.get("/get-uncategorized-offices", async function(req, res) {
+
+  let unknownOffices = new Set();
+  
+  let knownOffices = [];
+  Object.keys(storedRegions).forEach(r => {
+    knownOffices = knownOffices.concat(storedRegions[r]);
+  });
+
+  let include = {
+    "location": 1
+  };
+
+  let locs = await User.find({ location: {$nin: knownOffices} }, include).exec();
+
+  locs.forEach(l => unknownOffices.add(l.location));
+
+  let ret = Array.from(unknownOffices);
 
   res.json(ret);
 
