@@ -50,6 +50,12 @@ router.use(function (req, res, next) {
  *          schema:
  *            type: string
  *            example: joh
+ *        - in: body
+ *          name: offices
+ *          description: List of offices to use to restrict searches to (null implies no filters).
+ *          schema:
+ *            type: Array
+ *            example: ["New York", "Mumbai", "Chicago"]
  *      produces:
  *       - application/json:
  *      responses:
@@ -104,11 +110,23 @@ router.post("/get-users-by-filters", async function(req, res) {
 });
 
 
-
+/**
+ * @swagger
+ * path:
+ *  /api/admin/get-uncategorized-offices:
+ *    get:
+ *      summary: Get list of all offices not in the region wise categorized office list.
+ *      tags: [Admin]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: List of office names.
+ *        500:
+ *          description: Server error.
+ */
 router.get("/get-uncategorized-offices", async function(req, res) {
-
   let unknownOffices = new Set();
-  
   let knownOffices = [];
   Object.keys(storedRegions).forEach(r => {
     knownOffices = knownOffices.concat(storedRegions[r]);
@@ -117,15 +135,13 @@ router.get("/get-uncategorized-offices", async function(req, res) {
   let include = {
     "location": 1
   };
-
   let locs = await User.find({ location: {$nin: knownOffices} }, include).exec();
 
   locs.forEach(l => unknownOffices.add(l.location));
-
   let ret = Array.from(unknownOffices);
+  unknownOffices.sort();
 
   res.json(ret);
-
 });
 
 
