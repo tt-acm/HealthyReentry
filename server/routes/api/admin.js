@@ -145,6 +145,14 @@ router.get("/get-uncategorized-offices", async function(req, res) {
 });
 
 
+router.post("/get-office-stats", async function(req, res) {
+  let offices = req.body.selectedLocations;
+
+
+  return res.json(offices);  
+});
+
+
 /**
  * @swagger
  * path:

@@ -616,8 +616,18 @@ export default {
                     .reduce((tot, cur) => tot + "\n" + cur, tot);
       downloadCSV(csv, `encounters_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
-    downloadOfficeStats() {
-      console.log('foo');
+    async downloadOfficeStats() {
+      let selectedLocations = [];
+      this.regions.forEach(r => {
+        selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
+      });
+      let postData = {
+        selectedLocations: selectedLocations
+      };
+      console.log(postData);
+      let resp = await this.$api.post("/api/admin/get-office-stats", postData);
+      let data = resp.data;
+      console.log(data);
     },
     async refreshData(ignoreOfcFilters) {
 
