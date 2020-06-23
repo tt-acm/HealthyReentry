@@ -564,7 +564,7 @@ export default {
   },
   methods: {
     async downloadGraphForSelectedAsCSV() {
-      let userEmails = this.users.map(u => u.email);  
+      let userEmails = this.users.filter(u => u.selected).map(u => u.email);  
       if (userEmails.length < 1) return;
       this.isLoading = true;
       let postBody = {
