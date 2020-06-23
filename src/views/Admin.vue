@@ -15,7 +15,9 @@
             <div class="px-4">
               <b>Status to set: </b>
               <p>
-                <i :class="'fas fa-circle fa-xs ' + enumStatusMap.filter(s => s.code === userUpdateData.statusCodeToSet)[0].css_key "></i>
+                <span :class="enumStatusMap.filter(s => s.code === userUpdateData.statusCodeToSet)[0].css_key">
+                  <i class="fas fa-circle fa-xs"></i>
+                </span>
                 {{ enumStatusMap.filter(s => s.code === userUpdateData.statusCodeToSet)[0].label }}
               </p>
             </div>
@@ -655,10 +657,10 @@ export default {
       let res = await this.$api.post("/api/admin/update-users", this.userUpdateData);
       let updatedUsers = res.data;
       updatedUsers.forEach(nu => {
-        let idx = this.users.findIndex(u => u._id === nu._id);
+        let idx = this.users.findIndex(u => u.id === nu._id);
         this.users[idx] = nu;
-        this.refreshData();
       });
+      this.refreshData();
 
       this.clearUpdateData();
       this.updInviewUserSelectedState(false);
@@ -670,16 +672,13 @@ export default {
       this.isLoading = false;
 
     },
-    setRegionSelection(name, val) {
-      this.regions.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
-    },
-    updInviewUserSelectedState(val) {
-      this.users.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);
-    },
     async clearUpdateData() {
       this.userUpdateData.statusCodeToSet = -1;
       this.userUpdateData.selectedUserIds = [];
       this.userUpdateData.locationToSet = null;
+    },
+    updInviewUserSelectedState(val) {
+      this.users.forEach(u => u.selected = (val === 'invert') ? !u.selected : val);
     },
     sortUsers(key, inAsc) {
       this.sortBy = key;
@@ -700,6 +699,9 @@ export default {
       if (newNo < 1) return;
       this.itemsOnPage = parseInt(newNo);
       await this.refreshData();
+    },
+    setRegionSelection(name, val) {
+      this.regions.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
     },
     setOfficeFilterForAll(val) {
       this.regions.forEach(r => {
