@@ -624,10 +624,11 @@ export default {
       let postData = {
         selectedLocations: selectedLocations
       };
-      console.log(postData);
+      let csv = "Office,Green,Orange,Red,Total";
       let resp = await this.$api.post("/api/admin/get-office-stats", postData);
       let data = resp.data;
-      console.log(data);
+      data.forEach(d => { csv += `${d.office},${d.stats.green},${d.stats.orange},${d.stats.red},${d.stats.total}\n`; });
+      downloadCSV(csv, `office-stats_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
     async refreshData(ignoreOfcFilters) {
 
