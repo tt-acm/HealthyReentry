@@ -148,8 +148,33 @@ router.get("/get-uncategorized-offices", async function(req, res) {
 router.post("/get-office-stats", async function(req, res) {
   let offices = req.body.selectedLocations;
 
+  let ret = [];
+  for(let o of offices) {
+    let users = await User.find({ location: o }).exec();
 
-  return res.json(offices);  
+    let stats = {
+      green: 0,
+      orange: 0,
+      red: 0,
+      total: users.length
+    };
+    for(let u of users) {
+      let st = (await Status.find({ "user": u._id })
+                            .sort({ date: -1 })
+                            .limit(1))[0];
+      if(st.status === 0) stats.green++;
+      else if(st.status === 1) stats.orange++;
+      else if(st.status === 2) stats.red++;
+    }
+
+    let officeStats = {
+      office: o,
+      stats: stats
+    };
+    ret.push(officeStats);
+  }
+
+  return res.json(ret);
 });
 
 
