@@ -31,7 +31,7 @@ MongoClient.connect(url, {
     useUnifiedTopology: true
 }).then(function (db) {
     console.log("CONNECTED TO DB");
-
+    console.log(emails);
     var today = new Date();
     if (today.getDay() == 5) console.log("today is friday");
     else {
