@@ -54,14 +54,15 @@ app.use(session({
         saveUninitialized: true
     }));
 
-    // Initialize passport and also allow it to read
-    // the request session information.
-    app.use(passport.initialize());
-    app.use(passport.session());
+// Initialize passport and also allow it to read
+// the request session information.
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(bodyParser.json({
   limit: '500mb'
 }));
+
 app.use(bodyParser.urlencoded({
   limit: '500mb',
   extended: true
@@ -73,10 +74,20 @@ const base = path.join(__dirname, '../');
 const indexFilePath = path.join(base, '/dist/index.html');
 app.use('/*', (req, res) => res.sendFile(indexFilePath));
 
-https.createServer({
-  key: fs.readFileSync('./testingCertificates/ttlocalcert.key'),
-  cert: fs.readFileSync('./testingCertificates/ttlocalcert.crt'),
-  ca: fs.readFileSync('./testingCertificates/ttlocalcert.crt')
-}, app).listen(PORT, () => {
-  console.log(`listening on ${PORT}`);
-});
+if(process.env.NODE_ENV === "development") {
+
+  https.createServer({
+    key: fs.readFileSync('./testingCertificates/ttlocalcert.key'),
+    cert: fs.readFileSync('./testingCertificates/ttlocalcert.crt'),
+    ca: fs.readFileSync('./testingCertificates/ttlocalcert.crt')
+  }, app).listen(PORT, () => {
+    console.log(`listening on ${PORT}`);
+  });
+  
+} else {
+  
+  app.listen(PORT, () => {
+    console.log(`listening on ${PORT}`);
+  });
+  
+}
