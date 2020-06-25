@@ -7,6 +7,8 @@ var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 var passport = require('./configs/passport');
 const path = require('path');
+const fs = require('fs');
+const https = require('https');
 
 const DIR = 'dist';
 const PORT = process.env.PORT || 8080;
@@ -71,6 +73,10 @@ const base = path.join(__dirname, '../');
 const indexFilePath = path.join(base, '/dist/index.html');
 app.use('/*', (req, res) => res.sendFile(indexFilePath));
 
-app.listen(PORT, () => {
+https.createServer({
+  key: fs.readFileSync('./testingCertificates/ttlocalcert.key'),
+  cert: fs.readFileSync('./testingCertificates/ttlocalcert.crt'),
+  ca: fs.readFileSync('./testingCertificates/ttlocalcert.crt')
+}, app).listen(PORT, () => {
   console.log(`listening on ${PORT}`);
 });

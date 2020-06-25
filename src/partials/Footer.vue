@@ -7,7 +7,7 @@
           </a>
         </div>
         <div class="md-layout-item md-large-size-90 md-medium-size-80 md-small-size-55 md-xsmall-size-100 text-center">
-          <a href="http://core.thorntontomasetti.com" id="core-logo-import" target="_blank">
+          <a href="https://core.thorntontomasetti.com" id="core-logo-import" target="_blank">
             <!-- <md-icon md-src="logoContent" style="width:300px" /> -->
             <img :src="companyLogo" alt="companyLogo" style="height:15px;color=white">
           </a>
