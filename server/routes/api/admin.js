@@ -200,6 +200,37 @@ router.post("/get-office-stats", async function(req, res) {
 });
 
 
+router.post("/get-office-status-updates", async function(req, res) {
+  let offices = req.body.selectedLocations;
+
+  let ret = [];
+  let d = new Date();
+  d.setHours(0,0,0,0);
+  let cutoffDate = d.setDate(d.getDate() - 7);
+
+  for(let o of offices) {
+    let allUsers = await User.find({ location: o }).exec();
+    let unreportedUsers = [];
+    for(let u of allUsers) {
+      let st = (await Status.find({ "user": u._id })
+                            .sort({ date: -1 })
+                            .limit(1))[0];
+      if (st.date < cutoffDate) {
+        let user = u.toObject();
+        user.status = st;
+        unreportedUsers.push(user);
+      }
+    }
+    ret.push({
+      office: o,
+      users: unreportedUsers
+    });
+  }
+
+  return res.json(ret);
+});
+
+
 /**
  * @swagger
  * path:
