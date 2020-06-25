@@ -17,11 +17,7 @@ var url = process.env.MONGO_URL;
 const fs = require('fs');
 var content = fs.readFileSync("./server/assets/email_templates/reentryTeamReport.html").toString("utf-8");
 
-//let emails = ["eertugrul@thorntontomasetti.com", "ssingh@thorntontomasetti.com"]
-
-let emails = ["tscarangello@thorntontomasetti.com","rdaddazio@thorntontomasetti.com","msquarzini@thorntontomasetti.com","pdimaggio@thorntontomasetti.com","wstocks@thorntontomasetti.com",
-"jkent@thorntontomasetti.com","jdray@thorntontomasetti.com","rotani@thorntontomasetti.com","dsoler@thorntontomasetti.com","ssingh@thorntontomasetti.com","lagostini@thorntontomasetti.com","dstauthamer@thorntontomasetti.com", 
-"rhonig@thorntontomasetti.com","gpanariello@thorntontomasetti.com"]
+let emails = process.env.VUE_APP_TEAM.split(',');
 
 //"Office,Name,Email\r\n";
 function nodeToCsv(node) {
@@ -29,7 +25,6 @@ function nodeToCsv(node) {
 }
 
 let allUsers = [];
-
 
 
 MongoClient.connect(url, {
@@ -91,7 +86,6 @@ MongoClient.connect(url, {
         let attachment3 = Buffer.from(csv3).toString('base64');
 
         sendEmail(emails, attachment, attachment2, attachment3);
-
 
     })
 
