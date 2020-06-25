@@ -142,6 +142,22 @@
               <h6>
                 Download Office Stats
               </h6>
+
+              <span>
+                <small><i>
+                  <span
+                    style="cursor: pointer;"
+                    @click="setOfficeFilterForAllRegionsForDownload(true);"
+                  >All</span>
+                </i></small>
+                |
+                <small><i>
+                  <span
+                    style="cursor: pointer;"
+                    @click="setOfficeFilterForAllRegionsForDownload(false);"
+                  >None</span>
+                </i></small>
+              </span>
               
               <div class="row overflow-auto mx-0" style="height:400px">
                 <div class="col">
@@ -154,14 +170,14 @@
                         (
                         <span
                           style="cursor: pointer;"
-                          @click="setRegionForOfcStatSelection(region.name, true);"
+                          @click="setRegionForDownloadSelection(region.name, true);"
                         >All</span>
                       </i></small>
                       |
                       <small><i>
                         <span
                           style="cursor: pointer;"
-                          @click="setRegionForOfcStatSelection(region.name, false);"
+                          @click="setRegionForDownloadSelection(region.name, false);"
                         >None</span>
                         )
                       </i></small>
@@ -201,6 +217,22 @@
               <h6>
                 Download Office Status Updates
               </h6>
+
+              <span>
+                <small><i>
+                  <span
+                    style="cursor: pointer;"
+                    @click="setOfficeFilterForAllRegionsForDownload(true);"
+                  >All</span>
+                </i></small>
+                |
+                <small><i>
+                  <span
+                    style="cursor: pointer;"
+                    @click="setOfficeFilterForAllRegionsForDownload(false);"
+                  >None</span>
+                </i></small>
+              </span>
               
               <div class="row overflow-auto mx-0" style="height:400px">
                 <div class="col">
@@ -213,14 +245,14 @@
                         (
                         <span
                           style="cursor: pointer;"
-                          @click="setRegionForOfcStatSelection(region.name, true);"
+                          @click="setRegionForDownloadSelection(region.name, true);"
                         >All</span>
                       </i></small>
                       |
                       <small><i>
                         <span
                           style="cursor: pointer;"
-                          @click="setRegionForOfcStatSelection(region.name, false);"
+                          @click="setRegionForDownloadSelection(region.name, false);"
                         >None</span>
                         )
                       </i></small>
@@ -262,10 +294,10 @@
 
             <div class="row">
               <div class="col-12 pl-3">
-                <button class="btn btn-outline-secondary" type="button" @click="setOfficeFilterForAll(true); refreshData(true);">
+                <button class="btn btn-outline-secondary" type="button" @click="setOfficeFilterForAllRegionsForFilter(true); refreshData(true);">
                   Select All
                 </button>
-                <button class="btn btn-outline-secondary mx-2" type="button" @click="setOfficeFilterForAll(false); refreshData();">
+                <button class="btn btn-outline-secondary mx-2" type="button" @click="setOfficeFilterForAllRegionsForFilter(false); refreshData();">
                   Select None
                 </button>
               </div>
@@ -852,12 +884,17 @@ export default {
     setRegionSelection(name, val) {
       this.regions.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
     },
-    setRegionForOfcStatSelection(name, val) {
-      this.regionsForDownloadSelections.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
-    },
-    setOfficeFilterForAll(val) {
+    setOfficeFilterForAllRegionsForFilter(val) {
       this.regions.forEach(r => {
         this.setRegionSelection(r.name, val);
+      });
+    },
+    setRegionForDownloadSelection(name, val) {
+      this.regionsForDownloadSelections.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
+    },
+    setOfficeFilterForAllRegionsForDownload(val) {
+      this.regionsForDownloadSelections.forEach(r => {
+        this.setRegionForDownloadSelection(r.name, val);
       });
     }
   }
