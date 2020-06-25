@@ -26,7 +26,7 @@ router.get("/login", function(req, res, next) {
   next();
 }, function(req, res) {
   var returnTo = req.session.returnTo;
-  var redirectPath = process.env.LOCAL_BUILD? process.env.VUE_APP_LOCALFRONTEND_URL : "https://" + req.headers.host;
+  var redirectPath = process.env.LOCAL_BUILD? process.env.VUE_APP_LOCALFRONTEND_URL : "http://" + req.headers.host;
 
   function finish() {
     return res.redirect(returnTo || redirectPath);
@@ -125,7 +125,7 @@ router.get("/login", function(req, res, next) {
  */
 router.get("/logout", function(req, res) {
   console.log("req.headers.host", req.headers.host);
-  var redirectPath = process.env.LOCAL_BUILD? process.env.VUE_APP_LOCALFRONTEND_URL : "https://" + req.headers.host;
+  var redirectPath = process.env.LOCAL_BUILD? process.env.VUE_APP_LOCALFRONTEND_URL : "http://" + req.headers.host;
   console.log("redirectPath", redirectPath);
   var returnPath = qs.escape(redirectPath);
   console.log("returnPath", returnPath);
