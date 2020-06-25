@@ -33,7 +33,7 @@ MongoClient.connect(url, {
     console.log("CONNECTED TO DB");
     console.log(emails);
     var today = new Date();
-    if (today.getDay() == 4) console.log("today is friday");
+    if (today.getDay() == 5) console.log("today is friday");
     else {
         console.log("today is not friday yet!")
         db.close();
@@ -168,7 +168,7 @@ function sendEmail(toEmail, attachment, attachment2, attachment3) {
             },
             {
                 "content": attachment3,
-                "filename": "Breakdown by Health Status.csv",
+                "filename": "Headcount By Office.csv",
                 "type": "text/csv"
             }
 
