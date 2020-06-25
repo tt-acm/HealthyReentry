@@ -209,7 +209,7 @@ function sendEmail(toEmail, location, attachment, attachment2, attachment3) {
     if (attachment) {
         mailOptions.attachments = [{
                 "content": attachment,
-                "filename": "Employees Who Signed up.csv",
+                "filename": "Employees Who Have Signed up.csv",
                 "type": "text/csv"
             },
             {
