@@ -7,6 +7,8 @@ var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 var passport = require('./configs/passport');
 const path = require('path');
+const fs = require('fs');
+const https = require('https');
 
 const DIR = 'dist';
 const PORT = process.env.PORT || 8080;

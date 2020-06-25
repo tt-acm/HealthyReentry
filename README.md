@@ -28,7 +28,7 @@ The project is based on a few external services (Auth0, SendGrid, MongoDB). If y
 - Install modules for the project: `npm install`
 - Update the env file with secrets and save it as `.env` ([Setup .env file](https://github.com/ThorntonTomasetti/HealthyReentry/blob/dev-OpenSourceDocumentation/docs/dev-details.md#populate-the-env-file))
 - Start the local server by running `npm run dev`
-- Go to your browser at `http://127.0.0.1:8081`
+- Go to your browser at `https://localhost:8081`
 
 ## Development
 The app is built as a web app running an [Express](https://expressjs.com/) server with a [Vue](https://vuejs.org/) front end and has been designed for use on desktop and mobile devices. It can be deployed on any server running [NodeJS]() and has been tested for deployment on [Heroku](https://heroku.com/).  
