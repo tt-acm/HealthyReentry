@@ -145,7 +145,7 @@
               
               <div class="row overflow-auto mx-0" style="height:400px">
                 <div class="col">
-                  <div v-for="region in regionsForOfcStats" :key="region.name">
+                  <div v-for="region in regionsForDownloadSelections" :key="region.name">
                     
                     <div class="pt-2">
                       <i class="fas fa-angle-right"></i>
@@ -204,7 +204,7 @@
               
               <div class="row overflow-auto mx-0" style="height:400px">
                 <div class="col">
-                  <div v-for="region in regionsForOfcStats" :key="region.name">
+                  <div v-for="region in regionsForDownloadSelections" :key="region.name">
                     
                     <div class="pt-2">
                       <i class="fas fa-angle-right"></i>
@@ -637,7 +637,7 @@ export default {
     };
     oth.offices = uncategorizedLocations.map(l => { return {LocationName: l, selected: true} });
     this.regions.push(oth);
-    this.regionsForOfcStats = JSON.parse(JSON.stringify(this.regions));
+    this.regionsForDownloadSelections = JSON.parse(JSON.stringify(this.regions));
     this.refreshData(true);
   },
   data() {
@@ -649,7 +649,7 @@ export default {
       sortBy: null,
       sortAsc: true,
       regions: [],
-      regionsForOfcStats: [],
+      regionsForDownloadSelections: [],
       users: [],
       totalUsersCount: 0,
       incubationDays: 2,
@@ -716,20 +716,32 @@ export default {
     },
     async downloadOfficeStats() {
       let selectedLocations = [];
-      this.regionsForOfcStats.forEach(r => {
+      this.regionsForDownloadSelections.forEach(r => {
         selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
       });
       let postData = {
         selectedLocations: selectedLocations
       };
-      let csv = "Office,Green,Orange,Red,Total\n";
       let resp = await this.$api.post("/api/admin/get-office-stats", postData);
       let data = resp.data;
+      let csv = "Office,Green,Orange,Red,Total\n";
       data.forEach(d => { csv += `${d.office},${d.stats.green},${d.stats.orange},${d.stats.red},${d.stats.total}\n`; });
       downloadCSV(csv, `office-stats_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
     async downloadOfficeStatusUpdates() {
-      console.log('foo');
+      let selectedLocations = [];
+      this.regionsForDownloadSelections.forEach(r => {
+        selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
+      });
+      let postData = {
+        selectedLocations: selectedLocations
+      };
+      console.log(postData);
+      // let resp = await this.$api.post("/api/admin/get-office-stats", postData);
+      // let data = resp.data;
+      // let csv = "Office,Green,Orange,Red,Total\n";
+      // data.forEach(d => { csv += `${d.office},${d.stats.green},${d.stats.orange},${d.stats.red},${d.stats.total}\n`; });
+      // downloadCSV(csv, `office-stats_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
     async refreshData(ignoreOfcFilters) {
 
@@ -840,7 +852,7 @@ export default {
       this.regions.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
     },
     setRegionForOfcStatSelection(name, val) {
-      this.regionsForOfcStats.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
+      this.regionsForDownloadSelections.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
     },
     setOfficeFilterForAll(val) {
       this.regions.forEach(r => {
