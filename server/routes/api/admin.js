@@ -203,13 +203,21 @@ router.post("/get-office-stats", async function(req, res) {
 router.post("/get-office-status-updates", async function(req, res) {
   let offices = req.body.selectedLocations;
 
+  let include = {
+    "_id": 1,
+    "dateOfConsent": 1,
+    "name": 1,
+    "email": 1,
+    "location": 1
+  };
+
   let ret = [];
   let d = new Date();
   d.setHours(0,0,0,0);
   let cutoffDate = d.setDate(d.getDate() - 7);
 
   for(let o of offices) {
-    let allUsers = await User.find({ location: o }).exec();
+    let allUsers = await User.find({ location: o }, include).exec();
     let unreportedUsers = [];
     for(let u of allUsers) {
       let st = (await Status.find({ "user": u._id })
