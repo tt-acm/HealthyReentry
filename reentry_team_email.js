@@ -31,7 +31,7 @@ MongoClient.connect(url, {
     useUnifiedTopology: true
 }).then(function (db) {
     console.log("CONNECTED TO DB");
-    console.log(emails);
+
     var today = new Date();
     if (today.getDay() == 5) console.log("today is friday");
     else {
@@ -168,7 +168,7 @@ function sendEmail(toEmail, attachment, attachment2, attachment3) {
             },
             {
                 "content": attachment3,
-                "filename": "Headcount By Office.csv",
+                "filename": "Breakdown by Health Status.csv",
                 "type": "text/csv"
             }
 
