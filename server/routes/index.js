@@ -11,7 +11,7 @@ const Status = require('../models/Status');
  * @apiGroup attachDefault
  */
 router.get("/login", function(req, res, next) {
-  // console.log("CALLING LOGIN", req.query, req.body, req.params);
+  console.log("CALLING LOGIN", req.query, req.body, req.params);
   // middleware in the use case that an app is only open to TT users
   // if (!process.env.CORE_SSO_TT_ONLY) return next();
   // if (req.user && !req.user.sso.idTT) {
@@ -46,6 +46,7 @@ router.get("/login", function(req, res, next) {
   }
 
   // if already logged in, go from whence we came
+  console.log("req.user", req.user);
   if (req.user && !req.query.token) {
     // login(req.user);
     // return res.redirect("back");
@@ -53,6 +54,7 @@ router.get("/login", function(req, res, next) {
   }
   // if valid token or other authentication, log in here
   if (req.query.token) {
+    console.log("has token")
     passport.custom.checkSsoToken(req.query.token).then(async function(ssoUser) {
       console.log("returnTo", returnTo);
       if (!ssoUser.email) {
@@ -85,6 +87,9 @@ router.get("/login", function(req, res, next) {
 
         status.save(async function(err, savedStatus) {
           if (err) return res.status(500).send(err);
+
+          // return res.json(savedStatus);
+          // return res.json(user);
           login(user);
         });
       }
@@ -97,7 +102,7 @@ router.get("/login", function(req, res, next) {
       // return res.redirect("back");
     });
   } else {
-    // console.log("empty req", req.query.returnTo, req.originalUrl);
+    console.log("empty req", req.query.returnTo, req.originalUrl);
     if (req.query.returnTo) {
       // set returnTo and redirect to login internal
       req.session.returnTo = req.query.returnTo;
@@ -105,7 +110,7 @@ router.get("/login", function(req, res, next) {
     } else {
       // redirect to login external
       var returnPath = qs.escape("https://" + req.headers.host + req.originalUrl);
-      // console.log("returnPath", returnPath);
+      console.log("returnPath", returnPath);
       var redirectPath = process.env.CORE_SSO_URL + "/user/authenticate/" + returnPath;
       if (process.env.CORE_SSO_TT_ONLY) redirectPath += "?tt-only=true";
       return res.redirect(redirectPath);
@@ -119,9 +124,11 @@ router.get("/login", function(req, res, next) {
  * @apiGroup attachDefault
  */
 router.get("/logout", function(req, res) {
-  // console.log("req.headers.host", req.headers.host);
+  console.log("req.headers.host", req.headers.host);
   var redirectPath = process.env.LOCAL_BUILD? process.env.VUE_APP_LOCALFRONTEND_URL : "https://" + req.headers.host;
+  console.log("redirectPath", redirectPath);
   var returnPath = qs.escape(redirectPath);
+  console.log("returnPath", returnPath);
   req.logout();
   res.redirect(process.env.CORE_SSO_URL + "/user/logout/" + returnPath);
 });
