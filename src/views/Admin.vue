@@ -142,6 +142,40 @@
               <h6>
                 Download Office Stats
               </h6>
+              
+              <div class="row overflow-auto mx-0" style="height:400px">
+                <div class="col">
+                  <div v-for="region in regionsForOfcStats" :key="region.name">
+                    
+                    <div class="pt-2">
+                      <i class="fas fa-angle-right"></i>
+                      {{ region.name }}
+                      <small><i>
+                        (
+                        <span
+                          style="cursor: pointer;"
+                          @click="setRegionForOfcStatSelection(region.name, true);"
+                        >All</span>
+                      </i></small>
+                      |
+                      <small><i>
+                        <span
+                          style="cursor: pointer;"
+                          @click="setRegionForOfcStatSelection(region.name, false);"
+                        >None</span>
+                        )
+                      </i></small>
+                    </div>
+
+                    <div v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
+                      <input class="form-check-input" type="checkbox" v-model="ofc.selected">
+                      {{ofc.LocationName}}
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              
             </div>
           </div>
           <div class="modal-footer">
@@ -185,30 +219,30 @@
 
                 <div v-for="region in regions" :key="region.name">
                   
-                    <div class="pt-2">
-                      <i class="fas fa-angle-right"></i>
-                      {{ region.name }}
-                      <small><i>
-                        (
-                        <span
-                          style="cursor: pointer;"
-                          @click="setRegionSelection(region.name, true); refreshData();"
-                        >All</span>
-                      </i></small>
-                      |
-                      <small><i>
-                        <span
-                          style="cursor: pointer;"
-                          @click="setRegionSelection(region.name, false); refreshData();"
-                        >None</span>
-                        )
-                      </i></small>
-                    </div>
+                  <div class="pt-2">
+                    <i class="fas fa-angle-right"></i>
+                    {{ region.name }}
+                    <small><i>
+                      (
+                      <span
+                        style="cursor: pointer;"
+                        @click="setRegionSelection(region.name, true); refreshData();"
+                      >All</span>
+                    </i></small>
+                    |
+                    <small><i>
+                      <span
+                        style="cursor: pointer;"
+                        @click="setRegionSelection(region.name, false); refreshData();"
+                      >None</span>
+                      )
+                    </i></small>
+                  </div>
 
-                    <div v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
-                      <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="refreshData();">
-                      {{ofc.LocationName}}
-                    </div>
+                  <div v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
+                    <input class="form-check-input" type="checkbox" v-model="ofc.selected" @change="refreshData();">
+                    {{ofc.LocationName}}
+                  </div>
 
                 </div>
                 
@@ -541,6 +575,7 @@ export default {
     };
     oth.offices = uncategorizedLocations.map(l => { return {LocationName: l, selected: true} });
     this.regions.push(oth);
+    this.regionsForOfcStats = JSON.parse(JSON.stringify(this.regions));
     this.refreshData(true);
   },
   data() {
@@ -552,6 +587,7 @@ export default {
       sortBy: null,
       sortAsc: true,
       regions: [],
+      regionsForOfcStats: [],
       users: [],
       totalUsersCount: 0,
       incubationDays: 2,
@@ -618,13 +654,13 @@ export default {
     },
     async downloadOfficeStats() {
       let selectedLocations = [];
-      this.regions.forEach(r => {
+      this.regionsForOfcStats.forEach(r => {
         selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
       });
       let postData = {
         selectedLocations: selectedLocations
       };
-      let csv = "Office,Green,Orange,Red,Total";
+      let csv = "Office,Green,Orange,Red,Total\n";
       let resp = await this.$api.post("/api/admin/get-office-stats", postData);
       let data = resp.data;
       data.forEach(d => { csv += `${d.office},${d.stats.green},${d.stats.orange},${d.stats.red},${d.stats.total}\n`; });
@@ -737,6 +773,9 @@ export default {
     },
     setRegionSelection(name, val) {
       this.regions.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
+    },
+    setRegionForOfcStatSelection(name, val) {
+      this.regionsForOfcStats.filter(r => r.name === name)[0].offices.forEach(o => o.selected = val);
     },
     setOfficeFilterForAll(val) {
       this.regions.forEach(r => {
