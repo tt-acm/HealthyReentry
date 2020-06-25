@@ -186,6 +186,65 @@
       </div>
     </div>
 
+    <!-- Office Status Updates Download Modal -->
+    <div class="modal fade" id="downloadOfficeStatusUpdatesModal" tabindex="-1" role="dialog" aria-labelledby="downloadOfficeStatusUpdatesLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="downloadOfficeStatusUpdatesLabel">Download Status Updates for Offices</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <h6>
+                Download Office Status Updates
+              </h6>
+              
+              <div class="row overflow-auto mx-0" style="height:400px">
+                <div class="col">
+                  <div v-for="region in regionsForOfcStats" :key="region.name">
+                    
+                    <div class="pt-2">
+                      <i class="fas fa-angle-right"></i>
+                      {{ region.name }}
+                      <small><i>
+                        (
+                        <span
+                          style="cursor: pointer;"
+                          @click="setRegionForOfcStatSelection(region.name, true);"
+                        >All</span>
+                      </i></small>
+                      |
+                      <small><i>
+                        <span
+                          style="cursor: pointer;"
+                          @click="setRegionForOfcStatSelection(region.name, false);"
+                        >None</span>
+                        )
+                      </i></small>
+                    </div>
+
+                    <div v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
+                      <input class="form-check-input" type="checkbox" v-model="ofc.selected">
+                      {{ofc.LocationName}}
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="downloadOfficeStatusUpdates">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <h5 class="text-muted">Admin Dashboard</h5>
 
     <hr class="my-3"/>
@@ -371,6 +430,9 @@
             </span>
             <span class="dropdown-item" data-toggle="modal" data-target="#downloadOfficeStatsModal">
               Download Office Stats
+            </span>
+            <span class="dropdown-item" data-toggle="modal" data-target="#downloadOfficeStatusUpdatesModal">
+              Download Office Status Updates
             </span>
           </div>
         </div>
@@ -665,6 +727,9 @@ export default {
       let data = resp.data;
       data.forEach(d => { csv += `${d.office},${d.stats.green},${d.stats.orange},${d.stats.red},${d.stats.total}\n`; });
       downloadCSV(csv, `office-stats_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
+    },
+    async downloadOfficeStatusUpdates() {
+      console.log('foo');
     },
     async refreshData(ignoreOfcFilters) {
 
