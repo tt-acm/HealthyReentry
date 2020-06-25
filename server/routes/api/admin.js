@@ -145,6 +145,28 @@ router.get("/get-uncategorized-offices", async function(req, res) {
 });
 
 
+/**
+ * @swagger
+ * path:
+ *  /api/admin/get-office-stats:
+ *    post:
+ *      summary: Get counts of total red, orange and green reports from office locations.
+ *      tags: [Admin]
+ *      parameters:
+ *        - in: body
+ *          name: selectedLocations
+ *          description: Array of offices to make the selections for.
+ *          schema:
+ *            type: Array
+ *            example: ["New York", "Mumbai", "Chicago"]
+ *      produces:
+ *       - application/json:
+ *      responses:
+ *        200:
+ *          description: Returns counts of total red, orange and green reports from office locations.
+ *        500:
+ *          description: Server error.
+ */
 router.post("/get-office-stats", async function(req, res) {
   let offices = req.body.selectedLocations;
 
