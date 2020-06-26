@@ -768,13 +768,21 @@ export default {
       let postData = {
         selectedLocations: selectedLocations
       };
-      console.log(postData);
       let resp = await this.$api.post("/api/admin/get-office-status-updates", postData);
-      let data = resp.data;
-      console.log(data);
-      // let csv = "Office,Green,Orange,Red,Total\n";
-      // data.forEach(d => { csv += `${d.office},${d.stats.green},${d.stats.orange},${d.stats.red},${d.stats.total}\n`; });
-      // downloadCSV(csv, `office-stats_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
+      let reports = resp.data;
+      let csv = "";
+      for(let report of reports) {
+        csv += `Office,${report.office}\n`;
+        csv += `Date,${new Date().toLocaleDateString()}\n`;
+        csv += `Cuttoff Days,7\n`;
+        csv += `Name,Email,Status,Last Updated\n`;
+        for(let u of report.users) {
+          let status = enumStatusMap.filter(s => s.code === u.status.status)[0];
+          csv += `${u.name},${u.email},${status.label},${u.status.date}\n`;
+        }
+        csv += '\n';
+      }
+      downloadCSV(csv, `office-status-reports_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
     },
     async refreshData(ignoreOfcFilters) {
 

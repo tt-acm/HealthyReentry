@@ -205,10 +205,8 @@ router.post("/get-office-status-updates", async function(req, res) {
 
   let include = {
     "_id": 1,
-    "dateOfConsent": 1,
     "name": 1,
-    "email": 1,
-    "location": 1
+    "email": 1
   };
 
   let ret = [];
