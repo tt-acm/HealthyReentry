@@ -882,7 +882,10 @@ export default {
       });
     },
     async setPageNo(newNo) {
-      if (newNo < 1 || ((newNo-1) * this.itemsOnPage) > this.totalUsersCount) return;
+      let nxtNo = newNo-1;
+      if (nxtNo <= 0) return;
+      if (((this.pageNo * this.itemsOnPage) <= this.filteredUsersCount) &&
+          ((nxtNo * this.itemsOnPage) > this.filteredUsersCount)) return;
       this.pageNo = parseInt(newNo);
       await this.refreshData();
     },
