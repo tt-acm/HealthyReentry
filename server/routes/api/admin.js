@@ -212,6 +212,28 @@ router.post("/get-office-stats", async function(req, res) {
 });
 
 
+/**
+ * @swagger
+ * path:
+ *  /api/admin/get-office-status-updates:
+ *    post:
+ *      summary: Get list of users who havn't updated their status in the last 7 days.
+ *      tags: [Admin]
+ *      parameters:
+ *        - in: body
+ *          name: selectedLocations
+ *          description: Array of offices to make the selections for.
+ *          schema:
+ *            type: Array
+ *            example: ["New York", "Mumbai", "Chicago"]
+ *      produces:
+ *       - application/json:
+ *      responses:
+ *        200:
+ *          description: Returns office-wise list of users who haven't updated their statuses in last 7 days.
+ *        500:
+ *          description: Server error.
+ */
 router.post("/get-office-status-updates", async function(req, res) {
   let offices = req.body.selectedLocations;
 

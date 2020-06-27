@@ -883,7 +883,7 @@ export default {
     },
     async setPageNo(newNo) {
       let nxtNo = newNo-1;
-      if (nxtNo <= 0) return;
+      if (nxtNo < 0) return;
       if (((this.pageNo * this.itemsOnPage) <= this.filteredUsersCount) &&
           ((nxtNo * this.itemsOnPage) > this.filteredUsersCount)) return;
       this.pageNo = parseInt(newNo);
