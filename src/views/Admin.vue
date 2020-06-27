@@ -406,9 +406,9 @@
             </div>
             <div class="input-group-append">
               <span
-                :style="'cursor: ' + (((pageNo) * itemsOnPage >= totalUsersCount) ? 'not-allowed' : 'pointer') "
+                :style="'cursor: ' + (((pageNo) * itemsOnPage >= filteredUsersCount) ? 'not-allowed' : 'pointer') "
                 @click="setPageNo(pageNo+1)"
-                :class="'input-group-text ' + (((pageNo) * itemsOnPage >= totalUsersCount) ? 'disabled' : '') "
+                :class="'input-group-text ' + (((pageNo) * itemsOnPage >= filteredUsersCount) ? 'disabled' : '') "
                 id="pageNav"
               ><i class="fas fa-chevron-right"></i></span>
             </div>
@@ -684,6 +684,7 @@ export default {
       regionsForDownloadSelections: [],
       users: [],
       totalUsersCount: 0,
+      filteredUsersCount: 0,
       incubationDays: 2,
       enumStatusMap: enumStatusMap,
       userUpdateData: {
@@ -809,7 +810,8 @@ export default {
       };
 
       let userData = await this.$api.post('/api/admin/get-users-by-filters', postData);
-      let users = userData.data;
+      this.filteredUsersCount = userData.data.filteredCount;
+      let users = userData.data.users;
 
 
       this.users = users.map(u => {
