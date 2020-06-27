@@ -71,8 +71,6 @@ router.post("/get-users-by-filters", async function(req, res) {
   let nameSearch = req.body.nameSearch;
   let offices = req.body.offices;
 
-  const ret = [];
-
   let include = {
     "_id": 1,
     "dateOfConsent": 1,
@@ -81,6 +79,14 @@ router.post("/get-users-by-filters", async function(req, res) {
     "location": 1
   };
 
+  let filteredCountQuery = !Array.isArray(offices)
+                          ? User.count({ name: {'$regex': nameSearch, '$options': 'i'} })
+                          : User.count({
+                              name: {'$regex': nameSearch, '$options': 'i'},
+                              location: {$in: offices}
+                            });
+  let filteredCount = await filteredCountQuery.exec();
+
   let findQuery = !Array.isArray(offices)
                 ? User.find({ name: {'$regex': nameSearch, '$options': 'i'} }, include)
                 : User.find({
@@ -88,22 +94,28 @@ router.post("/get-users-by-filters", async function(req, res) {
                     location: {$in: offices}
                   }, include);
 
-  const users = await findQuery
-                      .sort({ name: 1})
-                      .skip(skip)
-                      .limit(limit)
-                      .exec();
+  const dbUsers = await findQuery
+                        .sort({ name: 1})
+                        .skip(skip)
+                        .limit(limit)
+                        .exec();
 
-  for(let u of users) {
+  let users = [];
+  for(let u of dbUsers) {
     let nu = u.toObject();
     const st = await Status.find({ "user": nu._id })
                            .sort({ date: -1 })
                            .limit(1);
     nu.status = st[0];
-    ret.push(nu)
+    users.push(nu)
   }
 
-  ret.reverse();
+  users.reverse();
+
+  let ret = {
+    users: users,
+    filteredCount: filteredCount
+  };
 
   res.json(ret);
 
