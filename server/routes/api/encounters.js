@@ -144,14 +144,9 @@ router.post("/add-many", async function (req, res) {
 
             }
 
-            Encounter.insertMany(encounters, function (err, docs) {
-                if (err) {
-                    console.log("error in insert Many", err);
-                    return res.status(500).send();
-                } else {
-                    return res.json(true);
-                }
-            });
+            await Encounter.insertMany(encounters);
+            
+            return res.json(true);
 
         }
 
@@ -173,14 +168,9 @@ router.post("/add-many", async function (req, res) {
 
         });
 
-        Encounter.insertMany(encounters, function (err, docs) {
-            if (err) {
-                console.log("error in insert Many", err);
-                return res.status(500).send();
-            } else {
-                return res.json(true);
-            }
-        });
+        await Encounter.insertMany(encounters);
+        
+        return res.json(true);
 
     }
 
