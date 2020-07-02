@@ -111,79 +111,78 @@ router.post("/add-one", function (req, res) {
  *        500:
  *          description: Server error.
  */
-router.post("/add-many", function (req, res) {
+router.post("/add-many", async function (req, res) {
 
-    return new Promise(function (resolve, reject) {
-        let ids = req.body.encounters.reduce(function (out, x) {
-            out.push(x._id);
-            return out;
-        }, []);
-        var numEncounters = ids.length;
-        if (req.body.isGroup === "true") numEncounters = combinations(numEncounters + 1, 2);
 
-        var encounters = [];
+    var ids = req.body.encounters.reduce(function (out, x) {
+        out.push(x._id);
+        return out;
+    }, []);
+    var numEncounters = ids.length;
+    if (req.body.isGroup === "true") numEncounters = combinations(numEncounters + 1, 2);
 
-        if (req.body.isGroup === "true") {
-            // add sender to ids and add all combinations to encounter array
-            req.body.ids.push(req.user.id);
+    var encounters = [];
 
-            for (var k = 0; k < req.body.ids.length - 1; k++) {
+    if (req.body.isGroup === "true") {
+        // add sender to ids and add all combinations to encounter array
+        req.body.ids.push(req.user.id);
 
-                var id = req.body.ids[k];
+        for (var k = 0; k < req.body.ids.length - 1; k++) {
 
-                for (var l = k + 1; l < req.body.ids.length; l++) {
-                    var e = new Encounter({
-                        users: []
-                    });
-                    if (req.body.date) e.date = req.body.date;
+            var id = req.body.ids[k];
 
-                    else e.date = new Date();
-                    e.users.push(id);
-                    e.users.push(req.body.ids[l]);
-                    encounters.push(e.toObject());
-
-                    isDone();
-
-                }
-            }
-
-        } else {
-
-            // this add enounters with the sender user only
-            ids.forEach(function (id) {
-
+            for (var l = k + 1; l < req.body.ids.length; l++) {
                 var e = new Encounter({
                     users: []
                 });
                 if (req.body.date) e.date = req.body.date;
+
                 else e.date = new Date();
-                e.users.push(req.user.id);
                 e.users.push(id);
+                e.users.push(req.body.ids[l]);
                 encounters.push(e.toObject());
 
-                isDone();
+            }
 
+            Encounter.insertMany(encounters, function (err, docs) {
+                if (err) {
+                    console.log("error in insert Many", err);
+                    return res.status(500).send();
+                } else {
+                    return res.json(true);
+                }
             });
 
         }
 
-        function isDone() {
 
-            if (encounters.length === numEncounters) {
-                Encounter.insertMany(encounters, function (err, docs) {
-                    // console.log(docs);
-                    if (err) {
-                        console.log("error in insert Many", err);
-                        resolve(res.status(500).send());
 
-                    } else {
-                        resolve(res.json(true));
-                    }
-                });
+    } else {
+
+        // this add enounters with the sender user only
+        ids.forEach(function (id) {
+
+            var e = new Encounter({
+                users: []
+            });
+            if (req.body.date) e.date = req.body.date;
+            else e.date = new Date();
+            e.users.push(req.user.id);
+            e.users.push(id);
+            encounters.push(e.toObject());
+
+        });
+
+        Encounter.insertMany(encounters, function (err, docs) {
+            if (err) {
+                console.log("error in insert Many", err);
+                return res.status(500).send();
+            } else {
+                return res.json(true);
             }
-        }
+        });
 
-    });
+    }
 
 
 });
