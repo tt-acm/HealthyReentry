@@ -114,91 +114,67 @@ router.post("/add-one", function (req, res) {
 router.post("/add-many", async function (req, res) {
 
 
-    var ids = req.body.encounters.reduce(function (out, x) {
-        out.push(x._id);
-        return out;
-    }, []);
-    var numEncounters = ids.length;
-    if (req.body.isGroup === "true") numEncounters = combinations(numEncounters + 1, 2);
+    try {
 
-    var encounters = [];
-
-    if (req.body.isGroup === "true") {
-        // add sender to ids and add all combinations to encounter array
-        req.body.ids.push(req.user.id);
-
-        for (var k = 0; k < req.body.ids.length - 1; k++) {
-
-            var id = req.body.ids[k];
-
-            for (var l = k + 1; l < req.body.ids.length; l++) {
+        var ids = req.body.encounters.reduce(function (out, x) {
+            out.push(x._id);
+            return out;
+        }, []);
+    
+        var encounters = [];
+    
+        if (req.body.isGroup) {
+            // add sender to ids and add all combinations to encounter array
+            ids.push(req.user.id);
+    
+            for (var k = 0; k < ids.length - 1; k++) {
+    
+                var id = ids[k];
+    
+                for (var l = k + 1; l < ids.length; l++) {
+                    var e = new Encounter({
+                        users: []
+                    });
+                    e.date = (req.body.date) ? req.body.date : new Date();
+                    
+                    e.users.push(id);
+                    e.users.push(ids[l]);
+                    encounters.push(e.toObject());
+    
+                }
+    
+            }    
+    
+        } else {
+    
+            // this add enounters with the sender user only
+            ids.forEach(function (id) {
+    
                 var e = new Encounter({
                     users: []
                 });
                 if (req.body.date) e.date = req.body.date;
-
                 else e.date = new Date();
+                e.users.push(req.user.id);
                 e.users.push(id);
-                e.users.push(req.body.ids[l]);
                 encounters.push(e.toObject());
-
-            }
-
-            await Encounter.insertMany(encounters);
-            
-            return res.json(true);
-
-        }
-
-
-
-    } else {
-
-        // this add enounters with the sender user only
-        ids.forEach(function (id) {
-
-            var e = new Encounter({
-                users: []
+    
             });
-            if (req.body.date) e.date = req.body.date;
-            else e.date = new Date();
-            e.users.push(req.user.id);
-            e.users.push(id);
-            encounters.push(e.toObject());
-
-        });
-
+    
+        }
+    
         await Encounter.insertMany(encounters);
         
         return res.json(true);
+        
 
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send();
     }
 
 
 });
-
-
-//https://www.w3resource.com/javascript-exercises/javascript-math-exercise-42.php
-//calculation of the k combination
-function product_Range(a, b) {
-    var prd = a,
-        i = a;
-
-    while (i++ < b) {
-        prd *= i;
-    }
-    return prd;
-}
-
-
-function combinations(n, r) {
-    if (n == r) {
-        return 1;
-    } else {
-        r = (r < n - r) ? n - r : r;
-        return product_Range(r + 1, n) / product_Range(1, n - r);
-    }
-}
 
 
 /**
