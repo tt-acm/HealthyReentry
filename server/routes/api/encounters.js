@@ -167,7 +167,7 @@ router.post("/add-many", async function (req, res) {
         await Encounter.insertMany(encounters);
 
         var statuses = [];
-        for(var uid of ids) {
+        for(let uid of ids) {
             var st = await Status.find({
                 "user": uid
             })
@@ -178,7 +178,21 @@ router.post("/add-many", async function (req, res) {
             statuses.push(st[0]);
         }
 
-        var worstStatusCode = statuses.reduce((a, b) => { return (a.status > b.status) ? a : b });
+        var worstStatus = statuses.reduce((a, b) => { return (a.status > b.status) ? a : b });
+
+        if(worstStatus.status === 2) {
+            statuses = [];
+            for(let uid of ids) {
+                let u = await User.findOne({_id: uid});
+                var status = new Status({
+                  status: 1, // set status Orange
+                  user: u,
+                  date: new Date()
+                });
+                statuses.push(status);
+            }
+            await Status.insertMany(statuses);
+        }
         
         return res.json(true);
         
