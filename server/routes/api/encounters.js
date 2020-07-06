@@ -177,6 +177,8 @@ router.post("/add-many", async function (req, res) {
             .limit(1);
             statuses.push(st[0]);
         }
+
+        var worstStatusCode = statuses.reduce((a, b) => { return (a.status > b.status) ? a : b });
         
         return res.json(true);
         
