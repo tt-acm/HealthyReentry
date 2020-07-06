@@ -172,32 +172,39 @@ router.post("/add-many", async function (req, res) {
         // add self's id to the pool before checking for exposure risk
         allIds.push(req.user.id);
 
+        let worstStatus = 0;
+        let isGreen = [];
+        let isOrange = [];
+        let isRed = [];
+        
         let statuses = [];
         for(let uid of allIds) {
-            let st = await Status.find({
+            let st = (await Status.find({
                 "user": uid
             })
             .sort({
                 date: -1
             })
-            .limit(1);
-            statuses.push(st[0]);
+            .limit(1))[0];
+            statuses.push(st);
+            if (st.status > worstStatus) worstStatus = st.status;
+            if (st.status === 1) isOrange.push(uid);
+            else if (st.status === 2) isRed.push(uid);
+            else isGreen.push(uid);
         }
 
-        let worstStatus = statuses.reduce((a, b) => { return (a.status > b.status) ? a : b });
-
-        if (worstStatus.status === 2) {
-            statuses = [];
-            for(let uid of allIds) {
+        if (worstStatus === 2) {
+            let newStatuses = [];
+            for(let uid of isGreen) {
                 let u = await User.findOne({_id: uid});
                 let status = new Status({
                   status: 1, // set status Orange
                   user: u,
                   date: new Date()
                 });
-                statuses.push(status);
+                newStatuses.push(status);
             }
-            await Status.insertMany(statuses);
+            await Status.insertMany(newStatuses);
         }
         
         return res.json(true);
