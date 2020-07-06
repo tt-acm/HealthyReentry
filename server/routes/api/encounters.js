@@ -117,23 +117,26 @@ router.post("/add-many", async function (req, res) {
 
     try {
 
-        var ids = req.body.encounters.reduce(function (out, x) {
+        let ids = req.body.encounters.reduce(function (out, x) {
             out.push(x._id);
             return out;
         }, []);
+
+        // make copy of others ids which will be used to check status later
+        let allIds = JSON.parse(JSON.stringify(ids));
     
-        var encounters = [];
+        let encounters = [];
     
         if (req.body.isGroup) {
             // add sender to ids and add all combinations to encounter array
             ids.push(req.user.id);
     
-            for (var k = 0; k < ids.length - 1; k++) {
+            for (let k = 0; k < ids.length - 1; k++) {
     
-                var id = ids[k];
+                let id = ids[k];
     
-                for (var l = k + 1; l < ids.length; l++) {
-                    var e = new Encounter({
+                for (let l = k + 1; l < ids.length; l++) {
+                    let e = new Encounter({
                         users: []
                     });
                     e.date = (req.body.date) ? req.body.date : new Date();
@@ -151,7 +154,7 @@ router.post("/add-many", async function (req, res) {
             // this add enounters with the sender user only
             ids.forEach(function (id) {
     
-                var e = new Encounter({
+                let e = new Encounter({
                     users: []
                 });
                 if (req.body.date) e.date = req.body.date;
@@ -166,9 +169,12 @@ router.post("/add-many", async function (req, res) {
     
         await Encounter.insertMany(encounters);
 
-        var statuses = [];
-        for(let uid of ids) {
-            var st = await Status.find({
+        // add self's id to the pool before checking for exposure risk
+        allIds.push(req.user.id);
+
+        let statuses = [];
+        for(let uid of allIds) {
+            let st = await Status.find({
                 "user": uid
             })
             .sort({
@@ -178,13 +184,13 @@ router.post("/add-many", async function (req, res) {
             statuses.push(st[0]);
         }
 
-        var worstStatus = statuses.reduce((a, b) => { return (a.status > b.status) ? a : b });
+        let worstStatus = statuses.reduce((a, b) => { return (a.status > b.status) ? a : b });
 
-        if(worstStatus.status === 2) {
+        if (worstStatus.status === 2) {
             statuses = [];
-            for(let uid of ids) {
+            for(let uid of allIds) {
                 let u = await User.findOne({_id: uid});
-                var status = new Status({
+                let status = new Status({
                   status: 1, // set status Orange
                   user: u,
                   date: new Date()
