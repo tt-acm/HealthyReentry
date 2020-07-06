@@ -6,6 +6,7 @@ const eg = require('../../lib/build_encounter_graph');
 
 const User = require('../../models/User');
 const Encounter = require('../../models/Encounter');
+const Status = require('../../models/Status');
 
 
 
@@ -164,6 +165,18 @@ router.post("/add-many", async function (req, res) {
         }
     
         await Encounter.insertMany(encounters);
+
+        var statuses = [];
+        for(var uid of ids) {
+            var st = await Status.find({
+                "user": uid
+            })
+            .sort({
+                date: -1
+            })
+            .limit(1);
+            statuses.push(st[0]);
+        }
         
         return res.json(true);
         
