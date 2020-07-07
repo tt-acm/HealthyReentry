@@ -158,11 +158,11 @@
                   >None</span>
                 </i></small>
               </span>
-              
+
               <div class="row overflow-auto mx-0" style="height:400px">
                 <div class="col">
                   <div v-for="region in regionsForDownloadSelections" :key="region.name">
-                    
+
                     <div class="pt-2">
                       <i class="fas fa-angle-right"></i>
                       {{ region.name }}
@@ -191,7 +191,7 @@
                   </div>
                 </div>
               </div>
-              
+
             </div>
           </div>
           <div class="modal-footer">
@@ -233,11 +233,11 @@
                   >None</span>
                 </i></small>
               </span>
-              
+
               <div class="row overflow-auto mx-0" style="height:400px">
                 <div class="col">
                   <div v-for="region in regionsForDownloadSelections" :key="region.name">
-                    
+
                     <div class="pt-2">
                       <i class="fas fa-angle-right"></i>
                       {{ region.name }}
@@ -266,7 +266,7 @@
                   </div>
                 </div>
               </div>
-              
+
             </div>
           </div>
           <div class="modal-footer">
@@ -276,6 +276,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete User Modal -->
+    <md-dialog :md-active.sync="deleteActive">
+      <md-dialog-title>Delete User</md-dialog-title>
+      <md-dialog-content v-if="userToDelete">Are you sure to delete <b>{{userToDelete.name}}</b>?</md-dialog-content>
+
+      <md-dialog-actions>
+        <md-button class="md-primary" @click="deleteActive = false">Close</md-button>
+        <md-button class="md-primary" @click="submitDeleteUser">Save</md-button>
+      </md-dialog-actions>
+    </md-dialog>
 
     <h5 class="text-muted">Admin Dashboard</h5>
 
@@ -309,7 +320,7 @@
               <div class="col">
 
                 <div v-for="region in regions" :key="region.name">
-                  
+
                   <div class="pt-2">
                     <i class="fas fa-angle-right"></i>
                     {{ region.name }}
@@ -336,7 +347,7 @@
                   </div>
 
                 </div>
-                
+
               </div>
             </div>
 
@@ -572,6 +583,11 @@
               <i :class="'fas fa-circle ' + user.status.css_key"></i>
             </td>
             <td style="width: 25%">
+              <span class="pr-1" @click="deleteUser(user)">
+                <i class="fas fa-times-circle"></i>
+                <md-tooltip md-direction="top">Delete this user</md-tooltip>
+              </span>
+
               {{ user.name }}
             </td>
             <td style="width: 20%">
@@ -674,6 +690,8 @@ export default {
   },
   data() {
     return {
+      userToDelete: null,
+      deleteActive: false,
       isLoading: false,
       pageNo: 1,
       itemsOnPage: 10,
@@ -719,8 +737,26 @@ export default {
     }
   },
   methods: {
+    submitDeleteUser() {
+      this.deleteActive = false;
+
+      const body = {"email": this.userToDelete.email};
+
+      this.$api.post("/api/user/delete", body).then(msg => {
+        if (msg.data) {
+          //remove user from List
+          const userIndex = this.users.findIndex(u => u.email === this.userToDelete.email);
+
+          if (userIndex !== -1) this.users.splice(userIndex, 1);
+        }
+      });
+    },
+    deleteUser(u) {
+      this.deleteActive = true;
+      this.userToDelete = u;
+    },
     async downloadGraphForSelectedAsCSV() {
-      let userEmails = this.users.filter(u => u.selected).map(u => u.email);  
+      let userEmails = this.users.filter(u => u.selected).map(u => u.email);
       if (userEmails.length < 1) return;
       this.isLoading = true;
       let postBody = {
@@ -859,7 +895,7 @@ export default {
       $(function () {
         $('#updateConfModal').modal('hide');
       });
-      
+
       this.isLoading = false;
 
     },
