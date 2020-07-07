@@ -234,4 +234,38 @@ router.get('/test', function(req, res) {
   return res.send('Test user route');
 });
 
+/**
+ * @swagger
+ * path:
+ *  /api/user/delete:
+ *    post:
+ *      summary: Delete a user by email address.
+ *      tags: [Status]
+ *      parameters:
+ *        - in: body
+ *          name: email
+ *          description: User's email
+ *          schema:
+ *            type: string
+ *      produces:
+ *       - application/string
+ *      responses:
+ *        200:
+ *          description: User deleted successfully.
+ *        500:
+ *          description: Server error.
+ */
+router.post("/delete", function(req, res) {
+
+  User.deleteOne({
+    "email": req.body.email.toLowerCase()
+  })
+  .exec(function(err, user) {
+    if (err) {
+      return res.status(500).send();
+    }
+    return res.send("User deleted successfully");
+  });
+});
+
 module.exports = router;
