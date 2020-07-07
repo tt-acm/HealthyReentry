@@ -383,4 +383,40 @@ router.post("/get-graph", function (req, res) {
 
 
 
+function sendEmail(subject, toEmails, content, attachment, filename) {
+    return new Promise(function(resolve, reject) {
+  
+      const mailOptions = {
+        to: toEmails,
+        from: process.env.SENDGRID_EMAIL,
+        subject: subject || process.env.VUE_APP_NAME + " - TESTING",
+        text: " ",
+        html: content
+      };
+  
+      if (attachment) {
+        mailOptions.attachments = [{
+          "content": attachment,
+          "filename": filename,
+          "type": "text/csv"
+        }]
+      }
+  
+      // https://www.twilio.com/blog/sending-bulk-emails-3-ways-sendgrid-nodejs
+      // the recepients not able to see each other
+  
+      sgClient.sendMultiple(mailOptions, function(err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+  
+        resolve(mailOptions);
+      });
+  
+    });
+  
+}
+
+
 module.exports = router;
