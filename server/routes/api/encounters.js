@@ -9,7 +9,7 @@ const User = require('../../models/User');
 const Encounter = require('../../models/Encounter');
 const Status = require('../../models/Status');
 
-const orangeContent = fs.readFileSync("../../assets/email_templates/orangeContent.html").toString("utf-8");
+const orangeContent = fs.readFileSync('server/assets/email_templates/orangeContent.html').toString("utf-8");
 
 /**
  * @swagger
