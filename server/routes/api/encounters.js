@@ -324,7 +324,7 @@ router.get("/find-frequent-encounters", function (req, res) {
  */
 router.post("/get-graph", function (req, res) {
 
-    eg(req.user.email).then(function (graph) {
+    eg(req.user.email).then(async function (graph) {
 
         var headers = "Email, Number Of Direct Encounters, Degree of Separation , Status";
 
@@ -351,44 +351,12 @@ router.post("/get-graph", function (req, res) {
 
         var newdate = month + "/" + day + "/"+ year;
         var fileName = req.user.name + "-" + req.body.status + "-"+ newdate + ".csv";
-        const mailOptions = {
-            to: variables.ADMIN_USERS,
-            from: process.env.SENDGRID_EMAIL,
-            subject: title,
-            text: " ",
-            html: thisHTML,
-            "attachments": [{
-                "content": base64data,
-                "content_id": "",
-                "disposition": "attachment",
-                "filename": fileName,
-                "type": "text/csv"
-            }]
 
-        };
+        await sendEmail(title, variables.ADMIN_USERS, thisHTML, base64data, fileName)
 
-        sendEmail(mailOptions).then(function () {
-            return res.json(graph);
-        });
+        return res.json(graph);
 
     });
-
-
-    function sendEmail(mailOptions) {
-        return new Promise(function (resolve, reject) {
-            // https://github.com/sendgrid/sendgrid-python/blob/master/USAGE.md#post-mailsend
-            sgClient.send(mailOptions, function (err) {
-                if (err) {
-                    console.log("email failed", err);
-                    reject();
-                }
-
-                resolve();
-            });
-
-        });
-
-    }
 
 
 });
