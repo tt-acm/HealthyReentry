@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const fs = require('fs');
 
 const sgClient = require("../../lib/sgClient");
 const variables = require("../../util/variables");
@@ -8,7 +9,7 @@ const User = require('../../models/User');
 const Encounter = require('../../models/Encounter');
 const Status = require('../../models/Status');
 
-
+const orangeContent = fs.readFileSync("../../assets/email_templates/orangeContent.html").toString("utf-8");
 
 /**
  * @swagger
@@ -205,6 +206,17 @@ router.post("/add-many", async function (req, res) {
                 newStatuses.push(status);
             }
             await Status.insertMany(newStatuses);
+        }
+
+        else if (worstStatus === 1) {
+            let emails = [];
+            for(let uid of isGreen) {
+                let u = await User.findOne({_id: uid});
+                emails.push(u.email);
+            }
+            if (emails.length > 0) {
+                sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
+            }
         }
         
         return res.json(true);
