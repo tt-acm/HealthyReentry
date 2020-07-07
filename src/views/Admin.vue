@@ -584,7 +584,7 @@
             </td>
             <td style="width: 25%">
               <span class="pr-1" @click="deleteUser(user)">
-                <i class="fas fa-times-circle"></i>
+                <i class="fas fa-times-circle text-secondary" style="cursor: pointer;"></i>
                 <md-tooltip md-direction="top">Delete this user</md-tooltip>
               </span>
 
