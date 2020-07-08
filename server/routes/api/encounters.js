@@ -10,6 +10,7 @@ const Encounter = require('../../models/Encounter');
 const Status = require('../../models/Status');
 
 const orangeContent = fs.readFileSync('server/assets/email_templates/orangeContent.html').toString("utf-8");
+const redContent = fs.readFileSync("server/assets/email_templates/redContent.html").toString("utf-8");
 
 /**
  * @swagger
@@ -196,8 +197,10 @@ router.post("/add-many", async function (req, res) {
 
         if (worstStatus === 2) {
             let newStatuses = [];
+            let emails = [];
             for(let uid of isGreen) {
                 let u = await User.findOne({_id: uid});
+                emails.push(u.email);
                 let status = new Status({
                   status: 1, // set status Orange
                   user: u,
@@ -206,6 +209,12 @@ router.post("/add-many", async function (req, res) {
                 newStatuses.push(status);
             }
             await Status.insertMany(newStatuses);
+            if (emails.length > 0) {
+                // send notification email 30mins after event to avoid being traced by users
+                setTimeout(() => {
+                    sendEmail("Attention: Refrain from coming to the office", emails, redContent);
+                }, 60000 * 30);
+            }
         }
 
         else if (worstStatus === 1) {
