@@ -215,7 +215,10 @@ router.post("/add-many", async function (req, res) {
                 emails.push(u.email);
             }
             if (emails.length > 0) {
-                sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
+                // send notification email 30mins after event to avoid being traced by users
+                setTimeout(() => {
+                    sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
+                }, 60000 * 30);
             }
         }
         
