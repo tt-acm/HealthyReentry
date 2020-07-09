@@ -192,6 +192,41 @@ router.post("/add-many", async function (req, res) {
                 }, 60000 * 30);
             }
 
+            
+            let userStatus = (await Status.find({
+                "user": req.user.id
+            })
+            .sort({
+                date: -1
+            })
+            .limit(1))[0];
+
+            if (userStatus.status === 2) {
+                for(let id of ids) {
+                    let u = await User.findOne({_id: id});
+                    let newStatus = new Status({
+                      status: 1, // set status Orange
+                      user: u,
+                      date: new Date()
+                    });
+                    await newStatus.save();
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
+                    }, 60000 * 30);
+                }
+            }
+
+            if (userStatus.status === 1) {
+                for(let id of ids) {
+                    let u = await User.findOne({_id: id});
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
+                    }, 60000 * 30);
+                }
+            }
+
 
     
         }
