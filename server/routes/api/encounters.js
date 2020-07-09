@@ -70,6 +70,8 @@ router.post("/add-many", async function (req, res) {
             let isRed = [];
             
             let statuses = [];
+
+            // get and group current statuses of everyone in the group
             for(let uid of ids) {
                 let st = (await Status.find({
                     "user": uid
@@ -79,12 +81,14 @@ router.post("/add-many", async function (req, res) {
                 })
                 .limit(1))[0];
                 statuses.push(st);
+                // mark the most aggrevated status level
                 if (st.status > worstStatus) worstStatus = st.status;
                 if (st.status === 1) isOrange.push(uid);
                 else if (st.status === 2) isRed.push(uid);
                 else isGreen.push(uid);
             }
     
+            // add all combinations of encounters since its a group encounter
             for (let k = 0; k < ids.length - 1; k++) {
     
                 let id = ids[k];
@@ -98,11 +102,11 @@ router.post("/add-many", async function (req, res) {
                     e.users.push(id);
                     e.users.push(ids[l]);
                     encounters.push(e.toObject());
-    
                 }
     
             }
 
+            // if someone in the group is red, escalate everone who is green to orange and notify them
             if (worstStatus === 2) {
                 let newStatuses = [];
                 let emails = [];
@@ -125,6 +129,7 @@ router.post("/add-many", async function (req, res) {
                 }
             }
     
+            // if someone in the group is orange, notify all greens of the risk
             else if (worstStatus === 1) {
                 let emails = [];
                 for(let uid of isGreen) {
@@ -144,7 +149,7 @@ router.post("/add-many", async function (req, res) {
 
             let worstStatus = 0;
     
-            // this add enounters with the sender user only
+            // add encounters with the submitter one by one; get everyone's status; get the worst status encountered
             for(let id of ids) {
     
                 let e = new Encounter({
@@ -170,6 +175,7 @@ router.post("/add-many", async function (req, res) {
 
             }
 
+            // if anyone's been red, escalate submitter to orange and notify them
             if (worstStatus === 2) {
                 let u = await User.findOne({_id: req.user.id});
                 let newStatus = new Status({
@@ -184,6 +190,7 @@ router.post("/add-many", async function (req, res) {
                 }, 60000 * 30);
             }
     
+            // if anyone's been orange, notify the submitter
             else if (worstStatus === 1) {
                 let u = await User.findOne({_id: req.user.id});
                 // send notification email 30mins after event to avoid being traced by users
@@ -192,7 +199,7 @@ router.post("/add-many", async function (req, res) {
                 }, 60000 * 30);
             }
 
-            
+            // get submitter status
             let userStatus = (await Status.find({
                 "user": req.user.id
             })
@@ -201,6 +208,7 @@ router.post("/add-many", async function (req, res) {
             })
             .limit(1))[0];
 
+            // if submitter is red; mark all others orange and notify them 
             if (userStatus.status === 2) {
                 for(let id of ids) {
                     let u = await User.findOne({_id: id});
@@ -217,6 +225,7 @@ router.post("/add-many", async function (req, res) {
                 }
             }
 
+            // if submitter is orange; notify others
             if (userStatus.status === 1) {
                 for(let id of ids) {
                     let u = await User.findOne({_id: id});
