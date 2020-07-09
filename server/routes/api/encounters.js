@@ -126,50 +126,6 @@ router.post("/add-many", async function (req, res) {
 
         // make copy of others ids which will be used to check status later
         let allIds = JSON.parse(JSON.stringify(ids));
-    
-        let encounters = [];
-    
-        if (req.body.isGroup) {
-            // add sender to ids and add all combinations to encounter array
-            ids.push(req.user.id);
-    
-            for (let k = 0; k < ids.length - 1; k++) {
-    
-                let id = ids[k];
-    
-                for (let l = k + 1; l < ids.length; l++) {
-                    let e = new Encounter({
-                        users: []
-                    });
-                    e.date = (req.body.date) ? req.body.date : new Date();
-                    
-                    e.users.push(id);
-                    e.users.push(ids[l]);
-                    encounters.push(e.toObject());
-    
-                }
-    
-            }    
-    
-        } else {
-    
-            // this add enounters with the sender user only
-            ids.forEach(function (id) {
-    
-                let e = new Encounter({
-                    users: []
-                });
-                if (req.body.date) e.date = req.body.date;
-                else e.date = new Date();
-                e.users.push(req.user.id);
-                e.users.push(id);
-                encounters.push(e.toObject());
-    
-            });
-    
-        }
-    
-        await Encounter.insertMany(encounters);
 
         // add self's id to the pool before checking for exposure risk
         allIds.push(req.user.id);
@@ -194,42 +150,87 @@ router.post("/add-many", async function (req, res) {
             else if (st.status === 2) isRed.push(uid);
             else isGreen.push(uid);
         }
+    
+        let encounters = [];
+    
+        if (req.body.isGroup) {
+            // add sender to ids and add all combinations to encounter array
+            ids.push(req.user.id);
+    
+            for (let k = 0; k < ids.length - 1; k++) {
+    
+                let id = ids[k];
+    
+                for (let l = k + 1; l < ids.length; l++) {
+                    let e = new Encounter({
+                        users: []
+                    });
+                    e.date = (req.body.date) ? req.body.date : new Date();
+                    
+                    e.users.push(id);
+                    e.users.push(ids[l]);
+                    encounters.push(e.toObject());
+    
+                }
+    
+            }
 
-        if (worstStatus === 2) {
-            let newStatuses = [];
-            let emails = [];
-            for(let uid of isGreen) {
-                let u = await User.findOne({_id: uid});
-                emails.push(u.email);
-                let status = new Status({
-                  status: 1, // set status Orange
-                  user: u,
-                  date: new Date()
+            if (worstStatus === 2) {
+                let newStatuses = [];
+                let emails = [];
+                for(let uid of isGreen) {
+                    let u = await User.findOne({_id: uid});
+                    emails.push(u.email);
+                    let status = new Status({
+                      status: 1, // set status Orange
+                      user: u,
+                      date: new Date()
+                    });
+                    newStatuses.push(status);
+                }
+                await Status.insertMany(newStatuses);
+                if (emails.length > 0) {
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", emails, redContent);
+                    }, 60000 * 30);
+                }
+            }
+    
+            else if (worstStatus === 1) {
+                let emails = [];
+                for(let uid of isGreen) {
+                    let u = await User.findOne({_id: uid});
+                    emails.push(u.email);
+                }
+                if (emails.length > 0) {
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
+                    }, 60000 * 30);
+                }
+            }
+            
+    
+        } else {
+    
+            // this add enounters with the sender user only
+            ids.forEach(function (id) {
+    
+                let e = new Encounter({
+                    users: []
                 });
-                newStatuses.push(status);
-            }
-            await Status.insertMany(newStatuses);
-            if (emails.length > 0) {
-                // send notification email 30mins after event to avoid being traced by users
-                setTimeout(() => {
-                    sendEmail("Attention: Refrain from coming to the office", emails, redContent);
-                }, 60000 * 30);
-            }
+                if (req.body.date) e.date = req.body.date;
+                else e.date = new Date();
+                e.users.push(req.user.id);
+                e.users.push(id);
+                encounters.push(e.toObject());
+    
+            });
+    
         }
-
-        else if (worstStatus === 1) {
-            let emails = [];
-            for(let uid of isGreen) {
-                let u = await User.findOne({_id: uid});
-                emails.push(u.email);
-            }
-            if (emails.length > 0) {
-                // send notification email 30mins after event to avoid being traced by users
-                setTimeout(() => {
-                    sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
-                }, 60000 * 30);
-            }
-        }
+    
+        await Encounter.insertMany(encounters);
         
         return res.json(true);
         
