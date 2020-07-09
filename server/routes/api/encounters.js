@@ -212,7 +212,7 @@ router.post("/add-many", async function (req, res) {
             let worstStatus = 0;
     
             // this add enounters with the sender user only
-            for(let id in ids) {
+            for(let id of ids) {
     
                 let e = new Encounter({
                     users: []
@@ -244,7 +244,7 @@ router.post("/add-many", async function (req, res) {
                   user: u,
                   date: new Date()
                 });
-                await Status.insert(newStatus);
+                await newStatus.save();
                 // send notification email 30mins after event to avoid being traced by users
                 setTimeout(() => {
                     sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
