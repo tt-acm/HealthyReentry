@@ -208,9 +208,11 @@ router.post("/add-many", async function (req, res) {
 
     
         } else {
+
+            let worstStatus = 0;
     
             // this add enounters with the sender user only
-            ids.forEach(function (id) {
+            for(let id in ids) {
     
                 let e = new Encounter({
                     users: []
@@ -220,8 +222,44 @@ router.post("/add-many", async function (req, res) {
                 e.users.push(req.user.id);
                 e.users.push(id);
                 encounters.push(e.toObject());
+                
+                let st = (await Status.find({
+                    "user": id
+                })
+                .sort({
+                    date: -1
+                })
+                .limit(1))[0];
+
+                if (st.status > worstStatus) {
+                    worstStatus = st.status;
+                }
+
+            }
+
+            if (worstStatus === 2) {
+                let u = await User.findOne({_id: req.user.id});
+                let newStatus = new Status({
+                  status: 1, // set status Orange
+                  user: u,
+                  date: new Date()
+                });
+                await Status.insert(newStatus);
+                // send notification email 30mins after event to avoid being traced by users
+                setTimeout(() => {
+                    sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
+                }, 60000 * 30);
+            }
     
-            });
+            else if (worstStatus === 1) {
+                let u = await User.findOne({_id: req.user.id});
+                // send notification email 30mins after event to avoid being traced by users
+                setTimeout(() => {
+                    sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
+                }, 60000 * 30);
+            }
+
+
     
         }
     
