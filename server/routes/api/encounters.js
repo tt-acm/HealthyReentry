@@ -123,39 +123,34 @@ router.post("/add-many", async function (req, res) {
             out.push(x._id);
             return out;
         }, []);
-
-        // make copy of others ids which will be used to check status later
-        let allIds = JSON.parse(JSON.stringify(ids));
-
-        // add self's id to the pool before checking for exposure risk
-        allIds.push(req.user.id);
-
-        let worstStatus = 0;
-        let isGreen = [];
-        let isOrange = [];
-        let isRed = [];
-        
-        let statuses = [];
-        for(let uid of allIds) {
-            let st = (await Status.find({
-                "user": uid
-            })
-            .sort({
-                date: -1
-            })
-            .limit(1))[0];
-            statuses.push(st);
-            if (st.status > worstStatus) worstStatus = st.status;
-            if (st.status === 1) isOrange.push(uid);
-            else if (st.status === 2) isRed.push(uid);
-            else isGreen.push(uid);
-        }
     
         let encounters = [];
     
         if (req.body.isGroup) {
+
             // add sender to ids and add all combinations to encounter array
             ids.push(req.user.id);
+    
+            let worstStatus = 0;
+            let isGreen = [];
+            let isOrange = [];
+            let isRed = [];
+            
+            let statuses = [];
+            for(let uid of ids) {
+                let st = (await Status.find({
+                    "user": uid
+                })
+                .sort({
+                    date: -1
+                })
+                .limit(1))[0];
+                statuses.push(st);
+                if (st.status > worstStatus) worstStatus = st.status;
+                if (st.status === 1) isOrange.push(uid);
+                else if (st.status === 2) isRed.push(uid);
+                else isGreen.push(uid);
+            }
     
             for (let k = 0; k < ids.length - 1; k++) {
     
@@ -210,7 +205,7 @@ router.post("/add-many", async function (req, res) {
                     }, 60000 * 30);
                 }
             }
-            
+
     
         } else {
     
