@@ -147,6 +147,8 @@ router.post("/add-many", async function (req, res) {
     
         } else {
 
+            let user = await User.findOne({_id: req.user.id});
+
             // get submitter status
             let userStatus = (await Status.find({
                 "user": req.user.id
@@ -228,25 +230,22 @@ router.post("/add-many", async function (req, res) {
 
                 // if anyone's been red, escalate submitter to orange and notify them
                 if (st.status === 2 && userStatus < st.status) {
-                    let u = await User.findOne({_id: id});
                     let newStatus = new Status({
                         status: 1, // set status Orange
-                        user: u,
+                        user: user,
                         date: new Date()
                     });
-                    await newStatus.save();
                     // send notification email 30mins after event to avoid being traced by users
                     setTimeout(() => {
-                        sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
+                        sendEmail("Attention: Refrain from coming to the office", [user.email], redContent);
                     }, 60000 * 30);
                 }
 
                 // if anyone's been orange, notify the submitter
                 else if (st.status === 1 && userStatus < st.status) {
-                    let u = await User.findOne({_id: req.user.id});
                     // send notification email 30mins after event to avoid being traced by users
                     setTimeout(() => {
-                        sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
+                        sendEmail("Attention: Refrain from coming to the office", [user.email], orangeContent);
                     }, 60000 * 30);
                 }
 
