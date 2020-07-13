@@ -159,28 +159,50 @@ router.post("/add-many", async function (req, res) {
             // if submitter is red; mark all others orange and notify them 
             if (userStatus.status === 2) {
                 for(let id of ids) {
-                    let u = await User.findOne({_id: id});
-                    let newStatus = new Status({
-                      status: 1, // set status Orange
-                      user: u,
-                      date: new Date()
-                    });
-                    await newStatus.save();
-                    // send notification email 30mins after event to avoid being traced by users
-                    setTimeout(() => {
-                        sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
-                    }, 60000 * 30);
+                    let st = (await Status.find({
+                        "user": id
+                    })
+                    .sort({
+                        date: -1
+                    })
+                    .limit(1))[0];
+
+                    if (st.status < 2) {
+                        let u = await User.findOne({_id: id});
+                        let newStatus = new Status({
+                            status: 1, // set status Orange
+                            user: u,
+                            date: new Date()
+                        });
+                        await newStatus.save();
+                        // send notification email 30mins after event to avoid being traced by users
+                        setTimeout(() => {
+                            sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
+                        }, 60000 * 30);
+                    }
+
                 }
             }
 
             // if submitter is orange; notify others
             if (userStatus.status === 1) {
                 for(let id of ids) {
-                    let u = await User.findOne({_id: id});
-                    // send notification email 30mins after event to avoid being traced by users
-                    setTimeout(() => {
-                        sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
-                    }, 60000 * 30);
+                    let st = (await Status.find({
+                        "user": id
+                    })
+                    .sort({
+                        date: -1
+                    })
+                    .limit(1))[0];
+                    
+                    if (st.status < 1) {
+                        let u = await User.findOne({_id: id});
+                        // send notification email 30mins after event to avoid being traced by users
+                        setTimeout(() => {
+                            sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
+                        }, 60000 * 30);
+                    }
+                    
                 }
             }
 
