@@ -206,9 +206,7 @@ router.post("/add-many", async function (req, res) {
                 }
             }
 
-            let worstStatus = 0;
-    
-            // add encounters with the submitter one by one; get everyone's status; get the worst status encountered
+            // add encounters with the submitter one by one
             for(let id of ids) {
     
                 let e = new Encounter({
@@ -228,38 +226,32 @@ router.post("/add-many", async function (req, res) {
                 })
                 .limit(1))[0];
 
-                if (st.status > worstStatus) {
-                    worstStatus = st.status;
+                // if anyone's been red, escalate submitter to orange and notify them
+                if (st.status === 2 && userStatus < st.status) {
+                    let u = await User.findOne({_id: id});
+                    let newStatus = new Status({
+                        status: 1, // set status Orange
+                        user: u,
+                        date: new Date()
+                    });
+                    await newStatus.save();
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
+                    }, 60000 * 30);
+                }
+
+                // if anyone's been orange, notify the submitter
+                else if (st.status === 1 && userStatus < st.status) {
+                    let u = await User.findOne({_id: req.user.id});
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
+                    }, 60000 * 30);
                 }
 
             }
 
-            // if anyone's been red, escalate submitter to orange and notify them
-            if (worstStatus === 2) {
-                let u = await User.findOne({_id: req.user.id});
-                let newStatus = new Status({
-                  status: 1, // set status Orange
-                  user: u,
-                  date: new Date()
-                });
-                await newStatus.save();
-                // send notification email 30mins after event to avoid being traced by users
-                setTimeout(() => {
-                    sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
-                }, 60000 * 30);
-            }
-    
-            // if anyone's been orange, notify the submitter
-            else if (worstStatus === 1) {
-                let u = await User.findOne({_id: req.user.id});
-                // send notification email 30mins after event to avoid being traced by users
-                setTimeout(() => {
-                    sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
-                }, 60000 * 30);
-            }
-
-
-    
         }
     
         await Encounter.insertMany(encounters);
