@@ -229,12 +229,13 @@ router.post("/add-many", async function (req, res) {
                 .limit(1))[0];
 
                 // if anyone's been red, escalate submitter to orange and notify them
-                if (st.status === 2 && userStatus < st.status) {
+                if (st.status === 2 && userStatus.status < st.status) {
                     let newStatus = new Status({
                         status: 1, // set status Orange
                         user: user,
                         date: new Date()
                     });
+                    userStatus = await newStatus.save();
                     // send notification email 30mins after event to avoid being traced by users
                     setTimeout(() => {
                         sendEmail("Attention: Refrain from coming to the office", [user.email], redContent);
@@ -242,7 +243,7 @@ router.post("/add-many", async function (req, res) {
                 }
 
                 // if anyone's been orange, notify the submitter
-                else if (st.status === 1 && userStatus < st.status) {
+                else if (st.status === 1 && userStatus.status < st.status) {
                     // send notification email 30mins after event to avoid being traced by users
                     setTimeout(() => {
                         sendEmail("Attention: Refrain from coming to the office", [user.email], orangeContent);
