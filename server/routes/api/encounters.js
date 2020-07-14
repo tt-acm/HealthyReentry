@@ -169,7 +169,7 @@ router.post("/add-many", async function (req, res) {
                     })
                     .limit(1))[0];
 
-                    if (st.status < 2) {
+                    if (st.status < 1) {
                         let u = await User.findOne({_id: id});
                         let newStatus = new Status({
                             status: 1, // set status Orange
