@@ -18,7 +18,7 @@ const mongoose = require('mongoose');
  *            type: User
  *            description: User who submitted this preference.
  *        example:
- *           office: "Ottawa",
+ *           office: "Ottawa"
  *           createdAt: "2020-07-14T19:20:01.151Z"
  */
 var workPreferenceSchema = new mongoose.Schema({
