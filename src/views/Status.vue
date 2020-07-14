@@ -66,9 +66,10 @@
         <ul class="pl-3 mb-0">
           <li>Symptomatic of COVID-19, <b>OR</b></li>
           <li>Awaiting personal test results of COVID-19, <b>OR</b></li>
-          <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19.</li>
+          <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19, <b>OR</b></li>
+          <li>Travel quarantine requirement.</li>
         </ul>
-        <div class="card mt-2">
+        <!-- <div class="card mt-2">
           <div class="card-body bg-light p-1">
             <small class="mb-0 d-flex">
               <b style="margin-top:2px">Symptoms of COVID-19</b>
@@ -92,16 +93,17 @@
               </ul>
             </small>
           </div>
-        </div>
+        </div> -->
       </div>
       <div v-else>
         <h5 class="text-muted mt-2">Possible Exposure</h5>
         <ul class="pl-3 mb-0 text-muted">
           <li>Symptomatic of COVID-19, <b>OR</b></li>
           <li>Awaiting personal test results of COVID-19, <b>OR</b></li>
-          <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19.</li>
+          <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19, <b>OR</b></li>
+          <li>Travel quarantine requirement.</li>
         </ul>
-        <div class="card mt-2">
+        <!-- <div class="card mt-2">
           <div class="card-body bg-light p-1">
             <small class="mb-0 d-flex">
               <b style="margin-top:2px">Symptoms of COVID-19</b>
@@ -121,7 +123,7 @@
               </ul>
             </small>
           </div>
-        </div>
+        </div> -->
       </div>
 
 
