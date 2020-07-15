@@ -51,18 +51,21 @@
   <md-content>
     <md-dialog :md-active="showDialog">
       <md-dialog-title class="pb-0 mb-2">
-        Check in
-        <small class="text-muted ml-3" v-if="latestPreference">
-          Last submitted as <b>{{latestPreference.office}}</b> at {{showDisplayDate(latestPreference.createdAt, 'lll')}}
-        </small>
+        Check in - Work Location
       </md-dialog-title>
+
       <md-dialog-content>
-        <h6 class="my-2">Please choose your intended location to work today:</h6>
+        <span class="text-muted" v-if="latestPreference">
+          Last submitted as <b>{{latestPreference.office}}</b> at {{showDisplayDate(latestPreference.createdAt, 'lll')}}
+        </span>
+
+        <h6 class="my-4">Complete the sentence below by selecting the appropriate response.</h6>
 
         <md-content class="px-1">
-          <md-radio v-model="reentryOpt" value="0" class="md-primary">Work Remotely <small>(Default)</small></md-radio>
-          <md-radio v-model="reentryOpt" value="1" class="md-primary">
-            Work in office
+          <span class="d-flex mt-3">Today I will be _______.</span>
+          <md-radio v-model="reentryOpt" value="0" class="md-primary d-flex">Working Remotely <small>(Default)</small></md-radio>
+          <md-radio v-model="reentryOpt" value="1" class="md-primary d-flex">
+            Working in the office
             <div v-show="reentryOpt == 1" class="md-layout-item">
               <md-field>
                 <md-select name="offices" id="offices" v-model="userOffice">
@@ -74,10 +77,10 @@
             </div>
           </md-radio>
 
-          <div class="form-check ml-1" style="margin-top: 40px">
+          <div class="form-check ml-1" style="margin-top: 70px">
             <input class="form-check-input" type="checkbox" id="defaultCheck1" v-model="confirmOffice">
             <label class="form-check-label" for="defaultCheck1">
-              I comfirm with the selection above.
+              I agree with my selection above.
             </label>
           </div>
         </md-content>
