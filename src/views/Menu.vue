@@ -60,7 +60,7 @@
         <h6 class="my-2">Please choose your intended location to work today:</h6>
 
         <md-content class="px-1">
-          <md-radio v-model="reentryOpt" value="0" class="md-primary">Remain work from home <small>(Default)</small></md-radio>
+          <md-radio v-model="reentryOpt" value="0" class="md-primary">Work Remotely <small>(Default)</small></md-radio>
           <md-radio v-model="reentryOpt" value="1" class="md-primary">
             Work in office
             <div v-show="reentryOpt == 1" class="md-layout-item">
