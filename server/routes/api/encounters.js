@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const fs = require('fs');
 
 const sgClient = require("../../lib/sgClient");
 const variables = require("../../util/variables");
@@ -6,75 +7,10 @@ const eg = require('../../lib/build_encounter_graph');
 
 const User = require('../../models/User');
 const Encounter = require('../../models/Encounter');
+const Status = require('../../models/Status');
 
-
-
-/**
- * @swagger
- * path:
- *  /api/encounters/add-one:
- *    post:
- *      summary: Submit a new encounter to database.
- *      tags: [Encounters]
- *      parameters:
- *        - in: body
- *          name: date
- *          description: Date of the encounter; uses current date if null.
- *          schema:
- *            type: date
- *        - in: body
- *          name: id
- *          description: Encountered user's id (use id or email).
- *          schema:
- *            type: string
- *        - in: body
- *          name: email
- *          description: Encountered user's email (use id or email).
- *          schema:
- *            type: string
- *      produces:
- *       - application/json
- *      responses:
- *        200:
- *          description: The newly created encounter.
- *        500:
- *          description: Server error.
- */
-router.post("/add-one", function (req, res) {
-
-    var encounter = new Encounter({
-        users: []
-    });
-    if (req.body.date) encounter.date = req.body.date;
-    else encounter.date = new Date();
-
-    if (req.body.id) {
-        encounter.users.push(req.body.id); // req.user will be added presave
-        encounter.save(function (err, savedEncounter) {
-            if (!err) return res.json(savedEncounter);
-            else return res.status("500").send(err);
-        });
-
-    } else if (req.body.email) {
-
-        User.findOne({
-                "email": req.body.email.toLowerCase()
-            })
-            .exec(function (err, user) {
-                if (!err) {
-                    encounter.users.push(user); // req.user will be added presave
-                    encounter.save(function (error, savedEncounter) {
-                        if (!error) return res.json(savedEncounter);
-                        else return res.status("500").send(error);
-                    });
-
-                } else {
-                    return res.status(500).send(err);
-                }
-            });
-
-    }
-});
+const orangeContent = fs.readFileSync('server/assets/email_templates/orangeContent.html').toString("utf-8");
+const redContent = fs.readFileSync("server/assets/email_templates/redContent.html").toString("utf-8");
 
 
 /**
@@ -111,48 +47,171 @@ router.post("/add-one", function (req, res) {
  *        500:
  *          description: Server error.
  */
-router.post("/add-many", function (req, res) {
+router.post("/add-many", async function (req, res) {
 
-    return new Promise(function (resolve, reject) {
+
+    try {
+
         let ids = req.body.encounters.reduce(function (out, x) {
             out.push(x._id);
             return out;
         }, []);
-        var numEncounters = ids.length;
-        if (req.body.isGroup === "true") numEncounters = combinations(numEncounters + 1, 2);
+    
+        let encounters = [];
+    
+        if (req.body.isGroup) {
 
-        var encounters = [];
-
-        if (req.body.isGroup === "true") {
             // add sender to ids and add all combinations to encounter array
-            req.body.ids.push(req.user.id);
+            ids.push(req.user.id);
+    
+            let worstStatus = 0;
+            let isGreen = [];
+            let isOrange = [];
+            let isRed = [];
+            
+            let statuses = [];
 
-            for (var k = 0; k < req.body.ids.length - 1; k++) {
-
-                var id = req.body.ids[k];
-
-                for (var l = k + 1; l < req.body.ids.length; l++) {
-                    var e = new Encounter({
+            // get and group current statuses of everyone in the group
+            for(let uid of ids) {
+                let st = (await Status.find({
+                    "user": uid
+                })
+                .sort({
+                    date: -1
+                })
+                .limit(1))[0];
+                statuses.push(st);
+                // mark the most aggrevated status level
+                if (st.status > worstStatus) worstStatus = st.status;
+                if (st.status === 1) isOrange.push(uid);
+                else if (st.status === 2) isRed.push(uid);
+                else isGreen.push(uid);
+            }
+    
+            // add all combinations of encounters since its a group encounter
+            for (let k = 0; k < ids.length - 1; k++) {
+    
+                let id = ids[k];
+    
+                for (let l = k + 1; l < ids.length; l++) {
+                    let e = new Encounter({
                         users: []
                     });
-                    if (req.body.date) e.date = req.body.date;
-
-                    else e.date = new Date();
+                    e.date = (req.body.date) ? req.body.date : new Date();
+                    
                     e.users.push(id);
-                    e.users.push(req.body.ids[l]);
+                    e.users.push(ids[l]);
                     encounters.push(e.toObject());
+                }
+    
+            }
 
-                    isDone();
+            // if someone in the group is red, escalate everone who is green to orange and notify them
+            if (worstStatus === 2) {
+                let newStatuses = [];
+                let emails = [];
+                for(let uid of isGreen) {
+                    let u = await User.findOne({_id: uid});
+                    emails.push(u.email);
+                    let status = new Status({
+                      status: 1, // set status Orange
+                      user: u,
+                      date: new Date()
+                    });
+                    newStatuses.push(status);
+                }
+                await Status.insertMany(newStatuses);
+                if (emails.length > 0) {
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", emails, redContent);
+                    }, 60000 * 30);
+                }
+            }
+    
+            // if someone in the group is orange, notify all greens of the risk
+            else if (worstStatus === 1) {
+                let emails = [];
+                for(let uid of isGreen) {
+                    let u = await User.findOne({_id: uid});
+                    emails.push(u.email);
+                }
+                if (emails.length > 0) {
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
+                    }, 60000 * 30);
+                }
+            }
+
+    
+        } else {
+
+            let user = await User.findOne({_id: req.user.id});
+
+            // get submitter status
+            let userStatus = (await Status.find({
+                "user": req.user.id
+            })
+            .sort({
+                date: -1
+            })
+            .limit(1))[0];
+
+            // if submitter is red; mark all others orange and notify them 
+            if (userStatus.status === 2) {
+                for(let id of ids) {
+                    let st = (await Status.find({
+                        "user": id
+                    })
+                    .sort({
+                        date: -1
+                    })
+                    .limit(1))[0];
+
+                    if (st.status < 1) {
+                        let u = await User.findOne({_id: id});
+                        let newStatus = new Status({
+                            status: 1, // set status Orange
+                            user: u,
+                            date: new Date()
+                        });
+                        await newStatus.save();
+                        // send notification email 30mins after event to avoid being traced by users
+                        setTimeout(() => {
+                            sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
+                        }, 60000 * 30);
+                    }
 
                 }
             }
 
-        } else {
+            // if submitter is orange; notify others
+            if (userStatus.status === 1) {
+                for(let id of ids) {
+                    let st = (await Status.find({
+                        "user": id
+                    })
+                    .sort({
+                        date: -1
+                    })
+                    .limit(1))[0];
+                    
+                    if (st.status < 1) {
+                        let u = await User.findOne({_id: id});
+                        // send notification email 30mins after event to avoid being traced by users
+                        setTimeout(() => {
+                            sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
+                        }, 60000 * 30);
+                    }
+                    
+                }
+            }
 
-            // this add enounters with the sender user only
-            ids.forEach(function (id) {
-
-                var e = new Encounter({
+            // add encounters with the submitter one by one
+            for(let id of ids) {
+    
+                let e = new Encounter({
                     users: []
                 });
                 if (req.body.date) e.date = req.body.date;
@@ -160,53 +219,50 @@ router.post("/add-many", function (req, res) {
                 e.users.push(req.user.id);
                 e.users.push(id);
                 encounters.push(e.toObject());
+                
+                let st = (await Status.find({
+                    "user": id
+                })
+                .sort({
+                    date: -1
+                })
+                .limit(1))[0];
 
-                isDone();
+                // if anyone's been red, escalate submitter to orange and notify them
+                if (st.status === 2 && userStatus.status < st.status) {
+                    let newStatus = new Status({
+                        status: 1, // set status Orange
+                        user: user,
+                        date: new Date()
+                    });
+                    userStatus = await newStatus.save();
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", [user.email], redContent);
+                    }, 60000 * 30);
+                }
 
-            });
+                // if anyone's been orange, notify the submitter
+                else if (st.status === 1 && userStatus.status < st.status) {
+                    // send notification email 30mins after event to avoid being traced by users
+                    setTimeout(() => {
+                        sendEmail("Attention: Refrain from coming to the office", [user.email], orangeContent);
+                    }, 60000 * 30);
+                }
 
-        }
-
-        //https://www.w3resource.com/javascript-exercises/javascript-math-exercise-42.php
-        //calculation of the k combination
-        function product_Range(a, b) {
-            var prd = a,
-                i = a;
-
-            while (i++ < b) {
-                prd *= i;
             }
-            return prd;
+
         }
+    
+        await Encounter.insertMany(encounters);
+        
+        return res.json(true);
+        
 
-
-        function combinations(n, r) {
-            if (n == r) {
-                return 1;
-            } else {
-                r = (r < n - r) ? n - r : r;
-                return product_Range(r + 1, n) / product_Range(1, n - r);
-            }
-        }
-
-        function isDone() {
-
-            if (encounters.length === numEncounters) {
-                Encounter.insertMany(encounters, function (err, docs) {
-                    // console.log(docs);
-                    if (err) {
-                        console.log("error in insert Many", err);
-                        resolve(res.status(500).send());
-
-                    } else {
-                        resolve(res.json(true));
-                    }
-                });
-            }
-        }
-
-    });
-
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send();
+    }
 
 
 });
@@ -305,7 +361,7 @@ router.get("/find-frequent-encounters", function (req, res) {
  */
 router.post("/get-graph", function (req, res) {
 
-    eg(req.user.email).then(function (graph) {
+    eg(req.user.email).then(async function (graph) {
 
         var headers = "Email, Number Of Direct Encounters, Degree of Separation , Status";
 
@@ -332,48 +388,52 @@ router.post("/get-graph", function (req, res) {
 
         var newdate = month + "/" + day + "/"+ year;
         var fileName = req.user.name + "-" + req.body.status + "-"+ newdate + ".csv";
-        const mailOptions = {
-            to: variables.ADMIN_USERS,
-            from: process.env.SENDGRID_EMAIL,
-            subject: title,
-            text: " ",
-            html: thisHTML,
-            "attachments": [{
-                "content": base64data,
-                "content_id": "",
-                "disposition": "attachment",
-                "filename": fileName,
-                "type": "text/csv"
-            }]
 
-        };
+        await sendEmail(title, variables.ADMIN_USERS, thisHTML, base64data, fileName)
 
-        sendEmail(mailOptions).then(function () {
-            return res.json(graph);
-        });
+        return res.json(graph);
 
     });
 
 
-    function sendEmail(mailOptions) {
-        return new Promise(function (resolve, reject) {
-            // https://github.com/sendgrid/sendgrid-python/blob/master/USAGE.md#post-mailsend
-            sgClient.send(mailOptions, function (err) {
-                if (err) {
-                    console.log("email failed", err);
-                    reject();
-                }
-
-                resolve();
-            });
-
-        });
-
-    }
-
-
 });
 
+
+
+function sendEmail(subject, toEmails, content, attachment, filename) {
+    return new Promise(function(resolve, reject) {
+  
+      const mailOptions = {
+        to: toEmails,
+        from: process.env.SENDGRID_EMAIL,
+        subject: subject || process.env.VUE_APP_NAME + " - TESTING",
+        text: " ",
+        html: content
+      };
+  
+      if (attachment) {
+        mailOptions.attachments = [{
+          "content": attachment,
+          "filename": filename,
+          "type": "text/csv"
+        }]
+      }
+  
+      // https://www.twilio.com/blog/sending-bulk-emails-3-ways-sendgrid-nodejs
+      // the recepients not able to see each other
+  
+      sgClient.sendMultiple(mailOptions, function(err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+  
+        resolve(mailOptions);
+      });
+  
+    });
+  
+}
 
 
 module.exports = router;
