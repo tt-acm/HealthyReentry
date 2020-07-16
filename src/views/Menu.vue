@@ -171,6 +171,7 @@ export default {
 
       this.$api.post("/api/workPreference/add", reqBody).then(offices => {
         if (offices.data) this.showDialog = false;
+        this.latestPreference = offices.data;
       });
     },
     mapButtonCSS() {
