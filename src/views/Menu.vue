@@ -11,6 +11,11 @@
   <div class="mx-5 center" id="mainControls">
     <md-list v-if="user" id="controlButtons">
       <md-list-item>
+        <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent" @click="showDialog = true">
+          Change Work Location Status
+        </button>
+      </md-list-item>
+      <md-list-item>
         <router-link class="mx-auto" :to="{ name: 'status', params: { id: user._id}}">
           <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
             Report Your Status
@@ -121,7 +126,7 @@ export default {
     });
 
     this.$api.get("/api/workPreference/get-latest").then(preference => {
-      // console.log("preference", preference.data);
+      if (preference.data === null) this.showDialog = true;//if no preference, then show modal
       this.latestPreference = preference.data;
     });
   },
@@ -144,7 +149,7 @@ export default {
         "Orange - Possible Exposure",
         "Red - Positive Diagnosis"
       ],
-      showDialog: true,
+      showDialog: false,
       reentryOpt: "0",
       country: null,
       userOffice: null,

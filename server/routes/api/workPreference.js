@@ -77,7 +77,7 @@ router.get("/get-latest", function (req, res) {
     createdAt: -1
   }).limit(1)
   .exec(function(err, wp) {
-    if (wp == null) res.json(null);
+    if (wp.length === 0) res.json(null);
     if (!err) return res.json(wp[0]);
     else return res.status(500).send(err);
   });
