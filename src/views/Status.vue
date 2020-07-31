@@ -66,7 +66,8 @@
         <ul class="pl-3 mb-0">
           <li>Symptomatic of COVID-19, <b>OR</b></li>
           <li>Awaiting personal test results of COVID-19, <b>OR</b></li>
-          <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19.</li>
+          <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19, <b>OR</b></li>
+          <li>Travel quarantine requirement.</li>
         </ul>
         <div class="card mt-2">
           <div class="card-body bg-light p-1">
@@ -99,7 +100,8 @@
         <ul class="pl-3 mb-0 text-muted">
           <li>Symptomatic of COVID-19, <b>OR</b></li>
           <li>Awaiting personal test results of COVID-19, <b>OR</b></li>
-          <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19.</li>
+          <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19, <b>OR</b></li>
+          <li>Travel quarantine requirement.</li>
         </ul>
         <div class="card mt-2">
           <div class="card-body bg-light p-1">
@@ -205,8 +207,8 @@
 
 
     <md-dialog-actions class="mx-4 my-2">
-      <md-button @click="showDialog=false">Go Back</md-button>
-      <md-button class="md-accent md-raised text-white" @click="showDialog=false; submitEncounter()">Submit</md-button>
+      <button style="background-color:white; border:0px; font-size:16px" @click="showDialog=false">Go Back</button>
+      <button class="text-white p-2" style="background-color:#00a3ad; border:0px; font-size:16px" @click="showDialog=false; submitEncounter()">Submit</button>
     </md-dialog-actions>
   </md-dialog>
 
