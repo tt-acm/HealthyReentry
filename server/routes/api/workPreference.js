@@ -77,8 +77,10 @@ router.get("/get-latest", function (req, res) {
     createdAt: -1
   }).limit(1)
   .exec(function(err, wp) {
-    if (wp.length === 0) res.json(null);
-    if (!err) return res.json(wp[0]);
+    console.log("wp.length", wp.length);
+    debugger;
+    if (wp.length == 0) res.json(null);
+    if (!err) return res.json(wp);
     else return res.status(500).send(err);
   });
 

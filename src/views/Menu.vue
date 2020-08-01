@@ -53,13 +53,13 @@
 
 
   <!-- Reentry option modal -->
-  <md-content>
+  <!-- <md-content> -->
     <md-dialog :md-active="showDialog">
       <md-dialog-title class="pb-0 mb-2">
         Check in - Work Location
       </md-dialog-title>
 
-      <md-dialog-content>
+      <md-dialog-content style="min-height: 350px">
         <span class="text-muted" v-if="latestPreference">
           Last submitted as <b>{{latestPreference.office}}</b> at {{showDisplayDate(latestPreference.createdAt, 'lll')}}
         </span>
@@ -71,7 +71,7 @@
           <md-radio v-model="reentryOpt" value="0" class="md-primary d-flex">Working Remotely <small>(Default)</small></md-radio>
           <md-radio v-model="reentryOpt" value="1" class="md-primary d-flex">
             Working in the office
-            <div v-show="reentryOpt == 1" class="md-layout-item">
+            <div class="md-layout-item">
               <md-field>
                 <md-select name="offices" id="offices" v-model="userOffice">
                   <md-option v-for="o in offices" :key="o" :value="o">
@@ -80,14 +80,20 @@
                 </md-select>
               </md-field>
             </div>
+            <small class="d-flex">&#42; Working in the office is ONLY permitted if you are Green. If you are Orange or Red, please
+              refrain from coming into the office.
+              <br/>
+              Please confirm that you do NOT have COVID-19 symptoms and your temperature is not more than 100.4 degrees F (38 degrees C).
+            </small>
           </md-radio>
 
-          <div class="form-check ml-1" style="margin-top: 70px">
+
+          <!-- <div class="form-check ml-1" style="margin-top: 70px">
             <input class="form-check-input" type="checkbox" id="defaultCheck1" v-model="confirmOffice">
             <label class="form-check-label" for="defaultCheck1">
               I agree with my selection above.
             </label>
-          </div>
+          </div> -->
         </md-content>
       </md-dialog-content>
 
@@ -95,12 +101,12 @@
         <!-- <button type="button" class="btn btn-md text-white" @click="showDialog = false">
           <router-link :to="{ name: 'home' }"> <p class="mb-0 text-muted">Close</p> </router-link>
         </button> -->
-        <button type="button" class="btn btn-md text-white md-accent" @click="showDialog = false;submit()" :disabled="!confirmOffice">
+        <button type="button" class="btn btn-md text-white md-accent" @click="showDialog = false;submit()">
           Submit
         </button>
       </md-dialog-actions>
     </md-dialog>
-  </md-content>
+  <!-- </md-content> -->
 </div>
 </template>
 <script>
@@ -117,17 +123,33 @@ export default {
       this.styleObject.backgroundColor = statusColors[returnedStatus.data.status];
     });
 
-    this.$api.get("/api/user/get-available-offices").then(offices => {
-      this.offices = offices.data;
-      if (this.offices && this.offices.length > 0) {
-        const officeIndex = this.offices.indexOf(this.user.location);
-        if (officeIndex !== -1) this.userOffice = this.offices[officeIndex];
-      }
-    });
+    // this.$api.get("/api/user/get-available-offices").then(offices => {
+    //   this.offices = offices.data;
+    //   if (this.offices && this.offices.length > 0) {
+    //     const officeIndex = this.offices.indexOf(this.user.location);
+    //     if (officeIndex !== -1) this.userOffice = this.offices[officeIndex];
+    //   }
+    // });
+    console.log("pre get-latest");
 
     this.$api.get("/api/workPreference/get-latest").then(preference => {
-      if (preference.data === null) this.showDialog = true;//if no preference, then show modal
-      this.latestPreference = preference.data;
+      console.log("preference.data", preference.data);
+      console.log("this.user", this.user);
+      var latestPreference;
+      if (preference.data.length > 0) {
+        this.userOffice = preference.data[0].office;
+        this.latestPreference = preference.data[0];
+      }
+      else {
+        const matches = this.offices.filter(o => o.includes(this.user.location));
+        if (matches.length > 0) this.userOffice = matches[0];
+      }
+      // Search for the preference in the past 24 hrs
+      const searchDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+      const preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
+      if (preferenceToday.length > 0) this.showDialog = true;//if no preference, then show modal
+
+
     });
   },
   mounted() {
@@ -153,7 +175,55 @@ export default {
       reentryOpt: "0",
       country: null,
       userOffice: null,
-      offices: [],
+      offices: [
+        "Aberdeen",
+        "Albuquerque",
+        "Atlanta",
+        "Austin",
+        "Beijing",
+        "Boston",
+        "Bristol",
+        "Chicago",
+        "Copenhagen",
+        "Dallas",
+        "Denver",
+        "Dubai",
+        "Edinburgh",
+        "Fort Lauderdale",
+        "Halifax",
+        "Ho Chi Minh City",
+        "Hong Kong",
+        "Houston",
+        "Kansas City",
+        "London",
+        "Los Angeles",
+        "Miami",
+        "Milwaukee",
+        "Mississauga",
+        "Moscow",
+        "Mumbai",
+        "New York - Downtown",
+        "New York - Madison",
+        "Newark",
+        "Ottawa",
+        "Perth",
+        "Philadelphia",
+        "Phoenix",
+        "Portland",
+        "Romsey",
+        "San Diego",
+        'San Francisco',
+        "Santa Clara",
+        "Seattle",
+        "Tampa",
+        "Toronto",
+        "Warrington",
+        'Washington',
+        "West Hartford",
+        'Wellington',
+        "Shanghai",
+        "Sydney",
+      ],
       confirmOffice: false,
       latestPreference: null
     };
