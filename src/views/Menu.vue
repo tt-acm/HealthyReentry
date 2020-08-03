@@ -73,7 +73,7 @@
             Working in the office
             <div class="md-layout-item">
               <md-field>
-                <md-select name="offices" id="offices" v-model="userOffice">
+                <md-select name="offices" id="offices" v-model="userOffice" placeholder="Choose your office">
                   <md-option v-for="o in offices" :key="o" :value="o">
                     {{o}}
                   </md-option>
@@ -145,16 +145,16 @@ export default {
         this.userOffice = preference.data[0].office; // User office = user's default office selection
         this.latestPreference = preference.data[0];
       }
-      else {
-        const matches = this.offices.filter(o => o.includes(this.user.location));
-        if (matches.length > 0) this.userOffice = matches[0]; // User office = user's default office selection
-      }
+      // else {
+      //   const matches = this.offices.filter(o => o.includes(this.user.location));
+      //   if (matches.length > 0) this.userOffice = matches[0]; // User office = user's default office selection
+      // }
     });
   },
   mounted() {
     this.mapButtonCSS();
 
-    this.userOffice = this.user.location;
+    // this.userOffice = this.user.location;
   },
   updated() {
     this.mapButtonCSS();
