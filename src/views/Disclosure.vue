@@ -8,7 +8,7 @@
 
         <md-content class="p-3">
           <p class="mb-2">
-            At {{appName}}, our first priority – now and always – is the health and safety of our employees. 
+            At Thornton Tomasetti, our first priority – now and always – is the health and safety of our employees. 
             <br>
             <br>
             The COVID-19 outbreak has challenged us to find creative ways to best protect our employees.
