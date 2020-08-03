@@ -130,26 +130,25 @@ export default {
     //     if (officeIndex !== -1) this.userOffice = this.offices[officeIndex];
     //   }
     // });
-    console.log("pre get-latest");
-
     this.$api.get("/api/workPreference/get-latest").then(preference => {
-      console.log("preference.data", preference.data);
-      console.log("this.user", this.user);
+      this.showDialog = true;
+
+      // Search for the preference in the past 24 hrs
+      const searchDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+      const preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
+      if (preferenceToday.length > 0) this.showDialog = false;//if no preference, then show modal
+
+
       var latestPreference;
-      if (preference.data.length > 0) {
-        this.userOffice = preference.data[0].office;
+      if (preference.data.length > 0 && preference.data[0].office !=="Remote") {
+        // User had submitted work preference before
+        this.userOffice = preference.data[0].office; // User office = user's default office selection
         this.latestPreference = preference.data[0];
       }
       else {
         const matches = this.offices.filter(o => o.includes(this.user.location));
-        if (matches.length > 0) this.userOffice = matches[0];
+        if (matches.length > 0) this.userOffice = matches[0]; // User office = user's default office selection
       }
-      // Search for the preference in the past 24 hrs
-      const searchDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
-      const preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
-      if (preferenceToday.length > 0) this.showDialog = true;//if no preference, then show modal
-
-
     });
   },
   mounted() {

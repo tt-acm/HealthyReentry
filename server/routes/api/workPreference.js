@@ -79,9 +79,11 @@ router.get("/get-latest", function (req, res) {
   .exec(function(err, wp) {
     console.log("wp.length", wp.length);
     debugger;
-    if (wp.length == 0) res.json(null);
-    if (!err) return res.json(wp);
-    else return res.status(500).send(err);
+    if (err) return res.status(500).send(err);
+    else {
+      if (wp.length == 0) return res.json(null);
+      if (!err) return res.json(wp);
+    }
   });
 
 });

@@ -9,7 +9,7 @@ moment().format();
 
 const sgClient = require('@sendgrid/mail');
 
-sgClient.setApiKey(process.env.SENDGRID_API_KEY); 
+sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 var sender = process.env.SENDGRID_EMAIL;
 var url = process.env.MONGO_URL;
 
@@ -43,7 +43,8 @@ let directors = {
     "Mississauga": ["rbehboudi@thorntontomasetti.com", "mwesolowsky@thorntontomasetti.com"],
     "Moscow": "lzborovsky@thorntontomasetti.com",
     "Mumbai": "akadakia@thorntontomasetti.com",
-    "New York": ["jfeuerborn@thorntontomasetti.com", "egottlieb@thorntontomasetti.com"],
+    "New York - Downtown": "jfeuerborn@thorntontomasetti.com",
+    "New York - Madison": "egottlieb@thorntontomasetti.com",
     "Newark": "cchristoforou@thorntontomasetti.com",
     "Ottawa": ["rbehboudi@thorntontomasetti.com", "mwesolowsky@thorntontomasetti.com"],
     "Perth": "anelson@thorntontomasetti.com",
@@ -69,7 +70,7 @@ let zones = {};
 zones["-7"] = ["Los Angeles", "San Francisco", "Seattle", "Wellington", "San Diego", 'Santa Clara'];
 zones["-6"] = ["Washington", "Philadelphia", "Fort Lauderdale", "Dallas", "Albuquerque", "Austin", "Phoenix"];
 zones["-5"] = ["Chicago", "Kansas City", "Denver", "Milwaukee", "Houston"];
-zones["-4"] = ["New York", "Newark", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
+zones["-4"] = ["New York - Downtown", "New York - Madison", "Newark", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
 zones["-3"] = ["Halifax"];
 zones["1"] = ["London", "Edinburgh", "Warrington", "Romsey", "Aberdeen"];
 zones["2"] = ["Copenhagen", "Bristol"];
@@ -114,15 +115,15 @@ MongoClient.connect(url, {
         Object.keys(zones).forEach((key) => {
             var localtime = calcLocalTime(key)
             console.log(localtime);
-            // 2. Check local time 
+            // 2. Check local time
             if (localtime == 10) {
 
                 console.log("offices local time is 10 am", zones[key]);
-                //3.  loop over offices in the zone 
+                //3.  loop over offices in the zone
                 var offices = zones[key];
                 offices.foreach(office => {
-                    // 4. filter work preferences by office (key) 
-                    // if the filtered wp is empty do not sent email 
+                    // 4. filter work preferences by office (key)
+                    // if the filtered wp is empty do not sent email
                     // else
                     // 5. create cvs of user name and email
                     // 6. send email to OD
@@ -138,7 +139,8 @@ MongoClient.connect(url, {
                     let attachment = Buffer.from(csv).toString('base64');
 
                     var email = directors[office];
-                    email = 'eertugrul@thorntontomassetti.com' //// TEST 
+                    console.log("email", email);
+                    email = 'eertugrul@thorntontomassetti.com' //// TEST
                     sendEmail(email, office, attachment );
 
                 });
