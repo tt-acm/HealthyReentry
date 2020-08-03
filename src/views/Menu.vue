@@ -64,7 +64,7 @@
           Last submitted as <b>{{latestPreference.office}}</b> at {{showDisplayDate(latestPreference.createdAt, 'lll')}}
         </span>
 
-        <h6 class="my-4">Complete the sentence below by selecting the appropriate response.</h6>
+        <h6 class="my-4">Select the appropriate response below:</h6>
 
         <md-content class="px-1">
           <span class="d-flex mt-3">Today I will be _______.</span>
@@ -80,10 +80,10 @@
                 </md-select>
               </md-field>
             </div>
-            <small class="d-flex">&#42; Working in the office is ONLY permitted if you are Green. If you are Orange or Red, please
-              refrain from coming into the office.
+            <small class="d-flex">&#42; Working in the office is ONLY permitted if you are Green;
+              this includes confirming that you do NOT have COVID-19 symptoms and your temperature is not more than 100.4 degrees F (38 degrees C).
               <br/>
-              Please confirm that you do NOT have COVID-19 symptoms and your temperature is not more than 100.4 degrees F (38 degrees C).
+              If you are Orange or Red, please refrain from coming into the office.
             </small>
           </md-radio>
 
