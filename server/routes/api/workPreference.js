@@ -32,26 +32,36 @@ const WorkPreference = require('../../models/WorkPreference');
  */
 router.post("/add", function (req, res) {
 
-  WorkPreference.find({
-    "user": req.user._id
-  }).sort({
-    createdAt: -1
-  }).limit(1)
-  .exec(async function(err, preference) {
-    if (err) return res.status(500).send(err);
-
-    //if there is existing workPreference, delete them first
-    if (preference.length !== 0) await WorkPreference.remove({ "user": req.user._id });
-
-    wp = new WorkPreference({
-      office: req.body.office,
-      user: req.user
-    });
-    wp.save(async function (err, savedWP) {
-      if (!err) return res.json(savedWP);
-      else return res.status(500).send(err);
-    });
+  var wp = new WorkPreference({
+    office: req.body.office,
+    user: req.user
   });
+  wp.save(function (err, savedWP) {
+    console.log("err", err);
+    if (!err) return res.json(savedWP);
+    else return res.status(500).send(err);
+  });
+
+  // WorkPreference.find({
+  //   "user": req.user._id
+  // }).sort({
+  //   createdAt: -1
+  // }).limit(1)
+  // .exec(async function(err, preference) {
+  //   if (err) return res.status(500).send(err);
+  //
+  //   //if there is existing workPreference, delete them first
+  //   if (preference.length !== 0) await WorkPreference.remove({ "user": req.user._id });
+  //
+  //   wp = new WorkPreference({
+  //     office: req.body.office,
+  //     user: req.user
+  //   });
+  //   wp.save(async function (err, savedWP) {
+  //     if (!err) return res.json(savedWP);
+  //     else return res.status(500).send(err);
+  //   });
+  // });
 });
 
 

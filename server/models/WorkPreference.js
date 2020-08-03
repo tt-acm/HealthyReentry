@@ -27,8 +27,8 @@ var workPreferenceSchema = new mongoose.Schema({
 	user:
   {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    unique: true
+    ref: 'User'
+    // unique: true
   }
 },{
 	usePushEach: true
