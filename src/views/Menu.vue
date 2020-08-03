@@ -101,7 +101,7 @@
         <!-- <button type="button" class="btn btn-md text-white" @click="showDialog = false">
           <router-link :to="{ name: 'home' }"> <p class="mb-0 text-muted">Close</p> </router-link>
         </button> -->
-        <button type="button" class="btn btn-md text-white md-accent" @click="showDialog = false;submit()">
+        <button type="button" class="btn btn-md text-white md-accent" @click="showDialog = false;submit()" :disabled="userOffice===null&&reentryOpt!=0">
           Submit
         </button>
       </md-dialog-actions>
@@ -135,7 +135,8 @@ export default {
 
       // Search for the preference in the past 24 hrs
       const searchDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
-      const preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
+      var preferenceToday;
+      if (preference.data) preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
       if (preferenceToday.length > 0) this.showDialog = false;//if no preference, then show modal
 
 
