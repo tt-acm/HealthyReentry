@@ -8,7 +8,6 @@ var moment = require('moment');
 moment().format();
 
 const sgClient = require('@sendgrid/mail');
-
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 var sender = process.env.SENDGRID_EMAIL;
 var url = process.env.MONGO_URL;
@@ -121,27 +120,33 @@ MongoClient.connect(url, {
                 console.log("offices local time is 10 am", zones[key]);
                 //3.  loop over offices in the zone
                 var offices = zones[key];
-                offices.foreach(office => {
+                offices.forEach(office => {
                     // 4. filter work preferences by office (key)
                     // if the filtered wp is empty do not sent email
                     // else
                     // 5. create cvs of user name and email
                     // 6. send email to OD
                     const wpbyOffice = allWorkPreferences.filter(wp => wp.office === office);
-                    console.log("wpbyOffice", office, wpbyOffice.length);
+
                     if (wpbyOffice.length === 0) return;
-                    let csvHeader = "Name,Email\r\n";
-                    let csv = csvHeader;
 
-                    wpbyOffice.forEach((wp) => {
-                        csv += nodeToCsv(wp.user)
+                    const uniqueUpbyOffice =  [...new Map(wpbyOffice.map(item => [item[office], item])).values()]
+                    console.log("uniqueUpbyOffice", office, uniqueUpbyOffice.length);
+
+                    // wpbyOffice.forEach(function(wp) {
+                    //   getUser(db, wp).then(function(u){
+                    //     // console.log("u", u);
+                    //     csv += nodeToCsv(u);
+                    //   })
+                    // })
+                    generateODContent(db, uniqueUpbyOffice).then(function(csv){
+                      let attachment = Buffer.from(csv).toString('base64');
+
+                      var email = directors[office];
+                      console.log("email", email);
+                      // email = 'hsun@thorntontomassetti.com' //// TEST
+                      sendEmail(email, office, attachment );
                     })
-                    let attachment = Buffer.from(csv).toString('base64');
-
-                    var email = directors[office];
-                    console.log("email", email);
-                    email = 'eertugrul@thorntontomassetti.com' //// TEST
-                    sendEmail(email, office, attachment );
 
                 });
 
@@ -158,15 +163,59 @@ MongoClient.connect(url, {
     console.error(err);
 });
 
+function generateODContent(db, wpbyOffice) {
+  return new Promise((resolve, reject) => {
+    let csvHeader = "Name,Email\r\n";
+    let csv = csvHeader;
+    wpbyOffice.forEach(function(wp) {
+      getUser(db, wp).then(function(u){
+        csv += nodeToCsv(u)
+        resolve(csv);
+      })
+    })
+  })
+}
+
+function getUser(client_db, wp) {
+  return new Promise((resolve, reject) => {
+    let db = client_db.db();
+    let userCollection = db.collection('users');
+
+    let includeUser = {
+        "_id": 1,
+        "email": 1,
+        "name":1
+    }
+    userCollection
+      .find({_id: wp.user}, includeUser)
+      .toArray( function (err, user) {
+        if (user && user.length > 0) resolve (user[0]);
+    });
+  })
+}
 
 function getWorkPreferences(client_db) {
     return new Promise((resolve, reject) => {
         let db = client_db.db();
 
+        let include = {
+            "_id": 1,
+            // "dateOfConsent": 1,
+            "user": 1,
+            // "location": 1
+        }
+
+        var checkDate = new Date(new Date().getTime() - (6 * 60 * 60 * 1000));//move back 6 hours
+
         let collection = db.collection('workpreferences');
-        // populate user > ({ path: 'user'}).
-        collection.find().toArray(function (err, allWps) {
-            console.log("Work Preferences", allWps);
+        collection
+          .find({
+            createdAt: {
+              "$gte": checkDate
+            }
+          }, include)
+          .toArray(function (err, allWps) {
+            // console.log("Work Preferences", allWps);
             allWorkPreferences = allWps;
             resolve(true);
 
