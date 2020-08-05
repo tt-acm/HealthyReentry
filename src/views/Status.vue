@@ -200,7 +200,7 @@
               <p class="my-2">{{status[selectedStatus]}}</p>
             </div>
           </li>
-          <li v-if="currentPreference" class="list-group-item"><b class="mr-2">Reminder:</b>
+          <li v-if="currentPreference && selectedStatus===0" class="list-group-item"><b class="mr-2">Reminder:</b>
             <p v-if="currentPreference==='Remote'">You have indicated to be working {{currentPreference}} today.</p>
             <p v-else >You have indicated to be working from the {{currentPreference}} office today.</p>
           </li>
