@@ -141,10 +141,10 @@ export default {
 
 
       var latestPreference;
-      if (preference.data.length > 0 && preference.data[0].office !=="Remote") {
+      if (preference.data.length > 0) {
         // User had submitted work preference before
-        this.userOffice = preference.data[0].office; // User office = user's default office selection
         this.latestPreference = preference.data[0];
+        if (preference.data[0].office !=="Remote") this.userOffice = preference.data[0].office; // User office = user's default office selection
       }
       // else {
       //   const matches = this.offices.filter(o => o.includes(this.user.location));
