@@ -134,7 +134,7 @@ export default {
       this.showDialog = true;
 
       // Search for the preference in the past 24 hrs
-      const searchDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+      const searchDate = new Date(new Date().getTime() - (6 * 60 * 60 * 1000));
       var preferenceToday;
       if (preference.data) preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
       if (preferenceToday.length > 0) this.showDialog = false;//if no preference, then show modal
