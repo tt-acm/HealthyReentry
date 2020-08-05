@@ -87,8 +87,6 @@ router.get("/get-latest", function (req, res) {
     createdAt: -1
   }).limit(1)
   .exec(function(err, wp) {
-    console.log("wp.length", wp.length);
-    debugger;
     if (err) return res.status(500).send(err);
     else {
       if (wp.length == 0) return res.json(null);

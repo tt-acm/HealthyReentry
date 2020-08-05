@@ -254,7 +254,6 @@ export default {
       // Search for the preference in the past 24 hrs
       const searchDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
       const preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
-      console.log("preferenceToday", preferenceToday);
       if (preferenceToday.length > 0) this.currentPreference = preferenceToday[0].office;
     })
   },
