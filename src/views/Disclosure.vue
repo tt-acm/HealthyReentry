@@ -8,17 +8,20 @@
 
         <md-content class="p-3">
           <p class="mb-2">
-            We respect your privacy. As we continue to monitor COVID-19 and its impact on our people and offices, it is important that designated members of our Talent Team are aware of COVID-19 related cases at our firm. To protect all of our
-            employees, the {{appName}} application will allow you to securely and confidentially record:
-          </p>
-          <p class="text-muted mb-2">
-            1. your personal COVID-19 status through a series of colors (green, orange and red).
+            At Thornton Tomasetti, our first priority – now and always – is the health and safety of our employees. 
             <br>
-            2. your in-person interactions with fellow employees at work and/or during work events that do not adhere to the firm’s guidance on social distancing.
+            <br>
+            The COVID-19 outbreak has challenged us to find creative ways to best protect our employees.
+            <br>
+            <br>
+            We respect your privacy. As we continue to monitor COVID-19 and its impact on our people and offices, it is important that designated members of our Talent Team are aware of COVID-19 related cases at our firm. To protect all of our employees, the Healthy Reentry application will allow you to securely and confidentially record:
           </p>
+          <ol class="text-muted mb-2 pl-3">
+            <li>your personal COVID-19 status through a series of colors (green, orange and red).</li>
+            <li>your in-person interactions with fellow employees at work and/or during work events that do not adhere to the firm’s guidance on social distancing.</li>
+          </ol>
           <p class="mb-2">
-            We ask that you share your COVID-19 health status and potential exposures with designated members of our Talent Team so we can continue to make decisions based on what is best for all employees’ safety and our business. The information
-            will <b>ONLY</b> be viewed by Lizette Agostini (Benefits Manager), Sarina Singh (Senior Talent Partner) and Dan Stauthamer (Chief Human Resources Officer).
+            We ask that you share your COVID-19 health status and potential exposures with designated members of our Talent Team so we can continue to make decisions based on what is best for all employees’ safety and our business. The information will <b>ONLY</b> be viewed Dan Stauthamer (Chief Human Resources Officer), Sarina Singh (Senior Talent Partner) and Gwendolyn Dowdy (Senior Talent Operations Coordinator).
           </p>
         </md-content>
 
@@ -28,7 +31,7 @@
 
         <md-content class="p-3">
           <p class="mb-1">
-            Your consent is required to report your status on Encounter. Please read and accept the terms below.
+            Your consent is required to report your status on Healthy Reentry. Please read and accept the terms below.
             <br>
             <small><i>The information you provide should strictly relate to COVID-19 and will be used for the sole purpose of protecting you and your colleagues.</i>
             </small>
@@ -38,23 +41,23 @@
             I hereby authorize the previously mentioned Talent Team employees to have access to my COVID-19 status.
             <br>
             <br>
-            I understand that my status will be kept confidential and is being used solely to reduce and prevent the spread of COVID-19. Further, I understand that by acknowledging this statement, I am sharing this information confidentially with
-            the Talent Team personnel previously listed.
+            I understand that my status will be kept confidential and is being used solely to reduce and prevent the spread of COVID-19. Further, I understand that by acknowledging this statement, I am sharing this information confidentially with the Talent Team personnel previously listed.
             <br>
             <br>
             I certify that my consent for the release of this information is voluntary. I also understand the following:
             <ul class="pl-3 mb-1">
               <li>Information about the spread of COVID-19 is in the firm’s legitimate interest.</li>
-              <li>I have the right to revoke this authorization at any time. In order to revoke this authorization, I must do so in writing and submit it to Lizette Agostini.</li>
+              <li>I have the right to revoke this authorization at any time. In order to revoke this authorization, I must do so in writing and submit it to Dan Stauthamer.</li>
               <li>The company may use the confidential disclosure of my COVID-19 status to make key decisions in order to keep our offices safe. My name will remain confidential unless I provide written consent.</li>
               <li>I will receive an email acknowledgement of this consent.</li>
             </ul>
           </p>
 
           <small>
-            Note: Using the application is not in any way a condition of your employment at {{company}}.
-            However, it is your duty to report infectious disease to the firm. On the grounds of containing the virus and for the safety of other employees, we require disclosure. If you choose not to report using the app, contact Lizette Agostini
-            directly.
+            Note: Using the application is not in any way a condition of your employment at Thornton Tomasetti.
+            However, it is your duty to report infectious disease to the firm.
+            On the grounds of containing the virus and for the safety of other employees, we require disclosure.
+            If you choose not to report using the app, contact Gwendolyn Dowdy directly.
           </small>
 
           <div class="form-check mt-4 ml-1">

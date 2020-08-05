@@ -200,6 +200,10 @@
               <p class="my-2">{{status[selectedStatus]}}</p>
             </div>
           </li>
+          <li v-if="currentPreference" class="list-group-item"><b class="mr-2">Reminder:</b>
+            <p v-if="currentPreference==='Remote'">You have indicated to be working {{currentPreference}} today.</p>
+            <p v-else >You have indicated to be working from the {{currentPreference}} office today.</p>
+          </li>
         </ul>
       </div>
     </md-content>
@@ -245,6 +249,13 @@ export default {
         this.selectedStatus = 0; //default to green
       }
     });
+
+    this.$api.get("/api/workPreference/get-latest").then(preference => {
+      // Search for the preference in the past 24 hrs
+      const searchDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+      const preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
+      if (preferenceToday.length > 0) this.currentPreference = preferenceToday[0].office;
+    })
   },
   mounted() {
 
@@ -283,7 +294,8 @@ export default {
         "/imgs/lens-green.svg",
         "/imgs/lens-orange.svg",
         "/imgs/lens-red.svg"
-      ]
+      ],
+      currentPreference: null
     };
   },
   watch: {
