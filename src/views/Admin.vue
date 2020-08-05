@@ -283,8 +283,8 @@
       <md-dialog-content v-if="userToDelete">Are you sure to delete <b>{{userToDelete.name}}</b>?</md-dialog-content>
 
       <md-dialog-actions>
-        <md-button class="md-primary" @click="deleteActive = false">Close</md-button>
-        <md-button class="md-primary" @click="submitDeleteUser">Save</md-button>
+        <md-button @click="deleteActive = false">Go Back</md-button>
+        <md-button class="md-accent md-raised text-white" @click="submitDeleteUser">Submit</md-button>
       </md-dialog-actions>
     </md-dialog>
 
@@ -584,7 +584,7 @@
             </td>
             <td style="width: 25%">
               <span class="pr-1" @click="deleteUser(user)">
-                <i class="fas fa-times-circle"></i>
+                <i class="fas fa-times-circle text-secondary" style="cursor: pointer;"></i>
                 <md-tooltip md-direction="top">Delete this user</md-tooltip>
               </span>
 

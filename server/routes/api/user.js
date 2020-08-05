@@ -169,6 +169,44 @@ router.get("/get-all", function (req, res) {
 
 });
 
+/**
+ * @swagger
+ * path:
+ *  /api/user/get-available-office:
+ *    get:
+ *      summary: Get all available offices.
+ *      tags: [Users]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: List of offices.
+ *        500:
+ *          description: Server error.
+ */
+router.get("/get-available-offices", function (req, res) {
+
+  // returns only location, and _id
+  let include = {
+    "location": 1
+  }
+
+  User.find({}, include)
+    .exec(function (error, offices) {
+      const officesList = offices.filter(function(o){
+        if (o.location && typeof(o.location) !== "undefined" && o.location !=="N/A") return true;
+      }).map(o=>o.location);
+
+      function onlyUnique(value, index, self) {
+          return self.indexOf(value) === index;
+      }
+
+      var uniqueOffices = officesList.filter(onlyUnique).sort();
+      if (!error) return res.json(uniqueOffices);
+      else return res.status("500").send("Unable to perform find");
+    })
+
+});
 
 /**
  * @swagger

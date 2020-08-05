@@ -69,7 +69,7 @@
           <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19, <b>OR</b></li>
           <li>Travel quarantine requirement.</li>
         </ul>
-        <!-- <div class="card mt-2">
+        <div class="card mt-2">
           <div class="card-body bg-light p-1">
             <small class="mb-0 d-flex">
               <b style="margin-top:2px">Symptoms of COVID-19</b>
@@ -93,7 +93,7 @@
               </ul>
             </small>
           </div>
-        </div> -->
+        </div>
       </div>
       <div v-else>
         <h5 class="text-muted mt-2">Possible Exposure</h5>
@@ -103,7 +103,7 @@
           <li>Had in-person contact with symptomatic individuals or someone who has tested positive for COVID-19, <b>OR</b></li>
           <li>Travel quarantine requirement.</li>
         </ul>
-        <!-- <div class="card mt-2">
+        <div class="card mt-2">
           <div class="card-body bg-light p-1">
             <small class="mb-0 d-flex">
               <b style="margin-top:2px">Symptoms of COVID-19</b>
@@ -123,7 +123,7 @@
               </ul>
             </small>
           </div>
-        </div> -->
+        </div>
       </div>
 
 
@@ -200,6 +200,10 @@
               <p class="my-2">{{status[selectedStatus]}}</p>
             </div>
           </li>
+          <li v-if="currentPreference" class="list-group-item"><b class="mr-2">Reminder:</b>
+            <p v-if="currentPreference==='Remote'">You have indicated to be working {{currentPreference}} today.</p>
+            <p v-else >You have indicated to be working from the {{currentPreference}} office today.</p>
+          </li>
         </ul>
       </div>
     </md-content>
@@ -207,8 +211,8 @@
 
 
     <md-dialog-actions class="mx-4 my-2">
-      <md-button @click="showDialog=false">Go Back</md-button>
-      <md-button class="md-accent md-raised text-white" @click="showDialog=false; submitEncounter()">Submit</md-button>
+      <button style="background-color:white; border:0px; font-size:16px" @click="showDialog=false">Go Back</button>
+      <button class="text-white p-2" style="background-color:#00a3ad; border:0px; font-size:16px" @click="showDialog=false; submitEncounter()">Submit</button>
     </md-dialog-actions>
   </md-dialog>
 
@@ -245,6 +249,13 @@ export default {
         this.selectedStatus = 0; //default to green
       }
     });
+
+    this.$api.get("/api/workPreference/get-latest").then(preference => {
+      // Search for the preference in the past 24 hrs
+      const searchDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+      const preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
+      if (preferenceToday.length > 0) this.currentPreference = preferenceToday[0].office;
+    })
   },
   mounted() {
 
@@ -283,7 +294,8 @@ export default {
         "/imgs/lens-green.svg",
         "/imgs/lens-orange.svg",
         "/imgs/lens-red.svg"
-      ]
+      ],
+      currentPreference: null
     };
   },
   watch: {
