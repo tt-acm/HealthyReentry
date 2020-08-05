@@ -9,7 +9,9 @@ moment().format();
 
 const sgClient = require('@sendgrid/mail');
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
+
 var sender = process.env.SENDGRID_EMAIL;
+// var sender ="healthyreentry-notifications@thorntontomasetti.com"
 var url = process.env.MONGO_URL;
 
 const fs = require('fs');
@@ -97,10 +99,10 @@ function calcLocalTime(offset) {
 }
 
 let allWorkPreferences = [];
-
+let colorDict = ["Green", "Orange", "Red"]
 //"Name,Email\r\n";
 function nodeToCsv(node) {
-    return `${node.name},${node.email}\r\n`;
+    return `${node.name},${node.email},${colorDict[node.status.status]}, ${moment(node.status.date).format('MMMM Do YYYY')}\r\n`;
 }
 
 
@@ -113,11 +115,11 @@ MongoClient.connect(url, {
 
         Object.keys(zones).forEach((key) => {
             var localtime = calcLocalTime(key)
-            console.log(localtime);
+            // console.log(localtime);
             // 2. Check local time
             if (localtime == 10) {
 
-                console.log("offices local time is 10 am", zones[key]);
+                console.log("There offices are currently at 10AM: ", zones[key]);
                 //3.  loop over offices in the zone
                 var offices = zones[key];
                 offices.forEach(office => {
@@ -128,10 +130,13 @@ MongoClient.connect(url, {
                     // 6. send email to OD
                     const wpbyOffice = allWorkPreferences.filter(wp => wp.office === office);
 
-                    if (wpbyOffice.length === 0) return;
+                    if (wpbyOffice.length === 0) {
+                      console.log("No employee reported in this office:", office);
+                      return;
+                    }
 
                     const uniqueUpbyOffice =  [...new Map(wpbyOffice.map(item => [item[office], item])).values()]
-                    console.log("uniqueUpbyOffice", office, uniqueUpbyOffice.length);
+                    console.log("Some employees reported in this office:", office, uniqueUpbyOffice.length);
 
                     // wpbyOffice.forEach(function(wp) {
                     //   getUser(db, wp).then(function(u){
@@ -165,7 +170,7 @@ MongoClient.connect(url, {
 
 function generateODContent(db, wpbyOffice) {
   return new Promise((resolve, reject) => {
-    let csvHeader = "Name,Email\r\n";
+    let csvHeader = "Name,Email, Status, Status Last Updated\r\n";
     let csv = csvHeader;
     wpbyOffice.forEach(function(wp) {
       getUser(db, wp).then(function(u){
@@ -180,6 +185,7 @@ function getUser(client_db, wp) {
   return new Promise((resolve, reject) => {
     let db = client_db.db();
     let userCollection = db.collection('users');
+    let statusCollection = db.collection('status');
 
     let includeUser = {
         "_id": 1,
@@ -189,7 +195,19 @@ function getUser(client_db, wp) {
     userCollection
       .find({_id: wp.user}, includeUser)
       .toArray( function (err, user) {
-        if (user && user.length > 0) resolve (user[0]);
+        if (user && user.length > 0) {
+          var currentUser = user[0];
+          statusCollection.find({
+                  "user": currentUser._id
+              })
+              .sort({
+                  date: -1
+              })
+              .limit(1).toArray(function (error, st) {
+                  currentUser.status = st[0];
+                  resolve (currentUser);
+              });
+        }
     });
   })
 }
@@ -230,8 +248,9 @@ function sendEmail(toEmail, location, attachment) {
 
     const mailOptions = {
         to: toEmail,
+        // to: "hsun@thorntontomasetti.com",
         from: sender,
-        subject: "Healthy Reentry – Daily Report for " + location,
+        subject: "Daily 'In the Office' Employee Update - " + location,
         html: content
     };
 
