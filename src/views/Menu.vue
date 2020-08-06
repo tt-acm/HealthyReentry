@@ -54,7 +54,7 @@
 
   <!-- Reentry option modal -->
   <!-- <md-content> -->
-    <md-dialog :md-active="showDialog">
+    <md-dialog :md-active="showDialog" :md-fullscreen="true">
       <md-dialog-title class="pb-0 mb-2">
         Check in - Work Location
       </md-dialog-title>

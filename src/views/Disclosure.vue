@@ -1,7 +1,7 @@
 <template>
 <div class="md-layout">
   <md-content>
-    <md-dialog :md-active="showDialog">
+    <md-dialog :md-active="showDialog" :md-fullscreen="true">
       <md-dialog-title class="mb-3 pb-3">Disclosure &amp; Consent</md-dialog-title>
       <md-dialog-content>
         <h6>Disclosure:</h6>

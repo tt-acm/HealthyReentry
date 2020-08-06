@@ -136,7 +136,7 @@
 
 
   <!-- Modal -->
-  <md-dialog :md-active.sync="showDialog" :md-fullscreen="false">
+  <md-dialog :md-active.sync="showDialog" :md-fullscreen="true">
       <md-dialog-title>Review Your Encounter</md-dialog-title>
       <md-subheader class="mx-2 mb-0">
         Review the details below then click <b class="ml-1 mr-0 px-0">Submit</b>. To edit, click <b class="ml-1 mr-0 px-0">Go Back</b>.
