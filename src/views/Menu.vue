@@ -11,8 +11,8 @@
   <div class="mx-5 center" id="mainControls">
     <md-list v-if="user" id="controlButtons">
       <md-list-item>
-        <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent" @click="showDialog = true">
-          Change Work Location Status
+        <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent" @click="showDialog=true; modalDismissable=true">
+          Change Work Location
         </button>
       </md-list-item>
       <md-list-item>
@@ -86,8 +86,6 @@
               If you are Orange or Red, please refrain from coming into the office.
             </small>
           </md-radio>
-
-
           <!-- <div class="form-check ml-1" style="margin-top: 70px">
             <input class="form-check-input" type="checkbox" id="defaultCheck1" v-model="confirmOffice">
             <label class="form-check-label" for="defaultCheck1">
@@ -101,6 +99,7 @@
         <!-- <button type="button" class="btn btn-md text-white" @click="showDialog = false">
           <router-link :to="{ name: 'home' }"> <p class="mb-0 text-muted">Close</p> </router-link>
         </button> -->
+        <button v-show="modalDismissable" style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="showDialog=false; modalDismissable=false">Go Back</button>
         <button type="button" class="btn btn-md text-white md-accent" @click="showDialog = false;submit()" :disabled="userOffice===null&&reentryOpt!=0">
           Submit
         </button>
@@ -225,7 +224,8 @@ export default {
         "Sydney",
       ],
       confirmOffice: false,
-      latestPreference: null
+      latestPreference: null,
+      modalDismissable: false
     };
   },
   computed: Vuex.mapState({
