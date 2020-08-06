@@ -269,4 +269,8 @@ export default {
   height: 65vh;
   /* border: 3px solid green; */
 }
+
+.md-dialog /deep/ .md-dialog-container {
+  transform: none;
+}
 </style>
