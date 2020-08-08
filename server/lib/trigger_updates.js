@@ -57,8 +57,8 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
     sub = "Your status color has been changed";
 
     if (statusEnum === 1 || statusEnum === 2) {
-      adminUpdateContent += "<p>If you are in the office, please return to working remotely. If you are out of the office, please refrain from going into the office. <br><br>The Talent Team will contact you within one business day with next steps. Please contact Lizette Agostini with questions.</p>";
-      userConfContent += "<p>If you are in the office, please return to working remotely. If you are out of the office, please refrain from going into the office. <br><br>The Talent Team will contact you within one business day with next steps. Please contact Lizette Agostini with questions.</p>";
+      adminUpdateContent += "<p>If you are in the office, please return to working remotely. If you are out of the office, please refrain from going into the office. <br><br>The Talent Team will contact you within one business day with next steps. Please contact Gwendolyn Dowdy with questions.</p>";
+      userConfContent += "<p>If you are in the office, please return to working remotely. If you are out of the office, please refrain from going into the office. <br><br>The Talent Team will contact you within one business day with next steps. Please contact Gwendolyn Dowdy with questions.</p>";
     }
 
     // inform the user

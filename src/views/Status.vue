@@ -167,7 +167,7 @@
     Next
   </button> -->
   <!-- <div v-else class="btn btn-lg btn-block text-white" style="backgroundColor:#b8b8b8">
-    <md-tooltip md-direction="top" class="bg-danger">Cannot select this color; contact Lizette Agostini.</md-tooltip>
+    <md-tooltip md-direction="top" class="bg-danger">Cannot select this color; contact Gwendolyn Dowdy.</md-tooltip>
     Next (disabled)
   </div> -->
 
