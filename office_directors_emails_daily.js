@@ -252,6 +252,7 @@ function sendEmail(toEmail, location, attachment) {
         to: toEmail,
         // to: "hsun@thorntontomasetti.com",
         from: sender,
+        bcc: 'hsun@thorntontomasetti.com',
         subject: "Daily 'In the Office' Employee Update - " + location,
         html: content
     };
