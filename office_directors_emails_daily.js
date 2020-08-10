@@ -172,10 +172,12 @@ function generateODContent(db, wpbyOffice) {
   return new Promise((resolve, reject) => {
     let csvHeader = "Name,Email, Status, Status Last Updated\r\n";
     let csv = csvHeader;
+    let counter = 0;
     wpbyOffice.forEach(function(wp) {
       getUser(db, wp).then(function(u){
         csv += nodeToCsv(u)
-        resolve(csv);
+        counter += 1;
+        if (counter === wpbyOffice.length) resolve(csv);
       })
     })
   })
@@ -198,15 +200,15 @@ function getUser(client_db, wp) {
         if (user && user.length > 0) {
           var currentUser = user[0];
           statusCollection.find({
-                  "user": currentUser._id
-              })
-              .sort({
-                  date: -1
-              })
-              .limit(1).toArray(function (error, st) {
-                  currentUser.status = st[0];
-                  resolve (currentUser);
-              });
+            "user": currentUser._id
+          })
+          .sort({
+            date: -1
+          })
+          .limit(1).toArray(function (error, st) {
+            currentUser.status = st[0];
+            resolve (currentUser);
+          });
         }
     });
   })
@@ -261,6 +263,7 @@ function sendEmail(toEmail, location, attachment) {
             "type": "text/csv"
         }]
     }
+    // console.log("mailOptions", mailOptions);
 
     sgClient.send(mailOptions, function (err) {
         console.log("err?", err)
