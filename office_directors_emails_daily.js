@@ -10,8 +10,8 @@ moment().format();
 const sgClient = require('@sendgrid/mail');
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 
-var sender = process.env.SENDGRID_EMAIL;
-// var sender ="healthyreentry-notifications@thorntontomasetti.com"
+// var sender = process.env.SENDGRID_EMAIL;
+var sender ="healthyreentry-notifications@thorntontomasetti.com"
 var url = process.env.MONGO_URL;
 
 const fs = require('fs');
@@ -135,7 +135,18 @@ MongoClient.connect(url, {
                       return;
                     }
 
-                    const uniqueUpbyOffice =  [...new Map(wpbyOffice.map(item => [item[office], item])).values()]
+                    let uniqueUpbyOffice = [];
+                    let namesPerOffice = [];
+
+                    wpbyOffice.forEach(o => {
+                      if (!namesPerOffice.includes(o.user)) {
+                        uniqueUpbyOffice.push(o);
+                        namesPerOffice.push(o.user);
+                      }
+                    });
+
+
+                    // const uniqueUpbyOffice =  [...new Map(wpbyOffice.map(item => [item[user], item])).values()]
                     console.log("Some employees reported in this office:", office, uniqueUpbyOffice.length);
 
                     // wpbyOffice.forEach(function(wp) {
@@ -232,7 +243,8 @@ function getWorkPreferences(client_db) {
           .find({
             createdAt: {
               "$gte": checkDate
-            }
+            },
+            office: { $ne: "Remote" }
           }, include)
           .toArray(function (err, allWps) {
             // console.log("Work Preferences", allWps);
