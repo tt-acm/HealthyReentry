@@ -18,7 +18,7 @@
       <md-list-item>
         <router-link class="mx-auto" :to="{ name: 'status', params: { id: user._id}}">
           <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
-            Report Your Status
+            Report Your Health Status
           </button>
           <!-- <md-button class="md-raised md-accent menu-button">
             <h6 class="my-3 text-white">Report Your Health Status</h6>

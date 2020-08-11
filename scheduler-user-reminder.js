@@ -86,7 +86,7 @@ sendEmail = (toEmails) => {
     const mailOptions = {
         to: toEmails,
         from: sender,
-        subject: "Please report your status",
+        subject: "Please report your health status",
         html: reminderContent
         // text: "This is a friendly reminder that you haven't reported your status last 7 days, please sign in the Healthy Reentry app and submit your status."
     };
