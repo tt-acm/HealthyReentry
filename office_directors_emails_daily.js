@@ -9,13 +9,13 @@ moment().format();
 
 const sgClient = require('@sendgrid/mail');
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
-
 // var sender = process.env.SENDGRID_EMAIL;
 var sender ="healthyreentry-notifications@thorntontomasetti.com"
 var url = process.env.MONGO_URL;
 
 const fs = require('fs');
-var content = fs.readFileSync("./server/assets/email_templates/officeDirectorsReport_daily.html").toString("utf-8");
+var templateContent = fs.readFileSync("./server/assets/email_templates/officeDirectorsReport_daily.html").toString("utf-8");
+
 
 let directors = {
     "Aberdeen": "jaevans@thorntontomasetti.com",
@@ -65,6 +65,56 @@ let directors = {
     'Wellington': "pwrona@thorntontomasetti.com",
     "Shanghai": "yzhu@thorntontomasetti.com",
     "Sydney": "anelson@thorntontomasetti.com"
+}
+
+let userCountByOffice = {
+    "Aberdeen": 8,
+    "Albuquerque": 12,
+    "Atlanta": 2,
+    "Austin": 8,
+    "Beijing": 12,
+    "Boston": 50,
+    "Bristol": 4,
+    "Chicago": 85,
+    "Copenhagen": 6,
+    "Dallas": 24,
+    "Denver": 25,
+    "Dubai": 4,
+    "Edinburgh": 28,
+    "Fort Lauderdale": 29,
+    "Halifax": 1,
+    "Ho Chi Minh City": 16,
+    "Hong Kong": 1,
+    "Houston": 9,
+    "Kansas City": 43,
+    "London": 48,
+    "Los Angeles": 50,
+    "Miami": 11,
+    "Milwaukee": 5,
+    "Mississauga": 12,
+    "Moscow": 1,
+    "Mumbai": 86,
+    "New York - Downtown": 155,
+    "New York - Madison": 241,
+    "Newark": 32,
+    "Ottawa": 2,
+    "Perth": 8,
+    "Philadelphia": 23,
+    "Phoenix": 2,
+    "Portland": 39,
+    "Romsey": 29,
+    "San Diego": 5,
+    'San Francisco': 45,
+    "Santa Clara": 5,
+    "Seattle": 10,
+    "Tampa": 5,
+    "Toronto": 12,
+    "Warrington": 24,
+    'Washington': 53,
+    "West Hartford": 4,
+    'Wellington': 1,
+    "Shanghai": 17,
+    "Sydney": 1
 }
 
 let zones = {};
@@ -139,9 +189,9 @@ MongoClient.connect(url, {
                     let namesPerOffice = [];
 
                     wpbyOffice.forEach(o => {
-                      if (!namesPerOffice.includes(o.user)) {
+                      if (!namesPerOffice.includes(String(o.user))) {
                         uniqueUpbyOffice.push(o);
-                        namesPerOffice.push(o.user);
+                        namesPerOffice.push(String(o.user));
                       }
                     });
 
@@ -159,9 +209,14 @@ MongoClient.connect(url, {
                       let attachment = Buffer.from(csv).toString('base64');
 
                       var email = directors[office];
-                      console.log("email", email);
+                      // console.log("email", email);
+                      let thisOfficeUserCount = userCountByOffice[office];
+                      let percentage = (uniqueUpbyOffice.length / thisOfficeUserCount * 100).toFixed(2);
+
+                      let content = templateContent.replace('<USER_COUNT>', thisOfficeUserCount).replace('<ATTENDANCE_PERCENT>', percentage).replace('<ATTENDANCE_COUNT>', uniqueUpbyOffice.length);
+
                       // email = 'hsun@thorntontomassetti.com' //// TEST
-                      sendEmail(email, office, attachment );
+                      sendEmail(email, office, attachment, content);
                     })
 
                 });
@@ -258,7 +313,7 @@ function getWorkPreferences(client_db) {
 
 }
 
-function sendEmail(toEmail, location, attachment) {
+function sendEmail(toEmail, location, attachment, emailContent) {
 
     const mailOptions = {
         to: toEmail,
@@ -266,8 +321,9 @@ function sendEmail(toEmail, location, attachment) {
         from: sender,
         bcc: 'hsun@thorntontomasetti.com',
         subject: "Daily 'In the Office' Employee Update - " + location,
-        html: content
+        html: emailContent
     };
+    // console.log("mailOptions", mailOptions);
 
     if (attachment) {
         mailOptions.attachments = [{
