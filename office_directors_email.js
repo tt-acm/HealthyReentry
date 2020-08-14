@@ -9,21 +9,20 @@ moment().format();
 
 const sgClient = require('@sendgrid/mail');
 
-sgClient.setApiKey(process.env.SENDGRID_API_KEY); 
+sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 var sender = process.env.SENDGRID_EMAIL;
 var url = process.env.MONGO_URL;
-
 const fs = require('fs');
 var content = fs.readFileSync("./server/assets/email_templates/officeDirectorsReport.html").toString("utf-8");
 
 let directors = {
-    "Aberdeen": "jaevans@thorntontomasetti.com", 
+    "Aberdeen": "jaevans@thorntontomasetti.com",
     "Albuquerque": "dtennant@thorntontomasetti.com",
     "Atlanta": "twhisenhunt@thorntontomasetti.com",
     "Austin": "jwesevich@thorntontomasetti.com",
     "Beijing":"pfu@thorntontomasetti.com",
     "Boston": ["ldavey@thorntontomasetti.com","bvollenweider@thorntontomasetti.com"],
-    "Bristol": "nmisselbrook@thorntontomasetti.com", 
+    "Bristol": "nmisselbrook@thorntontomasetti.com",
     "Chicago": "dweihing@thorntontomasetti.com",
     "Copenhagen": "learl@thorntontomasetti.com",
     "Dallas": "jelliott@thorntontomasetti.com",
@@ -54,7 +53,7 @@ let directors = {
     "San Diego": "klegenza@thorntontomasetti.com",
     'San Francisco': ["tcurtis@thorntontomasetti.com","bshen@thorntontomasetti.com"],
     "Santa Clara": "kdebus@thorntontomasetti.com",
-    "Seattle": "gbriggs@thorntontomasetti.com",
+    "Seattle": "bmacrae@thorntontomasetti.com",
     "Tampa": "DFusco@thorntontomasetti.com",
     "Toronto": "cminerva@thorntontomasetti.com",
     "Warrington": "pwoelke@thorntontomasetti.com",
@@ -65,6 +64,57 @@ let directors = {
     "Sydney": "anelson@thorntontomasetti.com"
 }
 
+let userCountByOffice = {
+    "Aberdeen": 8,
+    "Albuquerque": 12,
+    "Atlanta": 2,
+    "Austin": 8,
+    "Beijing": 12,
+    "Boston": 50,
+    "Bristol": 4,
+    "Chicago": 85,
+    "Copenhagen": 6,
+    "Dallas": 24,
+    "Denver": 25,
+    "Dubai": 4,
+    "Edinburgh": 28,
+    "Fort Lauderdale": 29,
+    "Halifax": 1,
+    "Ho Chi Minh City": 16,
+    "Hong Kong": 1,
+    "Houston": 9,
+    "Kansas City": 43,
+    "London": 48,
+    "Los Angeles": 50,
+    "Miami": 11,
+    "Milwaukee": 5,
+    "Mississauga": 12,
+    "Moscow": 1,
+    "Mumbai": 86,
+    "New York - Downtown": 155,
+    "New York - Madison": 241,
+    "Newark": 32,
+    "Ottawa": 2,
+    "Perth": 8,
+    "Philadelphia": 23,
+    "Phoenix": 2,
+    "Portland": 39,
+    "Romsey": 29,
+    "San Diego": 5,
+    'San Francisco': 45,
+    "Santa Clara": 5,
+    "Seattle": 10,
+    "Tampa": 5,
+    "Toronto": 12,
+    "Warrington": 24,
+    'Washington': 53,
+    "West Hartford": 4,
+    'Wellington': 1,
+    "Shanghai": 17,
+    "Sydney": 1
+}
+
+let allWorkPreferences = [];
 
 //"Name,Email\r\n";
 function nodeToCsv(node) {
@@ -92,16 +142,16 @@ MongoClient.connect(url, {
         //console.log("allUsers", allUsers);
         Object.keys(directors).forEach((key, index) => {
             // three attachment
-            // 1. employees who have signed up for the app, 
+            // 1. employees who have signed up for the app,
             // 2. employees who have signed up for the app but haven't reported their health status for more than 7 days,
             // 3. the number of app users in your office with a health status of Red and/or Orange.
 
             console.log(key); // office
 
-            // 1. employees who have signed up for the app, 
+            // 1. employees who have signed up for the app,
             const usersbyOffice = allUsers.filter(u => u.location === key);
             console.log("usersbyOffice", usersbyOffice.length);
-            if(usersbyOffice.length === 0 ) return;     
+            if(usersbyOffice.length === 0 ) return;
             let csvHeader = "Name,Email\r\n";
             let csv = csvHeader;
 
@@ -125,13 +175,48 @@ MongoClient.connect(url, {
             // 3. the number of app users in your office with a health status of Red and/or Orange.
             const usersStatusOrange = usersbyOffice.filter(u => u.status.status === 1);
             const usersStatusRed = usersbyOffice.filter(u => u.status.status === 2);
-            let csv3 = "Orange,Red,Total App Signups in Office\r\n";
+
+            var currentOfficePop1;//default container
+            var currentOfficePop2;
+            if (key === "New York") {
+              currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === "New York - Downtown");
+              currentOfficePop2 = allWorkPreferences.filter(wp=>wp.office === "New York - Madison");
+            }
+            else currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === key);
+
+            // console.log("currentOfficePop", currentOfficePop1, currentOfficePop2);
+
+            let uniqueUserinOffice1 = [];
+            if (currentOfficePop1.length > 0) {
+              currentOfficePop1.forEach(cop=>{
+                if (!uniqueUserinOffice1.includes(cop.user)) uniqueUserinOffice1.push(cop.user);
+              })
+            }
+            let uniqueUserinOffice2 = [];
+            if (currentOfficePop2 && currentOfficePop2.length > 0) {
+              currentOfficePop2.forEach(cop=>{
+                if (!uniqueUserinOffice2.includes(cop.user)) uniqueUserinOffice2.push(cop.user);
+              })
+            }
+
+            // console.log("uniqueUserinOffice", uniqueUserinOffice1.length, uniqueUserinOffice2.length);
+
+            let csv3 = "Office,Number of Orange,Number of Red,Total Signups in Office, Employee Count, Employee reported in Office this week, Percentage of Employee in Office this week\r\n";
             var numberOfOrange = usersStatusOrange.length;
             var numberOfRed = usersStatusRed.length;
             var total =  usersbyOffice.length;
-            csv3 += `${numberOfOrange},${numberOfRed},${total}\r\n`
+            var employeeInOffice = uniqueUserinOffice1.length;
+            var employeeInOffice2 = uniqueUserinOffice2.length;
+
+
+            if (key === "New York") {
+              csv3 += `${key},${numberOfOrange},${numberOfRed},${total},${''},${''}\r\n`;
+              csv3 += `${"Downtown"},${''},${''},${''},${userCountByOffice["New York - Downtown"]},${employeeInOffice},${String((employeeInOffice/userCountByOffice["New York - Downtown"]*100).toFixed(2)) + "%"}\r\n`;
+              csv3 += `${"Midtown"},${''},${''},${''},${userCountByOffice["New York - Madison"]},${employeeInOffice2}, ${String((employeeInOffice/userCountByOffice["New York - Madison"]*100).toFixed(2)) + "%"}\r\n`;
+            }
+            else csv3 += `${key},${numberOfOrange},${numberOfRed},${total},${userCountByOffice[key]},${employeeInOffice}, ${String((employeeInOffice/userCountByOffice[key]*100).toFixed(2)) + "%"}\r\n`;
             let attachment3 = Buffer.from(csv3).toString('base64');
-            
+
             sendEmail(directors[key], key, attachment, attachment2, attachment3);
 
         });
@@ -160,22 +245,21 @@ function getUsers(client_db) {
 
         collection.find({}, include).toArray(function (err, users) {
             var counter = 0;
-            for (let u of users) {
-                statusCollection.find({
-                        "user": u._id
-                    })
-                    .sort({
-                        date: -1
-                    })
-                    .limit(1).toArray(function (error, st) {                  
-                        u.status = st[0];
-                        allUsers.push(u);
-                        isDone();
-
-                    });
-
-            }
-
+            getWorkPreferences(client_db).then(function(){
+              for (let u of users) {
+                  statusCollection.find({
+                          "user": u._id
+                      })
+                      .sort({
+                          date: -1
+                      })
+                      .limit(1).toArray(function (error, st) {
+                          u.status = st[0];
+                          allUsers.push(u);
+                          isDone();
+                      });
+              }
+            })
 
 
             function isDone() {
@@ -197,11 +281,42 @@ function getUsers(client_db) {
 
 }
 
+function getWorkPreferences(client_db) {
+    return new Promise((resolve, reject) => {
+        let db = client_db.db();
+
+        let include = {
+            "_id": 1,
+            // "dateOfConsent": 1,
+            "user": 1,
+            // "location": 1
+        }
+
+        var checkDate = new Date(new Date().getTime() - (6*24 * 60 * 60 * 1000));//move back 6 days
+
+        let collection = db.collection('workpreferences');
+        collection
+          .find({
+            createdAt: {
+              "$gte": checkDate
+            },
+            office: { $ne: "Remote" }
+          }, include)
+          .toArray(function (err, allWps) {
+            // console.log("Work Preferences", allWps);
+            allWorkPreferences = allWps;
+            resolve(true);
+        });
+    });
+}
+
 function sendEmail(toEmail, location, attachment, attachment2, attachment3) {
 
     const mailOptions = {
         to: toEmail,
+        // to: "hsun@thorntontomasetti.com",
         from: sender,
+        bcc: 'hsun@thorntontomasetti.com',
         subject: "Healthy Reentry – Weekly Report for " + location,
         html: content
     };
@@ -219,10 +334,10 @@ function sendEmail(toEmail, location, attachment, attachment2, attachment3) {
             },
             {
                 "content": attachment3,
-                "filename": "Breakdown by Health Status.csv",
+                "filename": "Office Breakdown.csv",
                 "type": "text/csv"
             }
-            
+
         ]
     }
 
