@@ -69,8 +69,9 @@
         <md-content class="px-1">
           <span class="d-flex mt-3">Today I will be _______.</span>
           <md-radio v-model="reentryOpt" value="0" class="md-primary d-flex">Working Remotely <small>(Default)</small></md-radio>
-          <md-radio v-model="reentryOpt" value="1" class="md-primary d-flex">
+          <md-radio v-model="reentryOpt" value="1" class="md-primary d-flex" :disabled="latestStatus && latestStatus.status!==0">
             Working in the office
+            <md-tooltip v-if="latestStatus && latestStatus.status!==0" md-direction="bottom">Cannot select due to current health status.</md-tooltip>
             <div class="md-layout-item">
               <md-field>
                 <md-select name="offices" id="offices" v-model="userOffice" placeholder="Choose your office">
@@ -80,7 +81,7 @@
                 </md-select>
               </md-field>
             </div>
-            <small class="d-flex">&#42; Working in the office is ONLY permitted if you are Green;
+            <small>&#42; <b>Working in the office is ONLY permitted if you are Green;</b>
               this includes confirming that you do NOT have COVID-19 symptoms and your temperature is not more than 100.4 degrees F (38 degrees C).
               <br/>
               If you are Orange or Red, please refrain from coming into the office.
