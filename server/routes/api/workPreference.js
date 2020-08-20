@@ -124,11 +124,9 @@ router.get("/get-latest-preference", function (req, res) {
         latestOffice: null,
         statusToday: null
       };
-      console.log("wp", wp);
       if (wp.length == 0) return res.json(null);
 
       let allWPLocation = wp.filter(p=> p.office !=="Remote");
-      console.log("allWPLocation", allWPLocation);
       latestPreference.latestOffice = allWPLocation[0].office;
 
       const searchDate = new Date(new Date().getTime() - (6 * 60 * 60 * 1000));
