@@ -130,26 +130,16 @@ export default {
     //     if (officeIndex !== -1) this.userOffice = this.offices[officeIndex];
     //   }
     // });
-    this.$api.get("/api/workPreference/get-latest").then(preference => {
+    this.$api.get("/api/workPreference/get-latest-preference").then(preference => {
+      // console.log("preference", preference);
       this.showDialog = true;
 
-      // Search for the preference in the past 24 hrs
-      const searchDate = new Date(new Date().getTime() - (6 * 60 * 60 * 1000));
-      var preferenceToday;
-      if (preference.data) preferenceToday = preference.data.filter(p=> new Date(p.createdAt) > searchDate);
-      if (preferenceToday.length > 0) this.showDialog = false;//if no preference, then show modal
-
-
-      var latestPreference;
-      if (preference.data.length > 0) {
-        // User had submitted work preference before
-        this.latestPreference = preference.data[0];
-        if (preference.data[0].office !=="Remote") this.userOffice = preference.data[0].office; // User office = user's default office selection
+      if (preference.data.statusToday) {
+        this.showDialog = false;
+        this.latestPreference = preference.data.statusToday;
+        this.userOffice = preference.data.latestOffice;
       }
-      // else {
-      //   const matches = this.offices.filter(o => o.includes(this.user.location));
-      //   if (matches.length > 0) this.userOffice = matches[0]; // User office = user's default office selection
-      // }
+
     });
   },
   mounted() {
@@ -243,6 +233,7 @@ export default {
       this.$api.post("/api/workPreference/add", reqBody).then(offices => {
         if (offices.data) this.showDialog = false;
         this.latestPreference = offices.data;
+        if (offices.data.office !== "Remote") this.userOffice = offices.data.office;
       });
     },
     mapButtonCSS() {

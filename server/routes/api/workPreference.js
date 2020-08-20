@@ -96,6 +96,49 @@ router.get("/get-latest", function (req, res) {
 
 });
 
+/**
+ * @swagger
+ * path:
+ *  /api/status/get-current:
+ *    get:
+ *      summary: Get the latest status for the current user.
+ *      tags: [Status]
+ *      produces:
+ *       - application/json
+ *      responses:
+ *        200:
+ *          description: Current user's latest status.
+ *        500:
+ *          description: Server error.
+ */
+router.get("/get-latest-preference", function (req, res) {
+  WorkPreference.find({
+    "user": req.user._id
+  }).sort({
+    createdAt: -1
+  })
+  .exec(function(err, wp) {
+    if (err) return res.status(500).send(err);
+    else {
+      let latestPreference = {
+        latestOffice: null,
+        statusToday: null
+      };
+      console.log("wp", wp);
+      if (wp.length == 0) return res.json(null);
+
+      let allWPLocation = wp.filter(p=> p.office !=="Remote");
+      console.log("allWPLocation", allWPLocation);
+      latestPreference.latestOffice = allWPLocation[0].office;
+
+      const searchDate = new Date(new Date().getTime() - (6 * 60 * 60 * 1000));
+      latestPreference.statusToday = wp.filter(p=> new Date(p.createdAt) > searchDate)[0];
+      return res.json(latestPreference);
+    }
+  });
+
+});
+
 
 
 module.exports = router;
