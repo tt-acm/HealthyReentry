@@ -127,10 +127,12 @@ router.get("/get-latest-preference", function (req, res) {
       if (wp.length == 0) return res.json(null);
 
       let allWPLocation = wp.filter(p=> p.office !=="Remote");
-      latestPreference.latestOffice = allWPLocation[0].office;
+      if (allWPLocation && allWPLocation.length > 0) latestPreference.latestOffice = allWPLocation[0].office;
 
       const searchDate = new Date(new Date().getTime() - (6 * 60 * 60 * 1000));
-      latestPreference.statusToday = wp.filter(p=> new Date(p.createdAt) > searchDate)[0];
+      let statusToday = wp.filter(p=> new Date(p.createdAt) > searchDate);
+
+      if (statusToday && statusToday.length > 0) latestPreference.statusToday = statusToday[0];
       return res.json(latestPreference);
     }
   });
