@@ -47,6 +47,12 @@
           </md-button> -->
         </router-link>
       </md-list-item>
+
+      <md-list-item>
+        <button @click="enableNotifications" type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
+          Enable Notifications
+        </button>
+      </md-list-item>
       <!-- </div> -->
     </md-list>
   </div>
@@ -110,6 +116,7 @@
 </div>
 </template>
 <script>
+import notifications from '@/notifications/index.js';
 // import store from "store/index.js";
 const statusColors = ["#00C851", "#FF9800", "#DC3545"]
 
@@ -232,6 +239,9 @@ export default {
     user: state => state.user,
   }),
   methods: {
+    async enableNotifications() {
+      await notifications.registerNotification();
+    },
     submit() {
       let reqBody = {
         "office": this.userOffice

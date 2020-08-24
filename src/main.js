@@ -50,39 +50,6 @@ function getNextValidNotifDate(startDate = new Date()) {
 }
 
 
-// async function sendReminderNotification() {
-//   let title = "HealthyReentry Reminder";
-//   let body = "Hello! This is a friendly reminder to report your work location and health status. Thank you!";
-//   let options = {
-//     body: body,
-//     icon: "/imgs/logo-256.png",
-//     requireInteraction: true
-//   };
-//   let notif = new Notification(title, options);
-//   console.log(notif);
-// }
-
-
-// async function registerNotification() {
-//   if (Notification.permission === "denied") {
-//     return;
-//   }
-//   else if (Notification.permission === "default") {
-//     await Notification.requestPermission();
-//     registerNotification();
-
-//     let title = "HealthyReentry Reminder Signup";
-//     let body = "Great! You're signed up for reminders to submit your location and health status every weekday";
-//     let options = {
-//       body: body,
-//       icon: "/imgs/logo-256.png"
-//     };
-//     new Notification(title, options);
-
-//   }
-// }
-
-
 import browserDetect from "vue-browser-detect-plugin";
 Vue.use(browserDetect);
 
@@ -91,46 +58,13 @@ async function main() {
 
   if('serviceWorker' in navigator){
     try {
-      let reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.register('/sw.js');
       console.log('service worker registered');
-      
-
-      let currTime = new Date();
-      // let nextNotifTime = getNextValidNotifDate(currTime);
-      let nextNotifTime = new Date();
-      nextNotifTime.setMinutes(currTime.getMinutes() + 1);
-      let gap = nextNotifTime - currTime;
-      console.log(currTime);
-      console.log(nextNotifTime);
-      console.log(gap);
-      reg.showNotification(
-        'Demo Push Notification',
-        {
-          body: 'Hello World',
-          showTrigger: new TimestampTrigger(nextNotifTime),
-          data: {
-            url: window.location.href,
-          },
-          badge: "/imgs/logo-256.png",
-          icon: "/favicon.png"
-        }
-      );
-
-
     } catch(err) {
       console.log('service worker not registered');
       console.log(err);
     }
   }
-
-  // if('Notification' in window){
-  //   try {
-  //     registerNotification();
-  //   } catch(err) {
-  //     console.log('service worker not registered');
-  //     console.log(err);
-  //   }
-  // }
 
   router.beforeEach((to, from, next) => {
       // if (to.meta && to.meta.title) {
