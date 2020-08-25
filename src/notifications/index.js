@@ -1,13 +1,30 @@
 import store from "@/store/index.js";
 
 
+
+function getNextValidNotifDate(startDate = new Date()) {
+  let currTime = new Date(startDate.getTime());
+  let nextNotifTime = new Date(currTime.getTime());
+  nextNotifTime.setHours(9, 0, 0, 0);
+  nextNotifTime.setDate(currTime.getDate() + 1);
+  let nxtDay = nextNotifTime.getDay();
+  if (nxtDay === 6) {
+    nextNotifTime.setDate(currTime.getDate() + 3);
+  }
+  else if (nxtDay === 0) {
+    nextNotifTime.setDate(currTime.getDate() + 2);
+  }
+  return nextNotifTime;
+}
+
+
 async function scheduleNextNotification() {
   let reg = await navigator.serviceWorker.register('/sw.js');
 
   let currTime = new Date();
   // let nextNotifTime = getNextValidNotifDate(currTime);
   let nextNotifTime = new Date();
-  nextNotifTime.setSeconds(currTime.getSeconds() + 20);
+  nextNotifTime.setSeconds(currTime.getSeconds() + 5);
   console.log(currTime);
   console.log(nextNotifTime);
 
@@ -16,23 +33,21 @@ async function scheduleNextNotification() {
   let options = {
     body: body,
     showTrigger: new TimestampTrigger(nextNotifTime),
-    data: {
-      url: `${window.location.href}/${store.state.user._id}/status`,
-    },
     badge: "/imgs/logo-256.png",
     icon: "/favicon.png"
     // requireInteraction: true
   };
 
-  let notif = await reg.showNotification(title, options);
+  reg.showNotification(title, options);
   
-  // let notif = new Notification(title, options);
-  console.log(notif);
 }
 
 
 async function registerNotification() {
-  if (Notification.permission === "denied") {
+
+  let result = await Notification.requestPermission();
+
+  if (result !== "granted") {
     return;
   }
 

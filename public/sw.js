@@ -33,3 +33,19 @@ self.addEventListener('fetch', evt => {
     })
   );
 });
+
+
+
+
+self.addEventListener('notificationclick', function(event) {
+  console.log(event);
+  const clickedNotification = event.notification;
+  clickedNotification.close();
+  window.open('https://google.com');
+  // window.open(`${window.location.href}/${store.state.user._id}/status`);
+  event.waitUntil(notifReact);
+  // scheduleNextNotification();
+});
+async function notifReact() {
+  console.log('joo');
+}

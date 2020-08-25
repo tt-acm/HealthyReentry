@@ -33,23 +33,6 @@ Vue.use(VueQrcodeReader);
 Vue.prototype.moment = moment;
 
 
-
-function getNextValidNotifDate(startDate = new Date()) {
-  let currTime = new Date(startDate.getTime());
-  let nextNotifTime = new Date(currTime.getTime());
-  nextNotifTime.setHours(9, 0, 0, 0);
-  nextNotifTime.setDate(currTime.getDate() + 1);
-  let nxtDay = nextNotifTime.getDay();
-  if (nxtDay === 6) {
-    nextNotifTime.setDate(currTime.getDate() + 3);
-  }
-  else if (nxtDay === 0) {
-    nextNotifTime.setDate(currTime.getDate() + 2);
-  }
-  return nextNotifTime;
-}
-
-
 import browserDetect from "vue-browser-detect-plugin";
 Vue.use(browserDetect);
 
