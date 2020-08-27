@@ -48,9 +48,18 @@
         </router-link>
       </md-list-item>
 
+      <hr />
+
       <md-list-item>
-        <button @click="enableNotifications" type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
-          Enable Notifications
+        <button @click="toggleNotifications" type="button" class="btn btn-outline-secondary btn-lg btn-block text-center my-2">
+          {{ (!!this.user.pushSubscription) ? 'Disable ' : 'Enable ' }}
+          Notifications
+        </button>
+      </md-list-item>
+
+      <md-list-item>
+        <button @click="testNotifications()" type="button" class="btn btn-outline-secondary btn-lg btn-block text-center my-2">
+          Test Notifications
         </button>
       </md-list-item>
       <!-- </div> -->
@@ -117,7 +126,7 @@
 </template>
 <script>
 import notifications from '@/notifications/index.js';
-// import store from "store/index.js";
+import store from "@/store/index.js";
 const statusColors = ["#00C851", "#FF9800", "#DC3545"]
 
 import Vuex from 'vuex';
@@ -239,8 +248,27 @@ export default {
     user: state => state.user,
   }),
   methods: {
-    async enableNotifications() {
-      await notifications.registerNotification();
+    async testNotifications() {
+
+      let res = await this.$api.post("/api/user/test-notification", {});
+      console.log(res.data);
+
+    },
+    async toggleNotifications() {
+
+      let subscription = null;
+
+      if (!this.user.pushSubscription) {
+        let reg = await navigator.serviceWorker.register('/sw.js');
+        const applicationServerKey = notifications.urlB64ToUint8Array(process.env.VUE_APP_VAPID_PUBLIC_KEY);
+        const options = { applicationServerKey, userVisibleOnly: true };
+        subscription = await reg.pushManager.subscribe(options);
+      }
+
+      let subscriptionData = {pushSubscription: subscription};
+      let res = await this.$api.post("/api/user/save-push-subscription", subscriptionData);
+      store.commit('setUser', res.data);
+
     },
     submit() {
       let reqBody = {

@@ -306,4 +306,24 @@ router.post("/delete", function(req, res) {
   });
 });
 
+
+router.post('/save-push-subscription', async (req, res) => {
+  let user = await User.findOne({ _id: req.user._id });
+  user.pushSubscription = (req.body.pushSubscription) ? JSON.stringify(req.body.pushSubscription) : null;
+  user = await user.save();
+  return res.json(user);
+});
+
+
+router.post('/test-notification', async (req, res) => {
+  let user = req.user;
+  if (user.pushSubscription) {
+    let pushSubscription = JSON.parse(user.pushSubscription);
+    webpush.sendNotification(pushSubscription, 'reminder');
+    return res.send('OK');
+  } else {
+    return res.send('NOK');
+  }
+});
+
 module.exports = router;

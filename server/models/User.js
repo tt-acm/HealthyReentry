@@ -32,6 +32,10 @@ const variables = require("../util/variables");
  *          dateOfConsent:
  *            type: Date
  *            description: The consent date when a user signs the disclosure and consent form.
+ *          pushSubscription:
+ *            type: String
+ *            default: null
+ *            description: JSON representing user's push notification subscription.
  *        example:
  *           name: Peter Parker
  *           email: pp_is_stuck@web.com
@@ -67,6 +71,10 @@ const UserSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     }
+  },
+  pushSubscription: {
+    type: String,
+    default: null
   }
 }, {timestamps: true});
 
