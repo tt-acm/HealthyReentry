@@ -1,11 +1,21 @@
 const router = require('express').Router();
 const fs = require('fs');
 const sgClient = require("../../lib/sgClient");
+const webpush = require('web-push');
 
 const User = require('../../models/User');
 const Status = require('../../models/Status');
 const parseUser = require('../../util/parseUser');
 
+const vapidKeys = {
+  publicKey: process.env.VUE_APP_VAPID_PUBLIC_KEY,
+  privateKey: process.env.VAPID_PRIVATE_KEY
+};
+webpush.setVapidDetails(
+  'mailto:healthyreentry-notifications@thorntontomasetti.com',
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
+);
 
 /**
  * @swagger
