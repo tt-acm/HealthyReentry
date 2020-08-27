@@ -125,9 +125,20 @@
 </div>
 </template>
 <script>
-import notifications from '@/notifications/index.js';
 import store from "@/store/index.js";
 const statusColors = ["#00C851", "#FF9800", "#DC3545"]
+
+// ref: https://medium.com/izettle-engineering/beginners-guide-to-web-push-notifications-using-service-workers-cb3474a17679
+const urlB64ToUint8Array = base64String => {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+  const rawData = atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
 
 import Vuex from 'vuex';
 
@@ -256,18 +267,33 @@ export default {
     },
     async toggleNotifications() {
 
+      let reg = await navigator.serviceWorker.register('/sw.js');
       let subscription = null;
 
       if (!this.user.pushSubscription) {
-        let reg = await navigator.serviceWorker.register('/sw.js');
-        const applicationServerKey = notifications.urlB64ToUint8Array(process.env.VUE_APP_VAPID_PUBLIC_KEY);
-        const options = { applicationServerKey, userVisibleOnly: true };
-        subscription = await reg.pushManager.subscribe(options);
+
+        if(!('Notification' in window)) return;
+        let result = await Notification.requestPermission();
+        if (result !== "granted") return;
+
+        const applicationServerKey = urlB64ToUint8Array(process.env.VUE_APP_VAPID_PUBLIC_KEY);
+        subscription = await reg.pushManager.subscribe({ applicationServerKey, userVisibleOnly: true });
       }
 
       let subscriptionData = {pushSubscription: subscription};
       let res = await this.$api.post("/api/user/save-push-subscription", subscriptionData);
       store.commit('setUser', res.data);
+
+      if (this.user.pushSubscription) {
+        let title = "HealthyReentry Reminder Signup";
+        let body = "Great! You're signed up for reminders to submit your location and health status every weekday";
+        let options = {
+          body: body,
+          badge: "/imgs/logo-256.png",
+          icon: "/favicon.png"
+        };
+        reg.showNotification(title, options);
+      }
 
     },
     submit() {
