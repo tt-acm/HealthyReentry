@@ -131,13 +131,12 @@ export default {
     //   }
     // });
     this.$api.get("/api/workPreference/get-latest-preference").then(preference => {
-      // console.log("preference", preference);
       this.showDialog = true;
+      this.userOffice = preference.data.latestOffice;
 
       if (preference.data.statusToday) {
         this.showDialog = false;
         this.latestPreference = preference.data.statusToday;
-        this.userOffice = preference.data.latestOffice;
       }
 
     });
