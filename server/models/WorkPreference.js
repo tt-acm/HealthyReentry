@@ -23,7 +23,8 @@ const mongoose = require('mongoose');
  */
 var workPreferenceSchema = new mongoose.Schema({
   office: String,
-	createdAt: { type: Date, expires: 86400, default: Date.now },
+	// createdAt: { type: Date, expires: 86400, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
 	user:
   {
     type: mongoose.Schema.Types.ObjectId,
