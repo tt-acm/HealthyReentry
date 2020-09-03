@@ -29,7 +29,7 @@ function checkUsersStatus(client_db) {
     let counter = 0;
 
     var checkDate = new Date();
-    var pastDate = checkDate.getDate() - 7;
+    var pastDate = checkDate.getDate() - 3;
     checkDate.setDate(pastDate);
 
     let collection = db.collection('users');
