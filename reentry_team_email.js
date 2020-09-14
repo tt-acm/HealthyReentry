@@ -161,7 +161,7 @@ MongoClient.connect(url, {
               if (office === "New York") {
                 csv3 += `${office},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${''},${''}\r\n`;
                 csv3 += `${"New York-Downtown"},${''},${''},${''},${''},${userCountByOffice["New York - Downtown"]},${employeeInOffice},${String((employeeInOffice/userCountByOffice["New York - Downtown"]*100).toFixed(2)) + "%"}\r\n`;
-                csv3 += `${"New York-Midtown"},${''},${''},${''},${''},${userCountByOffice["New York - Madison"]},${employeeInOffice2}, ${String((employeeInOffice/userCountByOffice["New York - Madison"]*100).toFixed(2)) + "%"}\r\n`;
+                csv3 += `${"New York-Midtown"},${''},${''},${''},${''},${userCountByOffice["New York - Madison"]},${employeeInOffice2}, ${String((employeeInOffice2/userCountByOffice["New York - Madison"]*100).toFixed(2)) + "%"}\r\n`;
               }
               else csv3 += `${office},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${userCountByOffice[office]},${employeeInOffice}, ${String((employeeInOffice/userCountByOffice[office]*100).toFixed(2)) + "%"}\r\n`;
 
