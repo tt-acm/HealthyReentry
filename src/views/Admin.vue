@@ -620,7 +620,7 @@
 <script>
 import enumStatusMap from "../../server/util/enumStatusMap.js";
 import storedRegions from "../../server/util/officeList.js";
-import graphToCsv from "../../server/util/csvUtils.js";
+import csvUtil from "../../server/util/csvUtils.js";
 
 function downloadCSV(content, fileName) {
   let dlTrigger = document.createElement('a');
@@ -768,7 +768,7 @@ export default {
       let fileTxt = "";
       let c = 0;
       allGraphs.forEach(graph => {
-        let gCSV = graphToCsv(graph);
+        let gCSV = csvUtil.graphToCsv(graph);
         let u = this.selectedUsers[c];
         fileTxt += `Name,${u.name}\r\nStatus,${u.status.label}\r\nUpdated,${u.lastUpdated}\r\n${gCSV}\r\n`;
         c++;

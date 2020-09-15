@@ -51,7 +51,7 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
     let userConfContent = userConfTemplate.replace('<STATUS_LABEL>', status.label).replace('<STATUS_DATE>', localCurDate);
     let adminUpdateContent = adminUpdateTemplate.replace('<STATUS_LABEL>', status.label);
 
-    let csvHeader = "Name,Email,Number Of Direct Encounters,Degree of Separation,Status,Status Last Updated\r\n";
+    let csvHeader = "Name,Email,Number Of Direct Encounters,Degree of Separation,Status,Status Last Updated, Last Encountered\r\n";
     let sub = process.env.VUE_APP_NAME + " Alert";
 
     sub = "Your status color has been changed";

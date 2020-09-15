@@ -91,7 +91,9 @@ function buildEncounterGraph(users, encounters) {
         // Load Edges (encounters)
 
         encounters.forEach(function (enc) {
-
+            var attribute = {
+              encounter: enc
+            }
             // Number of Encounters
             var numEncounters = 0;
             if (enc.users[0] != undefined && enc.users[1] != undefined) {
@@ -99,8 +101,9 @@ function buildEncounterGraph(users, encounters) {
                     numEncounters = g.edge(enc.users[0].email, enc.users[1].email);
                 }
 
-                g.setEdge(enc.users[0].email, enc.users[1].email, numEncounters + 1);
-
+                attribute.numEncounters = numEncounters + 1;
+                g.setEdge(enc.users[0].email, enc.users[1].email, attribute);
+                // g.setEdge(enc.users[0].email, enc.users[1].email, numEncounters + 1);
             }
 
             countEnc += 1;
@@ -145,10 +148,11 @@ function findEncounterTree(user, incubationPeriod) {//incubation period 2 days i
                             data.push({
                                 "name": nd.name.replace(',', ''),
                                 "email": u,
-                                "number_of_encounters": g.edge(user, u),
+                                "number_of_encounters": g.edge(user, u).numEncounters,
                                 "degree-of-separation": 1,
                                 "status": (nd.status) ? nd.status.status : -1, // mark -1 if person hasn't ever reported any status
-                                "statusLastUpdated": (nd.status) ? nd.status.date : "N/A"
+                                "statusLastUpdated": (nd.status) ? nd.status.date : "N/A",
+                                "encountered_date": g.edge(user, u).encounter.date
                             });
                         } else if (r[u].distance > 1 && r[u].distance < Infinity) {
                             data.push({
