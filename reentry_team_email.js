@@ -145,13 +145,15 @@ MongoClient.connect(url, {
               let uniqueUserinOffice1 = [];
               if (currentOfficePop1.length > 0) {
                 currentOfficePop1.forEach(cop=>{
-                  if (!uniqueUserinOffice1.includes(cop.user)) uniqueUserinOffice1.push(cop.user);
+                  let curUser = String(cop.user);
+                  if (!uniqueUserinOffice1.includes(curUser)) uniqueUserinOffice1.push(curUser);
                 })
               }
               let uniqueUserinOffice2 = [];
               if (currentOfficePop2 && currentOfficePop2.length > 0) {
                 currentOfficePop2.forEach(cop=>{
-                  if (!uniqueUserinOffice2.includes(cop.user)) uniqueUserinOffice2.push(cop.user);
+                  let curUser = String(cop.user);
+                  if (!uniqueUserinOffice2.includes(curUser)) uniqueUserinOffice2.push(curUser);
                 })
               }
 
@@ -171,12 +173,12 @@ MongoClient.connect(url, {
           let totalUniqueName = [];
 
           allWorkPreferences.forEach(awp=>{
-            if (!totalUniqueName.includes(String(awp.user))) totalUniqueName.push(String(awp.user));
+            let awpUser = String(awp.user);
+            if (!totalUniqueName.includes(awpUser)) totalUniqueName.push(awpUser);
           })
 
 
           let content = contentTemplate.replace('<INOFFICE_PERCENTAGE>', ((totalUniqueName.length/1350)*100).toFixed(2)).replace('<INOFFICE_COUNT>', totalUniqueName.length);
-
 
           let attachment = Buffer.from(csv).toString('base64');
           let attachment2 = Buffer.from(csv2).toString('base64');
