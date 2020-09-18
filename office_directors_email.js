@@ -189,13 +189,15 @@ MongoClient.connect(url, {
             let uniqueUserinOffice1 = [];
             if (currentOfficePop1.length > 0) {
               currentOfficePop1.forEach(cop=>{
-                if (!uniqueUserinOffice1.includes(cop.user)) uniqueUserinOffice1.push(cop.user);
+                let copUser = cop.user;
+                if (!uniqueUserinOffice1.includes(copUser)) uniqueUserinOffice1.push(copUser);
               })
             }
             let uniqueUserinOffice2 = [];
             if (currentOfficePop2 && currentOfficePop2.length > 0) {
               currentOfficePop2.forEach(cop=>{
-                if (!uniqueUserinOffice2.includes(cop.user)) uniqueUserinOffice2.push(cop.user);
+                let copUser = cop.user;
+                if (!uniqueUserinOffice2.includes(copUser)) uniqueUserinOffice2.push(copUser);
               })
             }
 
