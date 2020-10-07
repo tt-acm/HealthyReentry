@@ -37,6 +37,11 @@ var statusSchema = new mongoose.Schema({
     usePushEach: true
 });
 
+statusSchema.index({
+    user: 1
+}, {
+    unique: false
+});
 
 /**
  * Pre-save hook:
