@@ -182,6 +182,12 @@ MongoClient.connect(url, {
               currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === "New York - Downtown");
               currentOfficePop2 = allWorkPreferences.filter(wp=>wp.office === "New York - Madison");
             }
+            else if (key === "Edinburgh") {
+              currentOfficePop1 = allWorkPreferences.filter(function (wp) {
+                if (wp.office === "Edinburgh" || wp.office === "Edinburgh - Limehillock") return true;
+                else return false
+              });
+            }
             else currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === key);
 
             // console.log("currentOfficePop", currentOfficePop1, currentOfficePop2);
@@ -189,7 +195,7 @@ MongoClient.connect(url, {
             let uniqueUserinOffice1 = [];
             if (currentOfficePop1.length > 0) {
               currentOfficePop1.forEach(cop=>{
-                let copUser = cop.user;
+                let copUser = String(cop.user);
                 if (!uniqueUserinOffice1.includes(copUser)) uniqueUserinOffice1.push(copUser);
               })
             }

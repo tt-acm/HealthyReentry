@@ -178,6 +178,7 @@ export default {
         "Denver",
         "Dubai",
         "Edinburgh",
+        "Edinburgh - Limehillock",
         "Fort Lauderdale",
         "Halifax",
         "Ho Chi Minh City",

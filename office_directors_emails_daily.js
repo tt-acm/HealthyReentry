@@ -31,6 +31,7 @@ let directors = {
     "Denver": "jdandrea@thorntontomasetti.com",
     "Dubai": "kkrall@thorntontomasetti.com",
     "Edinburgh": "nmisselbrook@thorntontomasetti.com",
+    "Edinburgh - Limehillock": "nmisselbrook@thorntontomasetti.com",
     "Fort Lauderdale": ["molender@thorntontomasetti.com", "bmalmsten@thorntontomasetti.com"],
     "Halifax": ["rbehboudi@thorntontomasetti.com", "mwesolowsky@thorntontomasetti.com"],
     "Ho Chi Minh City": "cdang@thorntontomasetti.com",
@@ -81,6 +82,7 @@ let userCountByOffice = {
     "Denver": 25,
     "Dubai": 4,
     "Edinburgh": 28,
+    "Edinburgh - Limehillock": 28,
     "Fort Lauderdale": 29,
     "Halifax": 1,
     "Ho Chi Minh City": 16,
@@ -123,7 +125,7 @@ zones["-6"] = ["Washington", "Philadelphia", "Fort Lauderdale", "Dallas", "Albuq
 zones["-5"] = ["Chicago", "Kansas City", "Denver", "Milwaukee", "Houston"];
 zones["-4"] = ["New York - Downtown", "New York - Madison", "Newark", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
 zones["-3"] = ["Halifax"];
-zones["1"] = ["London", "Edinburgh", "Warrington", "Romsey", "Aberdeen"];
+zones["1"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen"];
 zones["2"] = ["Copenhagen", "Bristol"];
 zones["3"] = ["Moscow"];
 zones["4"] = ["Dubai"];

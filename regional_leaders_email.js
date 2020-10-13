@@ -64,7 +64,7 @@ MongoClient.connect(url, {
             var offices = regions[key];
             offices.forEach(office => {
                 //console.log(office)
-                // 1. employees who have signed up for the app, 
+                // 1. employees who have signed up for the app,
                 const usersbyOffice = allUsers.filter(u => u.location === office);
 
                 usersbyOffice.forEach((user) => {
@@ -167,7 +167,9 @@ function sendEmail(toEmail, location, attachment, attachment2, attachment3) {
 
     const mailOptions = {
         to: toEmail,
+        // to: "hsun@thorntontomasetti.com",
         from: sender,
+        bcc: 'hsun@thorntontomasetti.com',
         subject: "Healthy Reentry – Weekly Report for " + location + " Region",
         html: content
     };

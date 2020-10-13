@@ -138,6 +138,12 @@ MongoClient.connect(url, {
                 currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === "New York - Downtown");
                 currentOfficePop2 = allWorkPreferences.filter(wp=>wp.office === "New York - Madison");
               }
+              else if (office === "Edinburgh") {
+                currentOfficePop1 = allWorkPreferences.filter(function (wp) {
+                  if (wp.office === "Edinburgh" || wp.office === "Edinburgh - Limehillock") return true;
+                  else return false;
+                });
+              }
               else currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === office);
 
               // console.log("currentOfficePop", currentOfficePop1, currentOfficePop2);
