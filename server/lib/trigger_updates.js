@@ -63,9 +63,9 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
 
     // inform the user
     if (byAdmin) {
-      await sendEmail("Your status color has been changed", [user.email], adminUpdateContent);
+      sendEmail("Your status color has been changed", [user.email], adminUpdateContent);
     } else {
-      await sendEmail("You have updated your status color", [user.email], userConfContent);
+      sendEmail("You have updated your status color", [user.email], userConfContent);
     }
 
     if (statusEnum === 1) // Status Reported Orange
@@ -88,15 +88,15 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
       let filename = `Encounter_${formattedDate}_${status.label}_${user.name}.csv`;
       if (alertAdmin) {
         if (byAdmin) {
-          await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
+          sendEmail("Employee’s log - " + user.name, variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
         } else {
-          await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent, attachment, filename); //user changed their status themselves
+          sendEmail("Employee’s log - " + user.name, variables.ADMIN_USERS, adminEmailContent, attachment, filename); //user changed their status themselves
         }
       }
 
       // inform every direct contact
       if (emails.length > 0) {
-        await sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
+        sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
       }
     } else if (statusEnum === 2) { // Status Reported Red
       let graph = await eg(user.email, variables.INCUBATION_PERIDOD); // get encounters within incubation period
@@ -117,7 +117,7 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
         await UpdateStatus(emails);
 
         // inform every direct contact
-        await sendEmail("Attention: Refrain from coming to the office", emails, redContent);
+        sendEmail("Attention: Refrain from coming to the office", emails, redContent);
       }
 
       // gather second degree contacts
@@ -136,13 +136,13 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
       let attachment = new Buffer(csv).toString('base64');
       if (alertAdmin) {
         if (byAdmin) {
-          await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
+          sendEmail("Employee’s log - " + user.name, variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
         } else {
-          await sendEmail("Employee’s log", variables.ADMIN_USERS, adminEmailContent, attachment, filename);
+          sendEmail("Employee’s log - " + user.name, variables.ADMIN_USERS, adminEmailContent, attachment, filename);
         }
       }
       // inform every second degree contact
-      if (emails.length > 0) await sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
+      if (emails.length > 0) sendEmail("Attention: Refrain from coming to the office", emails, orangeContent);
 
     }
 
@@ -162,36 +162,28 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
 
 
 function sendEmail(subject, toEmails, content, attachment, filename) {
-  return new Promise(function(resolve, reject) {
+  const mailOptions = {
+    to: toEmails,
+    from: process.env.SENDGRID_EMAIL,
+    subject: subject || process.env.VUE_APP_NAME + " - TESTING",
+    text: " ",
+    html: content
+  };
 
-    const mailOptions = {
-      to: toEmails,
-      from: process.env.SENDGRID_EMAIL,
-      subject: subject || process.env.VUE_APP_NAME + " - TESTING",
-      text: " ",
-      html: content
-    };
+  if (attachment) {
+    mailOptions.attachments = [{
+      "content": attachment,
+      "filename": filename,
+      "type": "text/csv"
+    }]
+  };
 
-    if (attachment) {
-      mailOptions.attachments = [{
-        "content": attachment,
-        "filename": filename,
-        "type": "text/csv"
-      }]
-    };
-
-    // https://www.twilio.com/blog/sending-bulk-emails-3-ways-sendgrid-nodejs
-    // the recepients not able to see each other
-
-    sgClient.sendMultiple(mailOptions, function(err) {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      resolve(mailOptions);
-    });
-
+  // https://www.twilio.com/blog/sending-bulk-emails-3-ways-sendgrid-nodejs
+  // the recepients not able to see each other
+  sgClient.sendMultiple(mailOptions, function(err) {
+    if (err) {
+      console.log(err);
+    }
   });
 
 }
