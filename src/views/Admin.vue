@@ -100,11 +100,11 @@
 
                     <div v-for="region in regions" :key="region.name">
 
-                      <div v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
-                        <p @click="userUpdateData.locationToSet = ofc.LocationName">
+                      <ul v-for="ofc in region.offices" :key="ofc.LocationName" class="pl-4">
+                        <li @click="userUpdateData.locationToSet = ofc.LocationName">
                           {{ ofc.LocationName }}
-                        </p>
-                      </div>
+                        </li>
+                      </ul>
 
                     </div>
 
@@ -288,7 +288,28 @@
       </md-dialog-actions>
     </md-dialog>
 
-    <h5 class="text-muted">Admin Dashboard</h5>
+    <h5 class="text-muted">Admin Dashboard
+      <md-button class="md-icon-button" @click="setUserStatus = true">
+        <md-icon class="fa fa-download">
+          <md-tooltip md-direction="bottom">Download data by user status</md-tooltip>
+        </md-icon>
+      </md-button>
+    </h5>
+
+    <md-dialog :md-active.sync="setUserStatus">
+      <md-dialog-title>Download user data by status</md-dialog-title>
+      <md-dialog-content>
+        <md-checkbox v-model="userStatusToDownload.green" value=true>Green</md-checkbox>
+        <md-checkbox v-model="userStatusToDownload.orange" value=true>Orange</md-checkbox>
+        <md-checkbox v-model="userStatusToDownload.red" value=true>Red</md-checkbox>
+      </md-dialog-content>
+
+
+      <md-dialog-actions>
+        <md-button class="md-primary" @click="setUserStatus = false">Close</md-button>
+        <md-button class="md-primary" @click="setUserStatus = false; downloadUserStatusAsCSV()">Download</md-button>
+      </md-dialog-actions>
+    </md-dialog>
 
     <hr class="my-3"/>
 
@@ -709,6 +730,12 @@ export default {
         statusCodeToSet: -1,
         selectedUserIds: [],
         locationToSet: null
+      },
+      setUserStatus: false,
+      userStatusToDownload: {
+        green: null,
+        orange: null,
+        red: null,
       }
     };
   },
@@ -737,6 +764,13 @@ export default {
     }
   },
   methods: {
+    downloadUserStatusAsCSV() {
+      this.$api.post("/api/admin/download-status", {selection: this.userStatusToDownload}).then(msg => {
+        if (msg.data) {
+          downloadCSV(msg.data, `User Status_${new Date().toLocaleDateString()}:${new Date().getHours()}:${new Date().getMinutes()}.csv`);
+        }
+      });
+    },
     submitDeleteUser() {
       this.deleteActive = false;
 

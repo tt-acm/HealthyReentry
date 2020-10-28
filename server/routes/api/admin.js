@@ -7,6 +7,9 @@ const eg = require('../../lib/build_encounter_graph');
 const triggerUpdates = require('../../lib/trigger_updates');
 const storedRegions = require('../../util/officeList');
 
+var moment = require('moment');
+moment().format();
+
 
 
 /**
@@ -15,7 +18,7 @@ const storedRegions = require('../../util/officeList');
  * @apiDescription Only allow admins to access admin routes
  * @apiGroup admin
  */
-router.use(function (req, res, next) {
+router.use(function(req, res, next) {
   if (!req.user.permissions.admin) {
     res.status("404").send("Not found");
   } else {
@@ -79,33 +82,59 @@ router.post("/get-users-by-filters", async function(req, res) {
     "location": 1
   };
 
-  let filteredCountQuery = !Array.isArray(offices)
-                          ? User.count({ name: {'$regex': nameSearch, '$options': 'i'} })
-                          : User.count({
-                              name: {'$regex': nameSearch, '$options': 'i'},
-                              location: {$in: offices}
-                            });
+  let filteredCountQuery = !Array.isArray(offices) ?
+    User.count({
+      name: {
+        '$regex': nameSearch,
+        '$options': 'i'
+      }
+    }) :
+    User.count({
+      name: {
+        '$regex': nameSearch,
+        '$options': 'i'
+      },
+      location: {
+        $in: offices
+      }
+    });
   let filteredCount = await filteredCountQuery.exec();
 
-  let findQuery = !Array.isArray(offices)
-                ? User.find({ name: {'$regex': nameSearch, '$options': 'i'} }, include)
-                : User.find({
-                    name: {'$regex': nameSearch, '$options': 'i'},
-                    location: {$in: offices}
-                  }, include);
+  let findQuery = !Array.isArray(offices) ?
+    User.find({
+      name: {
+        '$regex': nameSearch,
+        '$options': 'i'
+      }
+    }, include) :
+    User.find({
+      name: {
+        '$regex': nameSearch,
+        '$options': 'i'
+      },
+      location: {
+        $in: offices
+      }
+    }, include);
 
   const dbUsers = await findQuery
-                        .sort({ name: 1})
-                        .skip(skip)
-                        .limit(limit)
-                        .exec();
+    .sort({
+      name: 1
+    })
+    .skip(skip)
+    .limit(limit)
+    .exec();
 
   let users = [];
-  for(let u of dbUsers) {
+  for (let u of dbUsers) {
     let nu = u.toObject();
-    const st = await Status.find({ "user": nu._id })
-                           .sort({ date: -1 })
-                           .limit(1);
+    const st = await Status.find({
+        "user": nu._id
+      })
+      .sort({
+        date: -1
+      })
+      .limit(1);
     nu.status = st[0];
     users.push(nu)
   }
@@ -147,7 +176,11 @@ router.get("/get-uncategorized-offices", async function(req, res) {
   let include = {
     "location": 1
   };
-  let locs = await User.find({ location: {$nin: knownOffices} }, include).exec();
+  let locs = await User.find({
+    location: {
+      $nin: knownOffices
+    }
+  }, include).exec();
 
   locs.forEach(l => unknownOffices.add(l.location));
   let ret = Array.from(unknownOffices);
@@ -183,8 +216,10 @@ router.post("/get-office-stats", async function(req, res) {
   let offices = req.body.selectedLocations;
 
   let ret = [];
-  for(let o of offices) {
-    let users = await User.find({ location: o }).exec();
+  for (let o of offices) {
+    let users = await User.find({
+      location: o
+    }).exec();
 
     let stats = {
       green: 0,
@@ -192,13 +227,17 @@ router.post("/get-office-stats", async function(req, res) {
       red: 0,
       total: users.length
     };
-    for(let u of users) {
-      let st = (await Status.find({ "user": u._id })
-                            .sort({ date: -1 })
-                            .limit(1))[0];
-      if(st.status === 0) stats.green++;
-      else if(st.status === 1) stats.orange++;
-      else if(st.status === 2) stats.red++;
+    for (let u of users) {
+      let st = (await Status.find({
+          "user": u._id
+        })
+        .sort({
+          date: -1
+        })
+        .limit(1))[0];
+      if (st.status === 0) stats.green++;
+      else if (st.status === 1) stats.orange++;
+      else if (st.status === 2) stats.red++;
     }
 
     let officeStats = {
@@ -245,16 +284,22 @@ router.post("/get-office-status-updates", async function(req, res) {
 
   let ret = [];
   let d = new Date();
-  d.setHours(0,0,0,0);
+  d.setHours(0, 0, 0, 0);
   let cutoffDate = d.setDate(d.getDate() - 7);
 
-  for(let o of offices) {
-    let allUsers = await User.find({ location: o }, include).exec();
+  for (let o of offices) {
+    let allUsers = await User.find({
+      location: o
+    }, include).exec();
     let unreportedUsers = [];
-    for(let u of allUsers) {
-      let st = (await Status.find({ "user": u._id })
-                            .sort({ date: -1 })
-                            .limit(1))[0];
+    for (let u of allUsers) {
+      let st = (await Status.find({
+          "user": u._id
+        })
+        .sort({
+          date: -1
+        })
+        .limit(1))[0];
       if (st.date < cutoffDate) {
         let user = u.toObject();
         user.status = st;
@@ -335,11 +380,11 @@ router.post("/update-users", async function(req, res) {
 
   const savedData = [];
 
-  for(const userData of data.selectedUserIds) {
+  for (const userData of data.selectedUserIds) {
 
     let user = await User.findById(userData.userId);
 
-    if(mustSetLocation) {
+    if (mustSetLocation) {
       user.location = data.locationToSet;
       await user.save();
     }
@@ -350,9 +395,13 @@ router.post("/update-users", async function(req, res) {
 
       let statusEnum = parseInt(data.statusCodeToSet);
 
-      const latestStatus = await Status.find({ "user": userData.userId })
-                             .sort({ date: -1 })
-                             .limit(1);
+      const latestStatus = await Status.find({
+          "user": userData.userId
+        })
+        .sort({
+          date: -1
+        })
+        .limit(1);
       var ls;
       if (latestStatus && latestStatus.length > 0) ls = latestStatus[0];
 
@@ -375,9 +424,13 @@ router.post("/update-users", async function(req, res) {
 
     } else {
 
-      const st = await Status.find({ "user": user._id })
-                              .sort({ date: -1 })
-                              .limit(1);
+      const st = await Status.find({
+          "user": user._id
+        })
+        .sort({
+          date: -1
+        })
+        .limit(1);
       savedStatus = st[0];
 
     }
@@ -430,12 +483,110 @@ router.post("/get-graph", async function(req, res) {
     return;
   }
   let graphs = [];
-  for(let email of emailList) {
+  for (let email of emailList) {
     let graph = await eg(email, incubationDays);
     graphs.push(graph);
   }
   res.json(graphs);
 });
+
+
+router.post("/download-status", async function(req, res) {
+  console.log("req.body.selection", req.body.selection);
+  const colorDict = ["Green", "Orange", "Red"];
+
+  getAllUser().then(allUserWithStatus => {
+
+    var greenUser = [];
+    var orangeUser = [];
+    var redUser = [];
+
+
+    let csv = "Status,Name,Email,Office,Status Last Updated Date\r\n";
+
+    if (req.body.selection.green === "true") {
+      greenUser = allUserWithStatus.filter(u=> u.status.status=== 0);
+      greenUser.forEach(gr=>{
+        csv += nodeToCsv(gr);
+      })
+
+    }
+    if (req.body.selection.orange === "true") {
+      orangeUser = allUserWithStatus.filter(u=> u.status.status=== 1);
+      orangeUser.forEach(or=>{
+        csv += nodeToCsv(or);
+      })
+    }
+    if (req.body.selection.red === "true") {
+      redUser = allUserWithStatus.filter(u=> u.status.status=== 2);
+      redUser.forEach(rr=>{
+        csv += nodeToCsv(rr);
+      })
+    }
+    // console.log("greenUser", greenUser);
+    // console.log("orangeUser", orangeUser);
+    // console.log("redUser", redUser);
+
+    res.json(csv);
+  });
+
+
+  function nodeToCsv(node) {
+      return `${colorDict[node.status.status]},${node.name},${node.email},${node.location},${moment(node.status.date).format('MMMM Do YYYY')}\r\n`;
+  }
+
+  function getAllUser() {
+    return new Promise((resolve, reject) => {
+      let userSelect = {
+        "_id": 1,
+        "email": 1,
+        "name": 1,
+        "location": 1
+      };
+
+      User.find({}, userSelect)
+        .exec(function(err, userArray) {
+          if (err) {
+            return res.status(500).send();
+          }
+          // return res.json(user);
+
+          let promiseArray = [];
+          userArray.forEach((u) => {
+            promiseArray.push(getUserStatus(u));
+          });
+
+          Promise.all(promiseArray).then((values) => {
+            resolve(values);
+          });
+        });
+    })
+  }
+
+  function getUserStatus(user) {
+    return new Promise((resolve, reject) => {
+
+      var jsonString = JSON.stringify(user);
+      var userObj = JSON.parse(jsonString);
+
+      var currentUser = userObj;
+      Status.find({
+          "user": currentUser._id
+        })
+        .sort({
+          date: -1
+        })
+        .limit(1)
+        .exec(function(error, st) {
+          currentUser.status = st[0];
+          resolve(currentUser);
+        });
+    })
+  }
+});
+
+
+
 
 
 
@@ -444,7 +595,7 @@ const triggerUpdateQueue = [];
 
 async function triggerQueue(ls) {
 
-  while(triggerUpdateQueue.length > 0) {
+  while (triggerUpdateQueue.length > 0) {
     let triggerData = triggerUpdateQueue.shift();
 
     let success = await triggerUpdates(triggerData, true, ls);
