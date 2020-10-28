@@ -55,6 +55,7 @@ let userCountByOffice = {
     "Mississauga": 12,
     "Moscow": 1,
     "Mumbai": 86,
+    "New York - 120 Broadway": 396,
     "New York - Downtown": 155,
     "New York - Madison": 241,
     "Newark": 32,
@@ -134,9 +135,11 @@ MongoClient.connect(url, {
               /////////
               var currentOfficePop1;//default container
               var currentOfficePop2;
+              var currentOfficePop3;
               if (office === "New York") {
                 currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === "New York - Downtown");
                 currentOfficePop2 = allWorkPreferences.filter(wp=>wp.office === "New York - Madison");
+                currentOfficePop3 = allWorkPreferences.filter(wp=>wp.office === "New York - 120 Broadway");
               }
               else if (office === "Edinburgh") {
                 currentOfficePop1 = allWorkPreferences.filter(function (wp) {
@@ -162,14 +165,23 @@ MongoClient.connect(url, {
                   if (!uniqueUserinOffice2.includes(curUser)) uniqueUserinOffice2.push(curUser);
                 })
               }
+              let uniqueUserinOffice3 = [];
+              if (currentOfficePop3 && currentOfficePop3.length > 0) {
+                currentOfficePop3.forEach(cop=>{
+                  let curUser = String(cop.user);
+                  if (!uniqueUserinOffice3.includes(curUser)) uniqueUserinOffice3.push(curUser);
+                })
+              }
 
               var employeeInOffice = uniqueUserinOffice1.length;
               var employeeInOffice2 = uniqueUserinOffice2.length;
+              var employeeInOffice3 = uniqueUserinOffice3.length;
 
               if (office === "New York") {
                 csv3 += `${office},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${''},${''}\r\n`;
                 csv3 += `${"New York-Downtown"},${''},${''},${''},${''},${userCountByOffice["New York - Downtown"]},${employeeInOffice},${String((employeeInOffice/userCountByOffice["New York - Downtown"]*100).toFixed(2)) + "%"}\r\n`;
                 csv3 += `${"New York-Midtown"},${''},${''},${''},${''},${userCountByOffice["New York - Madison"]},${employeeInOffice2}, ${String((employeeInOffice2/userCountByOffice["New York - Madison"]*100).toFixed(2)) + "%"}\r\n`;
+                csv3 += `${"New York-120 Broadway"},${''},${''},${''},${''},${userCountByOffice["New York - 120 Broadway"]},${employeeInOffice3}, ${String((employeeInOffice3/userCountByOffice["New York - Madison"]*100).toFixed(2)) + "%"}\r\n`;
               }
               else csv3 += `${office},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${userCountByOffice[office]},${employeeInOffice}, ${String((employeeInOffice/userCountByOffice[office]*100).toFixed(2)) + "%"}\r\n`;
 

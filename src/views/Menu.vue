@@ -192,6 +192,7 @@ export default {
         "Mississauga",
         "Moscow",
         "Mumbai",
+        "New York - 120 Broadway",
         "New York - Downtown",
         "New York - Madison",
         "Newark",
