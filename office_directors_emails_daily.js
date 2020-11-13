@@ -122,11 +122,11 @@ let userCountByOffice = {
 }
 
 let zones = {};
-zones["-7"] = ["Los Angeles", "San Francisco", "Seattle", "Wellington", "San Diego", 'Santa Clara'];
-zones["-6"] = ["Washington", "Philadelphia", "Fort Lauderdale", "Dallas", "Albuquerque", "Austin", "Phoenix"];
-zones["-5"] = ["Chicago", "Kansas City", "Denver", "Milwaukee", "Houston"];
-zones["-4"] = ["New York - 120 Broadway", "New York - Downtown", "New York - Madison", "Newark", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
-zones["-3"] = ["Halifax"];
+zones["-8"] = ["Los Angeles", "San Francisco", "Seattle", "San Diego", 'Santa Clara'];
+zones["-7"] = ["Denver", "Albuquerque", "Phoenix"];
+zones["-6"] = ["Chicago", "Kansas City", "Milwaukee", "Houston", "Dallas", "Austin"];
+zones["-5"] = ["New York - 120 Broadway", "New York - Downtown", "New York - Madison", "Newark", "Philadelphia", "Washington", "Fort Lauderdale", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
+zones["-4"] = ["Halifax"];
 zones["1"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen"];
 zones["2"] = ["Copenhagen", "Bristol"];
 zones["3"] = ["Moscow"];
@@ -134,6 +134,7 @@ zones["4"] = ["Dubai"];
 zones["5"] = ["Mumbai"];
 zones["8"] = ["Shanghai", "Beijing", "Ho Chi Minh City", "Hong Kong", "Perth"];
 zones["10"] = ["Sydney"];
+zones["12"] = ["Wellington"];
 
 
 function calcLocalTime(offset) {
