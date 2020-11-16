@@ -37,7 +37,7 @@ function checkUsersStatus(client_db) {
     let allUsersCount = 0
     let emails = [];
 
-    collection.find().count().then(function (count) {
+    collection.find({ location: { $nin: [ "Sydney", "Perth"] } }).count().then(function (count) {
         console.log("Total users count :", count);
 
         allUsersCount = count;
