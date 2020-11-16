@@ -55,7 +55,7 @@ let directors = {
     "Phoenix": "rbaxter@thorntontomasetti.com",
     "Portland": ["mpulaski@thorntontomasetti.com", "pbecker@thorntontomasetti.com"],
     "Romsey": "gheward@thorntontomasetti.com",
-    "San Diego": "klegenza@thorntontomasetti.com",
+    "San Diego": "MConachen@ThorntonTomasetti.com",
     'San Francisco': ["tcurtis@thorntontomasetti.com", "bshen@thorntontomasetti.com"],
     "Santa Clara": "kdebus@thorntontomasetti.com",
     "Seattle": "bmacrae@thorntontomasetti.com",
