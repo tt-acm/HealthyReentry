@@ -42,7 +42,7 @@ function checkUsersStatus(client_db) {
 
         allUsersCount = count;
 
-        const cursor = collection.find();
+        const cursor = collection.find({ location: { $nin: [ "Sydney", "Perth"] } });
         cursor.forEach(function (user) {
 
             statusCollection.find({
