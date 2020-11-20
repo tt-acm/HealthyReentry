@@ -53,7 +53,7 @@ let directors = {
     "San Diego": "MConachen@ThorntonTomasetti.com",
     'San Francisco': ["tcurtis@thorntontomasetti.com","bshen@thorntontomasetti.com"],
     "Santa Clara": "kdebus@thorntontomasetti.com",
-    "Seattle": "bmacrae@thorntontomasetti.com",
+    "Seattle": ["bmacrae@thorntontomasetti.com", "BMorgen@ThorntonTomasetti.com"],
     "Tampa": "DFusco@thorntontomasetti.com",
     "Toronto": "cminerva@thorntontomasetti.com",
     "Warrington": "pwoelke@thorntontomasetti.com",
