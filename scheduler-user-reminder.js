@@ -37,12 +37,18 @@ function checkUsersStatus(client_db) {
     let allUsersCount = 0
     let emails = [];
 
-    collection.find({ location: { $nin: [ "Sydney", "Perth"] } }).count().then(function (count) {
+    collection.find({
+      location: { $nin: [ "Sydney", "Perth"] },
+      dateOfConsent:{ $gt: new Date('2019-01-01') }
+     }).count().then(function (count) {
         console.log("Total users count :", count);
 
         allUsersCount = count;
 
-        const cursor = collection.find({ location: { $nin: [ "Sydney", "Perth"] } });
+        const cursor = collection.find({
+          location: { $nin: [ "Sydney", "Perth"] },
+          dateOfConsent:{ $gt: new Date('2019-01-01') }
+         });
         cursor.forEach(function (user) {
 
             statusCollection.find({
