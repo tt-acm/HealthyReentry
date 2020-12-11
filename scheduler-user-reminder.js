@@ -50,18 +50,31 @@ function checkUsersStatus(client_db) {
           dateOfConsent:{ $gt: new Date('2019-01-01') }
          });
         cursor.forEach(function (user) {
-
             statusCollection.find({
                 user: ObjectId(new ObjectId(user._id)),
                 date: {
                     "$gte": checkDate
                 }
             }).count().then(function (count) {
-
                 if (count === 0) {
                     console.log("user has not updated status", user.email);
-                    emails.push(user.email);
-                    isDone();
+                    // find latest status and only alert green/orange user
+                    statusCollection.find({
+                            user: ObjectId(new ObjectId(user._id))
+                        })
+                        .sort({
+                            date: -1
+                        })
+                        .limit(1).toArray(function (error, st) {
+                          if (Array.isArray(st) && st.length > 0 && st[0].status != 2) {
+                            emails.push(user.email);
+                            isDone();
+                          }
+                          else{
+                            isDone();
+                          }
+                        });
+
                 } else {
                     isDone();
                 }
@@ -87,7 +100,7 @@ function checkUsersStatus(client_db) {
 }
 
 sendEmail = (toEmails) => {
-    console.log("emails", toEmails)
+    console.log("emails", toEmails.length);
     if(toEmails.length === 0) return;
     const mailOptions = {
         to: toEmails,
