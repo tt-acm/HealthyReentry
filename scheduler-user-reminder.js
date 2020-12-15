@@ -38,6 +38,7 @@ function checkUsersStatus(client_db) {
     let emails = [];
 
     collection.find({
+      email: { $nin: ["amenchaca@thorntontomasetti.com"] },
       location: { $nin: [ "Sydney", "Perth"] },
       dateOfConsent:{ $gt: new Date('2019-01-01') }
      }).count().then(function (count) {
@@ -46,6 +47,7 @@ function checkUsersStatus(client_db) {
         allUsersCount = count;
 
         const cursor = collection.find({
+          email: { $nin: ["amenchaca@thorntontomasetti.com"] },
           location: { $nin: [ "Sydney", "Perth"] },
           dateOfConsent:{ $gt: new Date('2019-01-01') }
          });
