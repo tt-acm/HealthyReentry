@@ -127,14 +127,16 @@ zones["-7"] = ["Denver", "Albuquerque", "Phoenix"];
 zones["-6"] = ["Chicago", "Kansas City", "Milwaukee", "Houston", "Dallas", "Austin"];
 zones["-5"] = ["New York - 120 Broadway", "New York - Downtown", "New York - Madison", "Newark", "Philadelphia", "Washington", "Fort Lauderdale", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
 zones["-4"] = ["Halifax"];
-zones["1"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen"];
-zones["2"] = ["Copenhagen", "Bristol"];
+// zones["1"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen"];
+zones["0"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen", "Bristol"];
+zones["1"] = ["Copenhagen"];
+// zones["2"] = ["Copenhagen", "Bristol"];
 zones["3"] = ["Moscow"];
 zones["4"] = ["Dubai"];
 zones["5"] = ["Mumbai"];
 zones["8"] = ["Shanghai", "Beijing", "Ho Chi Minh City", "Hong Kong", "Perth"];
-zones["10"] = ["Sydney"];
-zones["12"] = ["Wellington"];
+zones["11"] = ["Sydney"];
+zones["13"] = ["Wellington"];
 
 
 function calcLocalTime(offset) {
