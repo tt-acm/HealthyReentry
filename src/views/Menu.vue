@@ -132,7 +132,10 @@ export default {
     // });
     this.$api.get("/api/workPreference/get-latest-preference").then(preference => {
       this.showDialog = true;
-      this.userOffice = preference.data.latestOffice;
+      if (this.offices.indexOf(preference.data.latestOffice) > -1) {
+        // old selection still exists in current list
+        this.userOffice = preference.data.latestOffice;
+      }
 
       if (preference.data.statusToday) {
         this.showDialog = false;
@@ -194,7 +197,7 @@ export default {
         "Mumbai",
         "New York - 120 Broadway",
         "New York - Downtown",
-        "New York - Madison",
+        // "New York - Madison",
         "Newark",
         "Ottawa",
         "Perth",
