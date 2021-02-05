@@ -151,7 +151,7 @@
       <!-- <md-button class="md-primary md-raised" @click="showDialog=!showDialog" :disabled="disableSubmit" id="nextBtn" style="width:240px">
         <h6 class="mb-0">Next</h6>
       </md-button> -->
-      <button type="button" class="btn btn-lg btn-block text-white md-accent" @click="showDialog=!showDialog" :disabled="disableSubmit" id="nextBtn" style="width:240px">
+      <button type="button" class="btn btn-lg btn-block text-white md-accent" @click="showDialog=!showDialog" :disabled="disableSubmit || selectedStatus == null" id="nextBtn" style="width:240px">
         Next
       </button>
     </md-list-item>
@@ -230,9 +230,10 @@ export default {
     this.$api.get("/api/status/get-current").then(returnedStatus => {
       var curStatus = returnedStatus.data;
       if (curStatus) {
-        this.latestStatus = curStatus;
+
 
         if (curStatus.status !== null) {
+          this.latestStatus = curStatus;
           this.activeTab = tabIds[curStatus.status];
           this.selectedStatus = curStatus.status;
 
@@ -324,6 +325,7 @@ export default {
     },
     submitEncounter() {
       // use this when status submitted -- this saves number
+      if (this.selectedStatus == null) return;
       const body = {
         status: this.selectedStatus
       }
