@@ -122,11 +122,11 @@ let userCountByOffice = {
 }
 
 let zones = {};
-zones["-8"] = ["Los Angeles", "San Francisco", "Seattle", "San Diego", 'Santa Clara'];
-zones["-7"] = ["Denver", "Albuquerque", "Phoenix"];
-zones["-6"] = ["Chicago", "Kansas City", "Milwaukee", "Houston", "Dallas", "Austin"];
-zones["-5"] = ["New York - 120 Broadway", "New York - Downtown", "New York - Madison", "Newark", "Philadelphia", "Washington", "Fort Lauderdale", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
-zones["-4"] = ["Halifax"];
+zones["-7"] = ["Los Angeles", "San Francisco", "Seattle", "San Diego", 'Santa Clara'];
+zones["-6"] = ["Denver", "Albuquerque", "Phoenix"];
+zones["-5"] = ["Chicago", "Kansas City", "Milwaukee", "Houston", "Dallas", "Austin"];
+zones["-4"] = ["New York - 120 Broadway", "New York - Downtown", "New York - Madison", "Newark", "Philadelphia", "Washington", "Fort Lauderdale", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
+zones["-3"] = ["Halifax"];
 // zones["1"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen"];
 zones["0"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen", "Bristol"];
 zones["1"] = ["Copenhagen"];
