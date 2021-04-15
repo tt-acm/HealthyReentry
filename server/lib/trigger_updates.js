@@ -19,6 +19,7 @@ const redContent = fs.readFileSync("./server/assets/email_templates/redContent.h
 
 const adminTemplate = fs.readFileSync("./server/assets/email_templates/adminTemplate.html").toString("utf-8");
 const adminTemplate_byHR = fs.readFileSync("server/assets/email_templates/adminTemplate_byHR.html").toString("utf-8");
+const adminTemplate_bySystem = fs.readFileSync("server/assets/email_templates/adminTemplate_bySystem.html").toString("utf-8");
 const userConfTemplate = fs.readFileSync("./server/assets/email_templates/userConfTemplate.html").toString("utf-8");
 const adminUpdateTemplate = fs.readFileSync("./server/assets/email_templates/adminUpdateTemplate.html").toString("utf-8");
 
@@ -27,8 +28,7 @@ const adminUpdateTemplate = fs.readFileSync("./server/assets/email_templates/adm
 // Admin route update status -- admin report -boolean -admin true
 // get graph here...
 // user.id and statusEnum
-async function triggerUpdates(triggerData, byAdmin, currentStatus) {
-
+async function triggerUpdates(triggerData, byAdmin, currentStatus, alertUser = true, bySystem = false) {
 
   try {
 
@@ -48,6 +48,7 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
 
     let adminEmailContent = adminTemplate.replace('<USER_NAME>', user.name).replace('<STATUS_LABEL>', status.label).replace('<TRACE_PERIOD>', variables.INCUBATION_PERIDOD);
     let adminEmailContent_byHR = adminTemplate_byHR.replace('<USER_NAME>', user.name).replace('<STATUS_LABEL>', status.label).replace('<TRACE_PERIOD>', variables.INCUBATION_PERIDOD);
+    let adminEmailContent_bySystem = adminTemplate_bySystem.replace('<USER_NAME>', user.name).replace('<STATUS_LABEL>', status.label).replace('<TRACE_PERIOD>', variables.INCUBATION_PERIDOD);
     let userConfContent = userConfTemplate.replace('<STATUS_LABEL>', status.label).replace('<STATUS_DATE>', localCurDate);
     let adminUpdateContent = adminUpdateTemplate.replace('<STATUS_LABEL>', status.label);
 
@@ -62,10 +63,12 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
     }
 
     // inform the user
-    if (byAdmin) {
-      sendEmail("Your status color has been changed", [user.email], adminUpdateContent);
-    } else {
-      sendEmail("You have updated your status color", [user.email], userConfContent);
+    if (alertUser) {
+      if (byAdmin || bySystem) {
+        sendEmail("Your status color has been changed", [user.email], adminUpdateContent);
+      } else {
+        sendEmail("You have updated your status color", [user.email], userConfContent);
+      }
     }
 
     if (statusEnum === 1) // Status Reported Orange
@@ -87,7 +90,11 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
       let attachment = new Buffer(csv).toString('base64');
       let filename = `Encounter_${formattedDate}_${status.label}_${user.name}.csv`;
       if (alertAdmin) {
-        if (byAdmin) {
+        debugger;
+        if (bySystem) {
+          sendEmail("Employee’s log - " + user.name, variables.ADMIN_USERS, adminEmailContent_bySystem, attachment, filename); //admin changed status
+        }
+        else if (byAdmin) {
           sendEmail("Employee’s log - " + user.name, variables.ADMIN_USERS, adminEmailContent_byHR, attachment, filename); //admin changed status
         } else {
           sendEmail("Employee’s log - " + user.name, variables.ADMIN_USERS, adminEmailContent, attachment, filename); //user changed their status themselves
@@ -161,9 +168,11 @@ async function triggerUpdates(triggerData, byAdmin, currentStatus) {
 
 
 
-function sendEmail(subject, toEmails, content, attachment, filename) {
-  const mailOptions = {
-    to: toEmails,
+function sendEmail(subject, emails, content, attachment, filename) {
+  const toEmails = Array.isArray(emails)? emails : [emails];
+
+  var mailOptions = {
+    // to: toEmails,
     from: process.env.SENDGRID_EMAIL,
     subject: subject || process.env.VUE_APP_NAME + " - TESTING",
     text: " ",
@@ -178,13 +187,29 @@ function sendEmail(subject, toEmails, content, attachment, filename) {
     }]
   };
 
+  const messages = [];
+  toEmails.forEach(function(toEmail){
+    var curOption = mailOptions;
+    curOption["to"] = toEmail;
+    messages.push(curOption);
+  })
+
   // https://www.twilio.com/blog/sending-bulk-emails-3-ways-sendgrid-nodejs
   // the recepients not able to see each other
-  sgClient.sendMultiple(mailOptions, function(err) {
-    if (err) {
-      console.log(err);
-    }
+
+  sgClient.send(messages).then(() => {
+    console.log('emails sent successfully to: ', toEmails);
+  }).catch(error => {
+    console.log(error);
   });
+
+  // https://www.twilio.com/blog/sending-bulk-emails-3-ways-sendgrid-nodejs
+  // the recepients not able to see each other
+  // sgClient.sendMultiple(mailOptions, function(err) {
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  // });
 
 }
 

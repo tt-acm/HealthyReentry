@@ -11,7 +11,7 @@ const Status = require('../../models/Status');
 
 const orangeContent = fs.readFileSync('server/assets/email_templates/orangeContent.html').toString("utf-8");
 const redContent = fs.readFileSync("server/assets/email_templates/redContent.html").toString("utf-8");
-
+const triggerUpdates = require('../../lib/trigger_updates');
 
 /**
  * @swagger
@@ -35,7 +35,7 @@ const redContent = fs.readFileSync("server/assets/email_templates/redContent.htm
  *              type: string
  *        - in: body
  *          name: isGroup
- *          description: If true it is considered as a group encounters which add all combinations of 
+ *          description: If true it is considered as a group encounters which add all combinations of
  *                       encounters within the group. If false add encounter only with the sender.
  *          schema:
  *            type: boolean
@@ -49,26 +49,25 @@ const redContent = fs.readFileSync("server/assets/email_templates/redContent.htm
  */
 router.post("/add-many", async function (req, res) {
 
-
     try {
 
         let ids = req.body.encounters.reduce(function (out, x) {
             out.push(x._id);
             return out;
         }, []);
-    
+
         let encounters = [];
-    
+
         if (req.body.isGroup) {
 
             // add sender to ids and add all combinations to encounter array
             ids.push(req.user.id);
-    
+
             let worstStatus = 0;
             let isGreen = [];
             let isOrange = [];
             let isRed = [];
-            
+
             let statuses = [];
 
             // get and group current statuses of everyone in the group
@@ -87,48 +86,65 @@ router.post("/add-many", async function (req, res) {
                 else if (st.status === 2) isRed.push(uid);
                 else isGreen.push(uid);
             }
-    
+
             // add all combinations of encounters since its a group encounter
             for (let k = 0; k < ids.length - 1; k++) {
-    
+
                 let id = ids[k];
-    
+
                 for (let l = k + 1; l < ids.length; l++) {
                     let e = new Encounter({
                         users: []
                     });
                     e.date = (req.body.date) ? req.body.date : new Date();
-                    
+
                     e.users.push(id);
                     e.users.push(ids[l]);
                     encounters.push(e.toObject());
                 }
-    
+
             }
 
             // if someone in the group is red, escalate everone who is green to orange and notify them
             if (worstStatus === 2) {
                 let newStatuses = [];
                 let emails = [];
+
                 for(let uid of isGreen) {
                     let u = await User.findOne({_id: uid});
                     emails.push(u.email);
+
+                    const oldStatus = new Status({
+                      status: 0,
+                      user: u,
+                      date: new Date()
+                    });
+
                     let status = new Status({
                       status: 1, // set status Orange
                       user: u,
                       date: new Date()
                     });
                     newStatuses.push(status);
+
+                    // Trigger update to HR
+                    const triggerData = {
+                      user: u,
+                      statusEnum: 1
+                    };
+
+                    triggerUpdates(triggerData, true, oldStatus, false, true);
                 }
                 await Status.insertMany(newStatuses);
                 if (emails.length > 0) {
                     // send notification email 30mins after event to avoid being traced by users
                     setTimeout(() => {
+
                         sendEmail("Attention: Refrain from coming to the office", emails, redContent);
                     }, 60000 * 30);
                 }
             }
-    
+
             // if someone in the group is orange, notify all greens of the risk
             else if (worstStatus === 1) {
                 let emails = [];
@@ -144,7 +160,7 @@ router.post("/add-many", async function (req, res) {
                 }
             }
 
-    
+
         } else {
 
             let user = await User.findOne({_id: req.user.id});
@@ -158,7 +174,7 @@ router.post("/add-many", async function (req, res) {
             })
             .limit(1))[0];
 
-            // if submitter is red; mark all others orange and notify them 
+            // if submitter is red; mark all others orange and notify them
             if (userStatus.status === 2) {
                 for(let id of ids) {
                     let st = (await Status.find({
@@ -177,9 +193,20 @@ router.post("/add-many", async function (req, res) {
                             date: new Date()
                         });
                         await newStatus.save();
+
+
+
                         // send notification email 30mins after event to avoid being traced by users
                         setTimeout(() => {
                             sendEmail("Attention: Refrain from coming to the office", [u.email], redContent);
+
+                            // Trigger update to HR
+                            const triggerData = {
+                              user: u,
+                              statusEnum: 1
+                            };
+
+                            triggerUpdates(triggerData, true, st, false, true);
                         }, 60000 * 30);
                     }
 
@@ -196,7 +223,7 @@ router.post("/add-many", async function (req, res) {
                         date: -1
                     })
                     .limit(1))[0];
-                    
+
                     if (st.status < 1) {
                         let u = await User.findOne({_id: id});
                         // send notification email 30mins after event to avoid being traced by users
@@ -204,13 +231,13 @@ router.post("/add-many", async function (req, res) {
                             sendEmail("Attention: Refrain from coming to the office", [u.email], orangeContent);
                         }, 60000 * 30);
                     }
-                    
+
                 }
             }
 
             // add encounters with the submitter one by one
             for(let id of ids) {
-    
+
                 let e = new Encounter({
                     users: []
                 });
@@ -219,7 +246,7 @@ router.post("/add-many", async function (req, res) {
                 e.users.push(req.user.id);
                 e.users.push(id);
                 encounters.push(e.toObject());
-                
+
                 let st = (await Status.find({
                     "user": id
                 })
@@ -235,10 +262,18 @@ router.post("/add-many", async function (req, res) {
                         user: user,
                         date: new Date()
                     });
-                    userStatus = await newStatus.save();
+                    await newStatus.save();
                     // send notification email 30mins after event to avoid being traced by users
                     setTimeout(() => {
                         sendEmail("Attention: Refrain from coming to the office", [user.email], redContent);
+
+                        // Trigger update to HR
+                        const triggerData = {
+                          user: user,
+                          statusEnum: 1
+                        };
+
+                        triggerUpdates(triggerData, true, userStatus, false, true);
                     }, 60000 * 30);
                 }
 
@@ -253,11 +288,11 @@ router.post("/add-many", async function (req, res) {
             }
 
         }
-    
+
         await Encounter.insertMany(encounters);
-        
+
         return res.json(true);
-        
+
 
     } catch (err) {
         console.log(err);
@@ -348,7 +383,7 @@ router.get("/find-frequent-encounters", function (req, res) {
  * path:
  *  /api/encounters/get-graph:
  *    get:
- *      summary: Get graphs of all encounters for current user, send email to admin and 
+ *      summary: Get graphs of all encounters for current user, send email to admin and
  *               notify downstream contacts.
  *      tags: [Encounters]
  *      produces:
@@ -400,17 +435,19 @@ router.post("/get-graph", function (req, res) {
 
 
 
-function sendEmail(subject, toEmails, content, attachment, filename) {
+function sendEmail(subject, emails, content, attachment, filename) {
     return new Promise(function(resolve, reject) {
-  
-      const mailOptions = {
-        to: toEmails,
+
+      const toEmails = Array.isArray(emails)? emails : [emails];
+
+      var mailOptions = {
+        // to: toEmails,
         from: process.env.SENDGRID_EMAIL,
         subject: subject || process.env.VUE_APP_NAME + " - TESTING",
         text: " ",
         html: content
       };
-  
+
       if (attachment) {
         mailOptions.attachments = [{
           "content": attachment,
@@ -418,21 +455,35 @@ function sendEmail(subject, toEmails, content, attachment, filename) {
           "type": "text/csv"
         }]
       }
-  
+
+      const messages = [];
+      toEmails.forEach(function(toEmail){
+        var curOption = mailOptions;
+        curOption["to"] = toEmail;
+        messages.push(curOption);
+      })
+
       // https://www.twilio.com/blog/sending-bulk-emails-3-ways-sendgrid-nodejs
       // the recepients not able to see each other
-  
-      sgClient.sendMultiple(mailOptions, function(err) {
-        if (err) {
-          reject(err);
-          return;
-        }
-  
-        resolve(mailOptions);
+
+      sgClient.send(messages).then(() => {
+        console.log('emails sent successfully to: ', toEmails);
+        resolve(messages);
+      }).catch(error => {
+        console.log(error);
       });
-  
+
+      // sgClient.sendMultiple(mailOptions, function(err) {
+      //   if (err) {
+      //     reject(err);
+      //     return;
+      //   }
+      //
+      //   resolve(mailOptions);
+      // });
+
     });
-  
+
 }
 
 

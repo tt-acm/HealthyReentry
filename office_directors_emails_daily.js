@@ -13,6 +13,7 @@ sgClient.setApiKey(process.env.SENDGRID_API_KEY);
 var sender ="healthyreentry-notifications@thorntontomasetti.com"
 var url = process.env.MONGO_URL;
 
+
 const fs = require('fs');
 var templateContent = fs.readFileSync("./server/assets/email_templates/officeDirectorsReport_daily.html").toString("utf-8");
 
@@ -320,10 +321,11 @@ function getWorkPreferences(client_db) {
 
 }
 
-function sendEmail(toEmail, location, attachment, emailContent) {
+function sendEmail(emails, location, attachment, emailContent) {
+    const toEmails = Array.isArray(emails)? emails : [emails];
 
     const mailOptions = {
-        to: toEmail,
+        // to: toEmail,
         // to: "hsun@thorntontomasetti.com",
         from: sender,
         bcc: 'hsun@thorntontomasetti.com',
@@ -340,15 +342,27 @@ function sendEmail(toEmail, location, attachment, emailContent) {
         }]
     }
     // console.log("mailOptions", mailOptions);
+    const messages = [];
+    toEmails.forEach(function(toEmail){
+      var curOption = mailOptions;
+      curOption["to"] = toEmail;
+      messages.push(curOption);
+    })
 
-    sgClient.send(mailOptions, function (err) {
-        console.log("err?", err)
-        if (err)
-            return;
-        else
-            console.log('sent');
-
+    sgClient.send(messages).then(() => {
+      console.log('emails sent successfully to: ', toEmails);
+    }).catch(error => {
+      console.log(error);
     });
+
+    // sgClient.send(mailOptions, function (err) {
+    //     console.log("err?", err)
+    //     if (err)
+    //         return;
+    //     else
+    //         console.log('sent');
+    //
+    // });
 
 
 

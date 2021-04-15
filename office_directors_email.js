@@ -332,10 +332,11 @@ function getWorkPreferences(client_db) {
     });
 }
 
-function sendEmail(toEmail, location, attachment, attachment2, attachment3) {
+function sendEmail(emails, location, attachment, attachment2, attachment3) {
+    const toEmails = Array.isArray(emails)? emails : [emails];
 
     const mailOptions = {
-        to: toEmail,
+        // to: toEmail,
         // to: "hsun@thorntontomasetti.com",
         from: sender,
         bcc: 'hsun@thorntontomasetti.com',
@@ -363,14 +364,27 @@ function sendEmail(toEmail, location, attachment, attachment2, attachment3) {
         ]
     }
 
-    sgClient.send(mailOptions, function (err) {
-        console.log("err?", err)
-        if (err)
-            return;
-        else
-            console.log('sent');
+    const messages = [];
+    toEmails.forEach(function(toEmail){
+      var curOption = mailOptions;
+      curOption["to"] = toEmail;
+      messages.push(curOption);
+    })
 
+    sgClient.send(messages).then(() => {
+      console.log('emails sent successfully to: ', toEmails);
+    }).catch(error => {
+      console.log(error);
     });
+
+    // sgClient.send(messages, function (err) {
+    //     console.log("err?", err)
+    //     if (err)
+    //         return;
+    //     else
+    //         console.log('sent');
+    //
+    // });
 
 
 

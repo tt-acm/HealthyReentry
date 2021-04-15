@@ -12,7 +12,6 @@ const fs = require('fs');
 var reminderTemplate = fs.readFileSync("./server/assets/email_templates/reminderTemplate.html").toString("utf-8");
 let reminderContent = reminderTemplate.replace(new RegExp('<PRODUCTION_URL>', 'g'), process.env.VUE_APP_URL);
 
-
 MongoClient.connect(process.env.MONGO_URL,{useUnifiedTopology: true}).then(function (db) {
     console.log("CONNECTED TO DB");
     checkUsersStatus(db);
@@ -101,25 +100,39 @@ function checkUsersStatus(client_db) {
 
 }
 
-sendEmail = (toEmails) => {
-    console.log("emails", toEmails.length);
-    if(toEmails.length === 0) return;
+sendEmail = (emails) => {
+    console.log("emails", emails.length);
+    if(emails.length === 0) return;
     const mailOptions = {
-        to: toEmails,
+        // to: toEmails,
         from: sender,
         subject: "Please report your health status",
         html: reminderContent
         // text: "This is a friendly reminder that you haven't reported your status last 7 days, please sign in the Healthy Reentry app and submit your status."
     };
 
-    sgClient.sendMultiple(mailOptions, function (err) {
-        console.log("err?", err)
-        if (err)
-            return;
-        else
-            console.log('sent');
+    const toEmails = Array.isArray(emails)? emails : [emails];
+
+    const messages = [];
+    toEmails.forEach(function(toEmail){
+      var curOption = mailOptions;
+      curOption["to"] = toEmail;
+      messages.push(curOption);
+    })
 
 
+    sgClient.send(messages).then(() => {
+      console.log('emails sent successfully to: ', toEmails);
+    }).catch(error => {
+      console.log(error);
     });
+
+    // sgClient.sendMultiple(mailOptions, function (err) {
+    //     console.log("err?", err)
+    //     if (err)
+    //         return;
+    //     else
+    //         console.log('sent');
+    // });
 
 }

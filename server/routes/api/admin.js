@@ -492,7 +492,6 @@ router.post("/get-graph", async function(req, res) {
 
 
 router.post("/download-status", async function(req, res) {
-  console.log("req.body.selection", req.body.selection);
   const colorDict = ["Green", "Orange", "Red"];
 
   getAllUser().then(allUserWithStatus => {

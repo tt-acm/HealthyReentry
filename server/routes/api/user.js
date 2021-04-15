@@ -116,7 +116,7 @@ router.get("/consent-signed", function (req, res) {
       };
 
       // https://github.com/sendgrid/sendgrid-python/blob/master/USAGE.md#post-mailsend
-      sgClient.sendMultiple(mailOptions, function (err) {
+      sgClient.send(mailOptions, function (err) {
         if (err) {
           console.log("email failed", err);
           reject();
