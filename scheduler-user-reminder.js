@@ -115,7 +115,7 @@ sendEmail = (emails) => {
 
     const messages = [];
     toEmails.forEach(function(toEmail){
-      var curOption = mailOptions;
+      var curOption = JSON.parse(JSON.stringify(mailOptions))
       curOption["to"] = toEmail;
       messages.push(curOption);
     })
