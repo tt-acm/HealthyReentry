@@ -56,14 +56,6 @@ export default new VueRouter({
         title: route => "Healthy Reentry: Welcome",
         guest: true
       },
-      beforeEnter: (to, from, next) => {
-        if (store.state.user) {
-          console.log("store.state.user.dateOfConsent", store.state.user.dateOfConsent);
-          if (!store.state.user.dateOfConsent) return next('/disclosure');
-          else return next('/menu');
-        }
-        return next();
-      },
       props: true
     },
     {
