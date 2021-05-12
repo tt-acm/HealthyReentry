@@ -17,7 +17,7 @@
   </div>
 
 
-  <div class="mx-5 center" id="mainControls">
+  <div class="mx-5 center" id="mainControls" style="margin-top: 10vh">
     <md-list v-if="user" id="controlButtons">
       <md-list-item>
         <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent" @click="showDialog=true; modalDismissable=true">
@@ -432,7 +432,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 65vh;
+  /* height: 65vh; */
   /* border: 3px solid green; */
 }
 
