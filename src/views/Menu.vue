@@ -149,6 +149,10 @@
                       <md-option value="JohnsonJohnson">Johnson & Johnson’s Janssen</md-option>
                       <md-option value="AstraZeneca">AstraZeneca</md-option>
                       <md-option value="Novavax">Novavax</md-option>
+                      <md-option value="Covishield">Covishield</md-option>       
+                      <md-option value="Sinopharm">Sinopharm</md-option>
+                      <md-option value="CanSinoBIO">CanSinoBIO</md-option>
+                      <md-option value="CVnCoV">CVnCoV</md-option>                      
                       <md-option value="Other">Other</md-option>
                     </md-select>
                   </md-field>
