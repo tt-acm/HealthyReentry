@@ -10,7 +10,7 @@
 
     <div v-if="vaccinationsToDisplay.length > 0" class="card-body p-2 d-flex" id="vacCardBackground" >
       <h6 class="mb-0">
-        <b>Last Vaccinated on:</b> {{showDisplayDate(new Date(vaccinationsToDisplay[0].date), 'll')}}         
+        <b>Last Vaccinated on:</b> {{showDisplayDate(new Date(vaccinationsToDisplay[vaccinationsToDisplay.length-1].date), 'll')}}         
       </h6>
       <a class="ml-4 text-muted" @click="launchVaccinationDetails = true">Click here for more details</a>
     </div>
@@ -254,6 +254,7 @@ export default {
 
     this.$api.get("/api/vaccination/get-all").then(returnedVac => {
       this.vaccinationsToDisplay = returnedVac.data;
+      console.log(this.vaccinationsToDisplay);
     });
 
     // this.$api.get("/api/user/get-available-offices").then(offices => {
