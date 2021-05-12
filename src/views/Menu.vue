@@ -1,13 +1,22 @@
 <template>
 <!-- <div class="mx-auto" style="transform: translateY(150%)"> -->
 <div>
-  <div v-if="latestStatus" class="card mx-auto" id="statusCard" style="margin-top: 10px;">
-    <div class="card-body p-2 text-white" id="statusCardBackground" :style="styleObject">
-      <h6 class="ml-auto mt-auto mb-0">
+  <div  class="card mx-auto" id="statusCard" style="margin-top: 10px;">
+    <div v-if="latestStatus" class="card-body p-2 text-white" id="statusCardBackground" :style="styleObject">
+      <h6 class="mb-0">
         <b>Last Updated on:</b> {{showDisplayDate(new Date(latestStatus.date), 'll')}} as {{status[latestStatus.status]}}
       </h6>
     </div>
+
+    <div v-if="vaccinationsToDisplay.length > 0" class="card-body p-2 d-flex" id="vacCardBackground" >
+      <h6 class="mb-0">
+        <b>Last Vaccinated on:</b> {{showDisplayDate(new Date(vaccinationsToDisplay[0].date), 'll')}}         
+      </h6>
+      <a class="ml-4 text-muted" @click="launchVaccinationDetails = true">Click here for more details</a>
+    </div>
   </div>
+
+
   <div class="mx-5 center" id="mainControls">
     <md-list v-if="user" id="controlButtons">
       <md-list-item>
@@ -46,6 +55,12 @@
             <h6 class="mb-0 text-white">Display QR Code</h6>
           </md-button> -->
         </router-link>
+      </md-list-item>
+
+      <md-list-item>
+          <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent" @click="launchVaccinationForm=true;vaccineTab=1">
+            Record Your Vaccination Status
+          </button>
       </md-list-item>
       <!-- </div> -->
     </md-list>
@@ -87,12 +102,6 @@
               If you are Orange or Red, please refrain from coming into the office.
             </small>
           </md-radio>
-          <!-- <div class="form-check ml-1" style="margin-top: 70px">
-            <input class="form-check-input" type="checkbox" id="defaultCheck1" v-model="confirmOffice">
-            <label class="form-check-label" for="defaultCheck1">
-              I agree with my selection above.
-            </label>
-          </div> -->
         </md-content>
       </md-dialog-content>
 
@@ -107,6 +116,125 @@
       </md-dialog-actions>
     </md-dialog>
   <!-- </md-content> -->
+
+  <!-- Vaccination record modal -->
+  <md-dialog :md-active.sync="launchVaccinationForm">
+      <md-dialog-title class="pb-0 mb-2">
+        Record Your Vaccination Status
+      </md-dialog-title>
+
+
+      <md-dialog-content style="height: 70vh; max-width: 550px">
+        <span v-if="vaccineTab==1" class="text-muted">
+          Select your vaccine manufacturer from the drop down, then select the date of your dose and click the <b>Add Date</b> button. 
+          Repeat this step to add the dates of each dose, including booster shots (if applicable).
+        </span>
+        <span v-else class="text-muted">
+          Review the details below then click <b>Submit</b>. To edit, click <b>Go Back</b>.
+        </span>
+
+        <md-content class="mt-3">
+          <md-card v-if="vaccineTab == 1" id="add-vaccination-card" class="md-elevation-1">
+            <md-card-content>
+              <div class="row">
+                <div class="col-12 col-sm-5">
+                  Vaccine Manufacturer:
+                </div>
+                <div class="col-12 col-sm-7">                  
+                  <md-field>
+                    <label for="font">Choose the manufacturer</label>
+                    <md-select v-model="curVaccineManufacturer" name="vaccine" id="vaccine" placeholder="Choose the manufacturer">
+                      <md-option value="Pfizer">Pfizer-BioNTech</md-option>
+                      <md-option value="Moderna">Moderna</md-option>
+                      <md-option value="JohnsonJohnson">Johnson & Johnson’s Janssen</md-option>
+                      <md-option value="AstraZeneca">AstraZeneca</md-option>
+                      <md-option value="Novavax">Novavax</md-option>
+                      <md-option value="Other">Other</md-option>
+                    </md-select>
+                  </md-field>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 col-sm-5">
+                  Date:
+                </div>
+                <div class="col-12 col-sm-7">
+                  <md-datepicker v-model="curVaccineDate" :md-disabled-dates="disabledVaccinationDates" md-immediately>
+                    <label>Select a date</label>
+                  </md-datepicker>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-md text-white md-accent" @click="addVaccinateToRecord()" :disabled="curVaccineManufacturer==null || curVaccineDate== null">
+                Add Date
+              </button>
+
+            </md-card-content>
+          </md-card>
+
+
+          <div v-show="vaccinationsToDisplay.length > 0" id="vaccination-records">
+            <md-table v-model="vaccinationsToDisplay" class="mt-3 md-elevation-1" md-card>
+              <md-table-toolbar class="pl-0">
+                <h1 class="md-title">Vaccination Records</h1>
+              </md-table-toolbar>
+
+              <md-table-row slot="md-table-row" slot-scope="{ item, index }">
+                <md-table-cell md-label="Date">{{showDisplayDate(item.date, 'll')}}</md-table-cell>
+                <md-table-cell md-label="Manufacturer">{{ item.manufacturer }}</md-table-cell>
+                <md-table-cell md-label="">
+                  <button v-show="item.new" type="button" class="btn btn-md" @click="deleteVaccineSelection(index)">
+                    <md-icon class="fa fa-minus-circle" ></md-icon>
+                  </button>
+                </md-table-cell>
+              </md-table-row>
+            </md-table>
+          </div>
+
+        </md-content>
+      </md-dialog-content>
+
+      <md-dialog-actions>
+        <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="setVaccineTab()">Go Back</button>
+        <button v-if="vaccineTab == 1" type="button" class="btn btn-md text-white md-accent" @click="vaccineTab = 2" :disabled="this.vaccinationsToDisplay.length < 1">
+          Next
+        </button>
+        <button v-else type="button" class="btn btn-md text-white md-accent" @click="launchVaccinationForm = false;submitVaccinationRecord()">
+          Submit
+        </button>
+      </md-dialog-actions>
+  </md-dialog>
+
+  <!-- Vaccination detail modal -->
+  <md-dialog :md-active.sync="launchVaccinationDetails">
+      <md-dialog-title class="pb-0 mb-2">
+        Your Vaccination Record
+      </md-dialog-title>
+
+
+      <md-dialog-content style="height: 70vh; min-width: 50vw">        
+        <md-content class="mt-3">
+          
+          <div id="vaccination-records">
+            <md-table v-model="vaccinationsToDisplay" class="mt-3 md-elevation-1" md-card>
+              <!-- <md-table-toolbar class="pl-0">
+                <h1 class="md-title">Vaccination Records</h1>
+              </md-table-toolbar> -->
+
+              <md-table-row slot="md-table-row" slot-scope="{ item }">
+                <md-table-cell md-label="Date">{{showDisplayDate(item.date, 'll')}}</md-table-cell>
+                <md-table-cell md-label="Manufacturer">{{ item.manufacturer }}</md-table-cell>
+              </md-table-row>
+            </md-table>
+          </div>
+        </md-content>
+      </md-dialog-content>
+
+      <md-dialog-actions>
+        <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="launchVaccinationDetails = false">Go Back</button>
+      </md-dialog-actions>
+  </md-dialog>
 </div>
 </template>
 <script>
@@ -120,7 +248,12 @@ export default {
   created() {
     this.$api.get("/api/status/get-current").then(returnedStatus => {
       this.latestStatus = returnedStatus.data;
+      console.log("latest status", this.latestStatus);
       this.styleObject.backgroundColor = statusColors[returnedStatus.data.status];
+    });
+
+    this.$api.get("/api/vaccination/get-all").then(returnedVac => {
+      this.vaccinationsToDisplay = returnedVac.data;
     });
 
     // this.$api.get("/api/user/get-available-offices").then(offices => {
@@ -130,6 +263,7 @@ export default {
     //     if (officeIndex !== -1) this.userOffice = this.offices[officeIndex];
     //   }
     // });
+
     this.$api.get("/api/workPreference/get-latest-preference").then(preference => {
       this.showDialog = true;
       if (this.offices.indexOf(preference.data.latestOffice) > -1) {
@@ -220,7 +354,17 @@ export default {
       ],
       confirmOffice: false,
       latestPreference: null,
-      modalDismissable: false
+      modalDismissable: false,
+      launchVaccinationForm: false,
+      curVaccineManufacturer: null,
+      curVaccineDate: null,
+      disabledVaccinationDates: date => {
+        const today = new Date();
+        return date >= today;
+      },
+      vaccinationsToDisplay:[],
+      vaccineTab:1,
+      launchVaccinationDetails: false
     };
   },
   computed: Vuex.mapState({
@@ -247,6 +391,32 @@ export default {
     },
     showDisplayDate(date, format) {
       return this.moment(date).format(format);
+    },
+    addVaccinateToRecord() {
+      this.vaccinationsToDisplay.push({
+        manufacturer: this.curVaccineManufacturer,
+        date: this.curVaccineDate,
+        new: true
+      });
+    },
+    setVaccineTab() {
+      if (this.vaccineTab == 1) this.launchVaccinationForm = false;
+      else this.vaccineTab = 1;
+    },
+    deleteVaccineSelection(index) {
+      this.vaccinationsToDisplay.splice(index, 1);
+    },
+    submitVaccinationRecord() {
+      const newVaccination = this.vaccinationsToDisplay.filter(v=> {
+        return v.new == true;
+      });
+
+      console.log("newvaccination", newVaccination);
+
+      this.$api.post("/api/vaccination/add-vaccination-records", newVaccination).then(record => {
+        console.log("record", record.data);
+        this.vaccinationsToDisplay = record.data;
+      });
     }
   }
 };
