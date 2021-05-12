@@ -66,8 +66,8 @@ async function main() {
         //   if (to.name === "disclosure") return next();
         //   else return next("/disclosure");//route signed user to sign
         // }
-          if (to.name === "home" || to.name === "disclosure") return next("/menu");//route signed user to menu
-          else return next();
+        if (to.name === "home" || to.name === "disclosure") return next("/menu");//route signed user to menu
+        else return next();
 
       }
 
