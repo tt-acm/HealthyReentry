@@ -200,7 +200,7 @@
         <button v-if="vaccineTab == 1" type="button" class="btn btn-md text-white md-accent" @click="vaccineTab = 2" :disabled="this.vaccinationsToDisplay.length < 1">
           Next
         </button>
-        <button v-else type="button" class="btn btn-md text-white md-accent" @click="launchVaccinationForm = false;submitVaccinationRecord()">
+        <button v-else type="button" class="btn btn-md text-white" style="background-color:blue" @click="launchVaccinationForm = false;submitVaccinationRecord()">
           Submit
         </button>
       </md-dialog-actions>
@@ -414,7 +414,6 @@ export default {
       console.log("newvaccination", newVaccination);
 
       this.$api.post("/api/vaccination/add-vaccination-records", newVaccination).then(record => {
-        console.log("record", record.data);
         this.vaccinationsToDisplay = record.data;
       });
     }

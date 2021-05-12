@@ -21,7 +21,7 @@ const Vaccination = require('../../models/Vaccination');
  */
 router.post("/add-vaccination-records", function (req, res) {
 
-  if (req.body == null || !Array.isArray(req.body) || req.body.length == 0) res.status(500).send("Invalid vaccination input"); 
+  if (req.body == null || !Array.isArray(req.body) || req.body.length == 0) return res.status(500).send("Invalid vaccination input"); 
 
   const newVacArr = [];
 
