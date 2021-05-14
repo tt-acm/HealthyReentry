@@ -1,6 +1,6 @@
 <template>
   <div>
-    <md-field class="mb-0">
+    <md-field class="mb-3">
         <label for="font">Choose the manufacturer</label>
         <md-select v-model="curVaccineManufacturer" name="vaccine" id="vaccine" placeholder="Choose the manufacturer" :md-selected="$emit('vaccineSelected', curVaccineManufacturer, curIndex)">
             <md-option value="Pfizer">Pfizer-BioNTech</md-option>

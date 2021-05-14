@@ -288,6 +288,121 @@
       </md-dialog-actions>
     </md-dialog>
 
+    <!-- Vaccination detail modal -->
+    <md-dialog :md-active.sync="showSelectedVaccination">
+        <md-dialog-title class="pb-0 mb-2">
+          Your Vaccination Record
+        </md-dialog-title>
+
+
+        <md-dialog-content style="height: 70vh; min-width: 50vw">        
+          <md-content class="mt-3">          
+            <div id="vaccination-records">
+              <button type="button" class="btn btn-md" @click="allowEditVaccination = true;">
+                <md-icon class="fa fa-edit"></md-icon>
+              </button>  
+
+              <span v-if="curSelectedVaccinations.length == 0" class="d-flex ml-2 text-muted">There is no vaccination record for this user,
+                <br/> 
+                use the button on the above to add a new vaccination entry.
+              </span>
+
+
+
+              <!-- Add new vaccination card -->
+              <div v-if="allowEditVaccination == true" class="mt-3" style="max-width: 500px">
+                <md-card id="add-vaccination-card" class="md-elevation-1">
+                  <md-card-header><h5 >Add New Vaccination</h5></md-card-header>
+                  <md-card-content>
+                    <div class="row align-items-center">
+                      <div class="col-12 col-sm-5">
+                        Vaccine Manufacturer:
+                      </div>
+                      <div class="col-12 col-sm-7">        
+                        <VaccinationDropDown v-on:vaccineSelected="setNewVaccineManuFacturer"/>
+                      </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3">
+                      <div class="col-12 col-sm-5">
+                        Date:
+                      </div>
+                      <div class="col-12 col-sm-7">
+                        <md-datepicker v-model="newVaccine.date" class="mb-0" :md-disabled-dates="disabledVaccinationDates" md-immediately>
+                          <label>Select a date</label>
+                        </md-datepicker>
+                      </div>
+                    </div>
+
+                    <div class="d-flex">
+                      <button type="button" class="btn btn-md text-white md-accent mt-1 ml-auto" @click="addNewVaccinateToRecord()" :disabled="newVaccine.manufacturer == null || newVaccine.date == null">
+                        Add Date
+                      </button>
+                    </div>
+
+                    
+
+                  </md-card-content>
+                </md-card>
+
+              </div>
+
+
+
+
+              
+
+              <md-table v-if="allowEditVaccination != true" v-model="curSelectedVaccinations" class="mt-5 md-elevation-1" md-card>
+                <!-- <md-table-toolbar >
+                                
+                </md-table-toolbar> -->
+
+                <md-table-row slot="md-table-row" slot-scope="{ item, index }">
+                  <md-table-cell md-label="Date">
+                    {{showDisplayDate(item.date, 'll')}}                
+                  </md-table-cell>
+                  <md-table-cell md-label="Manufacturer">
+                    <span>{{ item.manufacturer }}</span>                
+                  </md-table-cell>                
+                </md-table-row>
+              </md-table>
+
+
+
+
+              <md-table v-else v-model="curSelectedVaccinations" class="mt-5 md-elevation-1" md-card>
+
+                <md-table-row slot="md-table-row" slot-scope="{ item, index }">
+                  <md-table-cell md-label="Date">
+                    <md-datepicker v-model="item.formattedDate" class="mb-3" :md-disabled-dates="disabledVaccinationDates" md-immediately>
+                      <label>Select a date</label>
+                    </md-datepicker>                
+                  </md-table-cell>
+
+                  <md-table-cell md-label="Manufacturer">
+                    <VaccinationDropDown :existingVaccine="item.manufacturer" :curIndex="index" v-on:vaccineSelected="overwriteExistingVacinemanufacturer"/>
+                  </md-table-cell>
+
+                  <md-table-cell md-label="">                
+                    <button v-show="allowEditVaccination" type="button" class="btn btn-md" @click="deleteExistingVaccineSelection(index)">
+                      <md-icon class="fa fa-minus-circle" ></md-icon>
+                    </button>                  
+                  </md-table-cell>
+                </md-table-row>      
+              </md-table>
+            </div>
+            
+          </md-content>
+        </md-dialog-content>
+
+        <md-dialog-actions>
+          <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="dismissResetVaccinationDetails()">Go Back</button>
+          <button v-show="allowEditVaccination" type="button" class="btn btn-md text-white" style="background-color:blue" @click="updateVaccinationChanges();">
+            Save
+          </button>
+        </md-dialog-actions>
+    </md-dialog>
+
     <h5 class="text-muted">Admin Dashboard
       <md-button class="md-icon-button" @click="setUserStatus = true">
         <md-icon class="fa fa-download">
@@ -616,7 +731,7 @@
         </thead>
 
         <tbody>
-          <tr v-for="user in users" :key="user.id">
+          <tr v-for="(user,index) in users" :key="user.id">
             <td style="width: 10%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
               {{ (user.selected) ? '&#9745;' : '&#9744;' }}
             </td>
@@ -645,10 +760,11 @@
               {{ user.lastUpdatedFormatted }}
             </td>
             <td style="width: 15%">
-              {{ user.lastVaccinated }}
+              <!-- {{ user.lastVaccinated }} -->
+              <a style="cursor:pointer" class="mx-auto" @click="curSelectedUserIndex = index">{{ user.lastVaccinated }}</a>
             </td>
             <td style="width: 10%;">
-              <span class="mx-auto">{{ user.vaccinationCount }}</span>
+              <a style="cursor:pointer" class="mx-auto" @click="curSelectedUserIndex = index">{{ user.vaccinationCount }}</a>
             </td>
             <td style="width: 15%">
               {{ user.dateOfConsentFormatted }}
@@ -668,6 +784,7 @@
 import enumStatusMap from "../../server/util/enumStatusMap.js";
 import storedRegions from "../../server/util/officeList.js";
 import csvUtil from "../../server/util/csvUtils.js";
+import VaccinationDropDown from '@/partials/VaccinationDropdown.vue'
 
 function downloadCSV(content, fileName) {
   let dlTrigger = document.createElement('a');
@@ -717,6 +834,9 @@ function fuzzyTime(date) {
 
 export default {
   created() {},
+  components: {
+    VaccinationDropDown
+  },
   async mounted() {
     Object.keys(storedRegions).forEach(region => {
       this.regions.push({
@@ -762,10 +882,34 @@ export default {
         green: null,
         orange: null,
         red: null,
+      },
+      curSelectedUserIndex:null,
+      allowEditVaccination: false,
+      disabledVaccinationDates: date => {
+        const today = new Date();
+        return date >= today;
+      },
+      newVaccine: {
+        manufacturer: null,
+        date: new Date()
       }
     };
   },
   computed: {
+    curSelectedVaccinations() {
+      console.log("curSelectedVaccinations", this.curSelectedUserIndex, this.users[this.curSelectedUserIndex]);
+      if (this.curSelectedUserIndex == null) return [];
+
+      let vacs = this.users[this.curSelectedUserIndex].vaccination? this.users[this.curSelectedUserIndex].vaccination: null;
+      if (vacs == null) return [];
+
+      vacs.forEach(vac=> {
+        vac.formattedDate = new Date(vac.date);
+      });
+
+      console.log("vacs", vacs);
+      return vacs;
+    },
     officesSelectedCount() {
       let i = 0;
       this.regions.forEach(r => {
@@ -787,6 +931,9 @@ export default {
     selectedUsers() {
       return this.users
                   .filter(u => u.selected);
+    },
+    showSelectedVaccination() {
+      return this.curSelectedUserIndex != null;
     }
   },
   methods: {
@@ -929,6 +1076,7 @@ export default {
           lastUpdated: hasStatus ? new Date(u.status.date) : null,
           lastVaccinated: u.vaccination.length > 0 ? new Date(u.vaccination[u.vaccination.length-1].date).toDateString() : 'Not Available',
           vaccinationCount: u.vaccination.length,
+          vaccination: u.vaccination,
           dateOfConsent: u.dateOfConsent ? new Date(u.dateOfConsent) : 0,
           dateOfConsentFormatted: u.dateOfConsent ? new Date(u.dateOfConsent).toDateString() : 'Not Available'
         };
@@ -1011,7 +1159,87 @@ export default {
       this.regionsForDownloadSelections.forEach(r => {
         this.setRegionForDownloadSelection(r.name, val);
       });
+    },
+    showDisplayDate(date, format) {
+      return this.moment(date).format(format);
+    },
+    overwriteExistingVacinemanufacturer(newVal, index) {
+      console.log("ovwerwriting...", newVal, index);
+      this.curSelectedVaccinations[index].manufacturer = newVal;
+      // this.users[this.curSelectedUserIndex].vaccination[index].manufacturer = newVal;
+    },
+    deleteExistingVaccineSelection(index) {
+      console.log("deleting existing", index);
+
+      let curItem = this.curSelectedVaccinations.splice(index, 1)[0];
+      console.log("curitem", curItem);
+      curItem.delete = true;
+
+      this.$api.post("/api/vaccination/delete-vaccination-record", curItem).then(record => {
+        console.log("record.data", record.data);
+        this.reformatVaccineMeta();
+      });
+    },
+    dismissResetVaccinationDetails() {
+      console.log("thhis.curSelectedVaccinations", this.curSelectedVaccinations);
+      console.log("going bnack", this.users[this.curSelectedUserIndex].vaccination );
+      // this.users[this.curSelectedUserIndex].vaccination = curSelectedVaccinations; //update to global users
+      this.curSelectedUserIndex = null; // turnoff dialog
+      console.log("gone", this.users);
+    },
+    reformatVaccineMeta() {
+
+      // update cur user vaccine info to this.users
+      if (!this.curSelectedUserIndex) return;
+      const vacCount = this.curSelectedVaccinations.length;
+      this.users[this.curSelectedUserIndex].vaccinationCount = vacCount;
+      this.users[this.curSelectedUserIndex].lastVaccinated = vacCount > 0 ? new Date(this.curSelectedVaccinations[vacCount-1].date).toDateString() : 'Not Available';
+    },
+    updateVaccinationChanges() {
+      console.log("thhis.curSelectedVaccinations", this.curSelectedVaccinations);
+      this.curSelectedVaccinations.forEach(vac=> {
+        vac.date = vac.formattedDate;
+      });
+
+      console.log("thhis.modified", this.curSelectedVaccinations);
+      this.reformatVaccineMeta();
+      this.submitVaccinationRecord();
+      this.allowEditVaccination = false;      
+      this.curSelectedUserIndex = null;//dismiss modal
+    },
+    submitVaccinationRecord() {
+      this.$api.post("/api/vaccination/update-vaccination-records", this.curSelectedVaccinations).then(record => {
+        console.log("record.data", record.data);
+        // this.vaccinationsToDisplay = record.data;
+        
+      });
+    },
+    addNewVaccinateToRecord() {
+      // this.curSelectedVaccinations.push(this.newVaccine)
+
+      const reqBody = {
+        vaccine: this.newVaccine,
+        userId: this.users[this.curSelectedUserIndex].id
+      }
+
+      console.log("reqbody", reqBody, this.users[this.curSelectedUserIndex]);
+      
+      this.$api.post("/api/vaccination/add-one", reqBody).then(newVac => {
+        // this.vaccinationsToDisplay = record.data;
+
+        this.curSelectedVaccinations.push(newVac.data);
+
+        console.log("this.uersssss", this.users[this.curSelectedUserIndex]);
+
+        this.reformatVaccineMeta();
+        
+      });
+
+    },
+    setNewVaccineManuFacturer(manufacturer) {
+      this.newVaccine.manufacturer = manufacturer;
     }
+    
   }
 };
 </script>
@@ -1020,6 +1248,10 @@ export default {
 .custom-dd-size {
   padding-left: 40px;
   width: 400px !important;
+}
+
+.md-dialog /deep/ .md-dialog-container {
+  transform: none;
 }
 
 /* Chrome, Safari, Edge, Opera */

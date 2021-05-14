@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const Vaccination = require('../../models/Vaccination');
+const User = require('../../models/User');
 
 
 
@@ -54,6 +55,31 @@ router.post("/add-vaccination-records", function (req, res) {
     }
   });
 
+});
+
+router.post("/add-one", function (req, res) {
+  console.log("req.body", req.body);
+  if (req.body == null || req.body.userId == null || req.body.vaccine == null) return res.status(500).send("Invalid vaccination input"); 
+  
+
+
+  User.findById(req.body.userId, function(err, user) {
+    if (err) res.status(500).send(err); 
+
+    const vac = new Vaccination({    
+      user: user,
+      manufacturer: req.body.vaccine.manufacturer,
+      date: req.body.vaccine.date
+    });
+  
+    vac.save().then(result=> {
+      console.log("result", result);
+      res.send(result);
+    })
+
+  });
+
+  
 });
 
 

@@ -118,7 +118,8 @@
   <!-- </md-content> -->
 
   <!-- Vaccination record modal -->
-  <md-dialog :md-active.sync="launchVaccinationForm">
+  <md-dialog :md-active.sync="launchVaccinationForm" :md-click-outside-to-close="false" :md-close-on-esc="false">
+  <!-- <md-dialog :md-active.sync="launchVaccinationForm"> -->
       <md-dialog-title class="pb-0 mb-2">
         Record Your Vaccination Status
       </md-dialog-title>
@@ -135,62 +136,54 @@
 
         <md-content class="mt-3">
           <md-card v-if="vaccineTab == 1" id="add-vaccination-card" class="md-elevation-1">
+            <md-card-header><h5 >Add New Vaccination</h5></md-card-header>
             <md-card-content>
-              <div class="row">
+              <div class="row align-items-center">
                 <div class="col-12 col-sm-5">
-                  Vaccine Manufacturer:
+                  <span>Vaccine Manufacturer:</span>
                 </div>
-                <div class="col-12 col-sm-7">                  
-                  <!-- <md-field>
-                    <label for="font">Choose the manufacturer</label>
-                    <md-select v-model="curVaccineManufacturer" name="vaccine" id="vaccine" placeholder="Choose the manufacturer">
-                      <md-option value="Pfizer">Pfizer-BioNTech</md-option>
-                      <md-option value="Moderna">Moderna</md-option>
-                      <md-option value="JohnsonJohnson">Johnson & Johnson’s Janssen</md-option>
-                      <md-option value="AstraZeneca">AstraZeneca</md-option>
-                      <md-option value="Novavax">Novavax</md-option>
-                      <md-option value="Covishield">Covishield</md-option>       
-                      <md-option value="Sinopharm">Sinopharm</md-option>
-                      <md-option value="CanSinoBIO">CanSinoBIO</md-option>
-                      <md-option value="CVnCoV">CVnCoV</md-option>                      
-                      <md-option value="Other">Other</md-option>
-                    </md-select>
-                  </md-field> -->
+                <div class="col-12 col-sm-7">             
                   <VaccinationDropDown v-on:vaccineSelected="overwriteVacinemanufacturer"/>
                 </div>
               </div>
 
-              <div class="row">
+              <div class="row align-items-center mb-3">
                 <div class="col-12 col-sm-5">
-                  Date:
+                  <span>Date:</span>                  
                 </div>
                 <div class="col-12 col-sm-7">
-                  <md-datepicker v-model="curVaccineDate" :md-disabled-dates="disabledVaccinationDates" md-immediately>
+                  <md-datepicker v-model="curVaccineDate" class="mb-0" :md-disabled-dates="disabledVaccinationDates" md-immediately>
                     <label>Select a date</label>
                   </md-datepicker>
                 </div>
               </div>
 
-              <button type="button" class="btn btn-md text-white md-accent" @click="addVaccinateToRecord()" :disabled="curVaccineManufacturer==null || curVaccineDate== null">
-                Add Date
-              </button>
+              <div class="d-flex">
+                <button type="button" class="btn btn-md text-white md-accent ml-auto mt-3" @click="addVaccinateToRecord()" :disabled="curVaccineManufacturer==null || curVaccineDate== null">
+                  Add Date
+                </button>
+              </div>
+              
 
             </md-card-content>
           </md-card>
 
 
-          <div v-show="vaccinationsToDisplay.length > 0" id="vaccination-records">
-            <md-table v-model="vaccinationsToDisplay" class="mt-3 md-elevation-1" md-card>
-              <md-table-toolbar class="pl-0">
+          <div id="vaccination-records">
+            <md-table v-model="vaccinationsToDisplay" class="mt-5 md-elevation-1" md-card>
+              <md-table-toolbar class="pl-3">
                 <h1 class="md-title">Vaccination Records</h1>
               </md-table-toolbar>
 
               <md-table-row slot="md-table-row" slot-scope="{ item, index }">
                 <md-table-cell md-label="Date">{{showDisplayDate(item.date, 'll')}}</md-table-cell>
-                <md-table-cell md-label="Manufacturer">{{ item.manufacturer }}</md-table-cell>
-                <md-table-cell md-label="">
-                  <button v-show="item.new" type="button" class="btn btn-md" @click="deleteVaccineSelection(index)">
-                    <md-icon class="fa fa-minus-circle" ></md-icon>
+                <md-table-cell md-label="Manufacturer">
+                  {{ item.manufacturer }}
+                  <small v-if="item.new == true"> [Pending...] </small>
+                </md-table-cell>
+                <md-table-cell md-label="">                  
+                  <button v-show="item.new" type="button" class="btn btn-md" @click="deleteVaccineSelection(index)">                    
+                    <md-icon class="fa fa-minus-circle" ></md-icon>                    
                   </button>
                 </md-table-cell>
               </md-table-row>
@@ -212,7 +205,7 @@
   </md-dialog>
 
   <!-- Vaccination detail modal -->
-  <md-dialog :md-active.sync="launchVaccinationDetails">
+  <md-dialog :md-active.sync="launchVaccinationDetails" :md-fullscreen="true">
       <md-dialog-title class="pb-0 mb-2">
         Your Vaccination Record
       </md-dialog-title>
@@ -231,7 +224,7 @@
                               
               </md-table-toolbar> -->
 
-              <md-table-row slot="md-table-row" slot-scope="{ item, index }">
+              <md-table-row slot="md-table-row" slot-scope="{ item }">
                 <md-table-cell md-label="Date">
                   {{showDisplayDate(item.date, 'll')}}                
                 </md-table-cell>
@@ -465,6 +458,12 @@ export default {
     setVaccineTab() {
       if (this.vaccineTab == 1) this.launchVaccinationForm = false;
       else this.vaccineTab = 1;
+
+      this.vaccinationsToDisplay = this.vaccinationsToDisplay.filter(v=> {
+        return v.new != true;
+      });
+      this.curVaccineDate = null;
+      this.curVaccineManufacturer = null;
     },
     deleteVaccineSelection(index) {
       this.vaccinationsToDisplay.splice(index, 1);
@@ -499,13 +498,11 @@ export default {
     overwriteExistingVacinemanufacturer(newVal, index) {
       console.log("ovwerwriting...", newVal, index);
       this.vaccinationsToDisplay[index].manufacturer = newVal;
-
     },
     formatVaccinationDate() {
       this.vaccinationsToDisplay.forEach(vac=> {
         vac.formattedDate = new Date(vac.date);
       });
-      console.log("thhis.vaccinatetodisplay", this.vaccinationsToDisplay);
     },
     clearUnsavedVaccinationEdit() {
       this.getAllVaccination();
