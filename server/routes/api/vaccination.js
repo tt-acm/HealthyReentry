@@ -33,9 +33,7 @@ router.post("/add-vaccination-records", function (req, res) {
     });
 
     newVacArr.push(vac);
-  })
-
-  
+  })  
 
   Vaccination.insertMany(newVacArr, function(error, updatedVaccinations) {
     if (error) {
@@ -56,6 +54,70 @@ router.post("/add-vaccination-records", function (req, res) {
     }
   });
 
+});
+
+
+router.post("/delete-vaccination-record", function (req, res) {
+  console.log("req.body", req.body);
+
+  if (req.body == null) return res.status(500).send("Invalid vaccination input"); 
+
+  console.log("about to delete", req.body._id);
+
+  Vaccination.deleteOne({ "_id" : req.body._id }).then(result =>{
+    console.log("deleted");
+    res.send("Success");
+  })
+
+});
+
+
+router.post("/update-vaccination-records", function (req, res) {
+  console.log("req.body", req.body);
+
+  if (req.body == null || !Array.isArray(req.body) || req.body.length == 0) return res.status(500).send("Invalid vaccination input"); 
+
+  const allPromises = [];
+
+  req.body.forEach(v => {
+    if (v.new == true){
+      const vac = new Vaccination({    
+        user: req.user,
+        manufacturer: v.manufacturer,
+        date: v.date
+      });
+
+      allPromises.push(vac.save());
+    }
+    // else if (v.delete) {
+    //   console.log("deleting: ", v);
+    //   Vaccination.deleteOne({ "_id" : v._id })
+    // }
+    else if (v._id) {
+      allPromises.push(
+        Vaccination.findOneAndUpdate(
+          { _id: v._id },
+          { $set: { date: v.date, manufacturer : v.manufacturer } },
+          { useFindAndModify: false }
+        )
+      );      
+    }    
+  })  
+
+  // console.log("allprmise", allPromises);
+
+  Promise.all(allPromises).then((result) => {
+    Vaccination.find({
+      "user": req.user._id
+    }).sort({
+      date: 1
+    })
+    .exec(function (err, latestVaccine) {
+      if (err) res.status(500).send(err); 
+      return res.send(latestVaccine);
+    })     
+    // res.send(result);
+  });
 });
 
 
