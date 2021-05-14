@@ -12,7 +12,7 @@
       <h6 class="mb-0">
         <b>Last Vaccinated on:</b> {{showDisplayDate(new Date(vaccinationsToDisplay[vaccinationsToDisplay.length-1].date), 'll')}}         
       </h6>
-      <a class="ml-4 text-muted" @click="launchVaccinationDetails = true">Click here for more details</a>
+      <a class="ml-4" @click="launchVaccinationDetails = true" style="color:#1a0dab"><u>Click here for more details</u></a>
     </div>
   </div>
 
