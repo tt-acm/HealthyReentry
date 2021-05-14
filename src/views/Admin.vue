@@ -509,7 +509,7 @@
 
         <thead>
           <tr>
-            <th style="width: 15%" class="text-center">
+            <th style="width: 10%" class="text-center">
               <small><i>
                 <span
                   style="cursor: pointer;"
@@ -552,7 +552,7 @@
               </span>
               Status
             </th>
-            <th style="width: 25%">
+            <th style="width: 20%">
               <span
                 style="cursor: pointer"
                 :class="(sortBy === 'name' ? '' : ' disabled')"
@@ -562,7 +562,7 @@
               </span>
               Name
             </th>
-            <th style="width: 20%">
+            <th style="width: 10%">
               <span
                 style="cursor: pointer"
                 :class="(sortBy === 'officeCode' ? '' : ' disabled')"
@@ -572,7 +572,7 @@
               </span>
               Office
             </th>
-            <th style="width: 20%">
+            <th style="width: 15%">
               <span
                 style="cursor: pointer"
                 :class="(sortBy === 'lastUpdated' ? '' : ' disabled')"
@@ -581,6 +581,26 @@
                 {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
               </span>
               Last Updated
+            </th>
+            <th style="width: 15%">
+              <span
+                style="cursor: pointer"
+                :class="(sortBy === 'lastVaccinated' ? '' : ' disabled')"
+                @click="sortUsers('lastVaccinated', !sortAsc)"
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
+              Last Vaccinated
+            </th>
+            <th style="width: 10%">
+              <span
+                style="cursor: pointer"
+                :class="(sortBy === 'vaccinationCount' ? '' : ' disabled')"
+                @click="sortUsers('vaccinationCount', !sortAsc)"
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
+              Vaccination Count
             </th>
             <th style="width: 15%">
               <span
@@ -597,13 +617,13 @@
 
         <tbody>
           <tr v-for="user in users" :key="user.id">
-            <td style="width: 15%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
+            <td style="width: 10%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
               {{ (user.selected) ? '&#9745;' : '&#9744;' }}
             </td>
             <td style="width: 5%" class="text-center">
               <i :class="'fas fa-circle ' + user.status.css_key"></i>
             </td>
-            <td style="width: 25%">
+            <td style="width: 20%">
               <span class="pr-1" @click="deleteUser(user)">
                 <i class="fas fa-times-circle text-secondary" style="cursor: pointer;"></i>
                 <md-tooltip md-direction="top">Delete this user</md-tooltip>
@@ -611,7 +631,7 @@
 
               {{ user.name }}
             </td>
-            <td style="width: 20%">
+            <td style="width: 10%">
               <span
                 data-toggle="modal"
                 data-target="#updateUserLocationModal"
@@ -621,8 +641,14 @@
               </span>
               {{ user.officeCode }}
             </td>
-            <td style="width: 20%">
+            <td style="width: 15%">
               {{ user.lastUpdatedFormatted }}
+            </td>
+            <td style="width: 15%">
+              {{ user.lastVaccinated }}
+            </td>
+            <td style="width: 10%;">
+              <span class="mx-auto">{{ user.vaccinationCount }}</span>
             </td>
             <td style="width: 15%">
               {{ user.dateOfConsentFormatted }}
@@ -883,6 +909,8 @@ export default {
       this.filteredUsersCount = userData.data.filteredCount;
       let users = userData.data.users;
 
+      console.log("users", users);
+
 
       this.users = users.map(u => {
         let hasStatus = u.status && u.status.status !== null && u.status.status !== undefined;
@@ -899,11 +927,15 @@ export default {
           statusCode: status.code,
           lastUpdatedFormatted: updateDate,
           lastUpdated: hasStatus ? new Date(u.status.date) : null,
+          lastVaccinated: u.vaccination.length > 0 ? new Date(u.vaccination[u.vaccination.length-1].date).toDateString() : 'Not Available',
+          vaccinationCount: u.vaccination.length,
           dateOfConsent: u.dateOfConsent ? new Date(u.dateOfConsent) : 0,
           dateOfConsentFormatted: u.dateOfConsent ? new Date(u.dateOfConsent).toDateString() : 'Not Available'
         };
         return user;
       });
+
+      console.log("this.user", this.users);
 
 
       this.isLoading = false;
