@@ -1,9 +1,16 @@
 const router = require('express').Router();
+const sgClient = require('@sendgrid/mail');
+const fs = require('fs');
 
 const Vaccination = require('../../models/Vaccination');
 const User = require('../../models/User');
 
+const adminUpdateTemplate = fs.readFileSync("./server/assets/email_templates/VaccinationUpdate_byAdmin.html").toString("utf-8");
+const userUpdateTemplate = fs.readFileSync("./server/assets/email_templates/VaccinationUpdate_byUser.html").toString("utf-8");
 
+
+sgClient.setApiKey(process.env.SENDGRID_API_KEY);
+var sdSender = process.env.SENDGRID_EMAIL;
 
 /**
  * @swagger
@@ -20,42 +27,42 @@ const User = require('../../models/User');
  *        500:
  *          description: Server error.
  */
-router.post("/add-vaccination-records", function (req, res) {
+// router.post("/add-vaccination-records", function (req, res) {
 
-  if (req.body == null || !Array.isArray(req.body) || req.body.length == 0) return res.status(500).send("Invalid vaccination input"); 
+//   if (req.body == null || !Array.isArray(req.body) || req.body.length == 0) return res.status(500).send("Invalid vaccination input"); 
 
-  const newVacArr = [];
+//   const newVacArr = [];
 
-  req.body.forEach(v => {
-    const vac = new Vaccination({    
-      user: req.user,
-      manufacturer: v.manufacturer,
-      date: v.date
-    });
+//   req.body.forEach(v => {
+//     const vac = new Vaccination({    
+//       user: req.user,
+//       manufacturer: v.manufacturer,
+//       date: v.date
+//     });
 
-    newVacArr.push(vac);
-  })  
+//     newVacArr.push(vac);
+//   })  
 
-  Vaccination.insertMany(newVacArr, function(error, updatedVaccinations) {
-    if (error) {
-      // status insert fail
-      console.log(error);
-      return res.status(500).send("Failed to save vaccination records"); 
-    } else {
-      // status insert success
-      Vaccination.find({
-        "user": req.user._id
-      }).sort({
-        date: 1
-      })
-      .exec(function (err, latestVaccine) {
-        if (err) res.status(500).send(err); 
-        return res.send(latestVaccine);
-      })      
-    }
-  });
+//   Vaccination.insertMany(newVacArr, function(error, updatedVaccinations) {
+//     if (error) {
+//       // status insert fail
+//       console.log(error);
+//       return res.status(500).send("Failed to save vaccination records"); 
+//     } else {
+//       // status insert success
+//       Vaccination.find({
+//         "user": req.user._id
+//       }).sort({
+//         date: 1
+//       })
+//       .exec(function (err, latestVaccine) {
+//         if (err) res.status(500).send(err); 
+//         return res.send(latestVaccine);
+//       })      
+//     }
+//   });
 
-});
+// });
 
 router.post("/add-one", function (req, res) {
   console.log("req.body", req.body);
@@ -86,14 +93,22 @@ router.post("/add-one", function (req, res) {
 router.post("/delete-vaccination-record", function (req, res) {
   console.log("req.body", req.body);
 
-  if (req.body == null) return res.status(500).send("Invalid vaccination input"); 
+  if (req.body == null || !Array.isArray(req.body)) return res.status(500).send("Invalid vaccination input"); 
 
-  console.log("about to delete", req.body._id);
+  console.log("about to delete", req.body);
 
-  Vaccination.deleteOne({ "_id" : req.body._id }).then(result =>{
-    console.log("deleted");
-    res.send("Success");
+  var allPromises = [];
+
+  req.body.forEach(d => {
+    allPromises.push(Vaccination.deleteOne({ "_id" : d._id }));
   })
+
+  Promise.all(allPromises).then((result) => {
+    console.log("result", result);
+    res.send("Success");
+  });
+
+  
 
 });
 
@@ -101,12 +116,18 @@ router.post("/delete-vaccination-record", function (req, res) {
 router.post("/update-vaccination-records", function (req, res) {
   console.log("req.body", req.body);
 
-  if (req.body == null || !Array.isArray(req.body) || req.body.length == 0) return res.status(500).send("Invalid vaccination input"); 
+  if (!req.body.sender || !req.body.target || !req.body.content) return res.status(500).send("Invalid info.");
+  const body = req.body.content;
+  if (body == null || !Array.isArray(body) || body.length == 0) return res.status(500).send("Invalid vaccination input"); 
 
+  
   const allPromises = [];
 
-  req.body.forEach(v => {
+  body.forEach(v => {
     if (v.new == true){
+      console.log("THIS IS NEW", v);
+
+      if (!v.manufacturer || !v.date) return;
       const vac = new Vaccination({    
         user: req.user,
         manufacturer: v.manufacturer,
@@ -140,6 +161,8 @@ router.post("/update-vaccination-records", function (req, res) {
     })
     .exec(function (err, latestVaccine) {
       if (err) res.status(500).send(err); 
+
+      triggerEmailConfirmation(req.body.sender, req.body.target);
       return res.send(latestVaccine);
     })     
     // res.send(result);
@@ -186,6 +209,39 @@ router.get("/get-all", function (req, res) {
   })
 });
 
+
+const triggerEmailConfirmation = function (sender, target) {
+  let adminContent = adminUpdateTemplate.replace(new RegExp('<PRODUCTION_URL>', 'g'), process.env.VUE_APP_URL);
+  let userContent = userUpdateTemplate.replace(new RegExp('<PRODUCTION_URL>', 'g'), process.env.VUE_APP_URL);
+
+
+    const adminEmailOptions = {
+        to: target,
+        from: sdSender,
+        subject: "Your vaccination record has been updated",
+        html: adminContent
+    };
+
+    const userEmailOptions = {
+      to: target,
+      from: sdSender,
+      subject: "You have updated your vaccination record",
+      html: userContent
+  };
+
+
+  var option;
+
+  if (sender == "Admin") option = adminEmailOptions;
+  else if (sender == "User") option = userEmailOptions;
+  else return; 
+
+  sgClient.send(option).then(() => {
+    console.log('emails sent successfully to: ', target);
+  }).catch(error => {
+    console.log(error);
+  });    
+}
 
 
 module.exports = router;

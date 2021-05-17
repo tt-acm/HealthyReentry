@@ -12,7 +12,7 @@
       <h6 class="mb-0">
         <b>Last Vaccinated on:</b> {{showDisplayDate(new Date(vaccinationsToDisplay[vaccinationsToDisplay.length-1].date), 'll')}}         
       </h6>
-      <a class="ml-4" @click="launchVaccinationDetails = true" style="color:#1a0dab"><u>Click here for more details</u></a>
+      <a class="ml-4" @click="launchVaccinationDetails = true" style="color:#1a0dab; cursor:pointer"><u>Click here for more details</u></a>
     </div>
   </div>
 
@@ -204,22 +204,22 @@
       </md-dialog-actions>
   </md-dialog>
 
-  <!-- Vaccination detail modal -->
+  <!-- Vaccination edit modal -->
   <md-dialog :md-active.sync="launchVaccinationDetails" :md-fullscreen="true">
       <md-dialog-title class="pb-0 mb-2">
-        Your Vaccination Record
+        Your Vaccination Record {{vaccineEditTab}}
       </md-dialog-title>
 
 
       <md-dialog-content style="height: 70vh; min-width: 50vw">        
-        <md-content class="mt-3">
+        <md-content v-if="vaccineEditTab==1" class="mt-3">
           
           <div id="vaccination-records">
-            <button type="button" class="btn btn-md" @click="allowEditVaccination = true; formatVaccinationDate()">
+            <button type="button" class="btn btn-md" @click="editVaccination = true; formatVaccinationDate()">
               <md-icon class="fa fa-edit"></md-icon>
             </button>  
 
-            <md-table v-if="allowEditVaccination != true" v-model="vaccinationsToDisplay" class="mt-3 md-elevation-1" md-card>
+            <md-table v-if="editVaccination != true" v-model="vaccinationsToDisplay" class="mt-3 md-elevation-1" md-card>
               <!-- <md-table-toolbar >
                               
               </md-table-toolbar> -->
@@ -233,25 +233,6 @@
                 </md-table-cell>                
               </md-table-row>
 
-              <!-- <md-table-row v-else slot="md-table-row" slot-scope="{ item, index }">
-                <md-table-cell md-label="Date">
-                  <md-datepicker v-model="item.formattedDate" :md-disabled-dates="disabledVaccinationDates" md-immediately>
-                    <label>Select a date</label>
-                  </md-datepicker>                
-                </md-table-cell>
-
-                <md-table-cell md-label="Manufacturer">
-                  <VaccinationDropDown :existingVaccine="item.manufacturer" :curIndex="index" v-on:vaccineSelected="overwriteExistingVacinemanufacturer"/>
-                </md-table-cell>
-
-                <md-table-cell md-label="">                
-                  <button v-show="allowEditVaccination" type="button" class="btn btn-md" @click="deleteExistingVaccineSelection(index)">
-                    <md-icon class="fa fa-minus-circle" ></md-icon>
-                  </button>                  
-                </md-table-cell>
-              </md-table-row> -->           
-              
-
             </md-table>
 
 
@@ -259,9 +240,9 @@
 
               <md-table-row slot="md-table-row" slot-scope="{ item, index }">
                 <md-table-cell md-label="Date">
-                  <md-datepicker v-model="item.formattedDate" class="mb-0" :md-disabled-dates="disabledVaccinationDates" md-immediately>
+                  <md-datepicker v-model="item.formattedDate" class="mb-3" :md-disabled-dates="disabledVaccinationDates" md-immediately>
                     <label>Select a date</label>
-                  </md-datepicker>                
+                  </md-datepicker>            
                 </md-table-cell>
 
                 <md-table-cell md-label="Manufacturer">
@@ -269,7 +250,7 @@
                 </md-table-cell>
 
                 <md-table-cell md-label="">                
-                  <button v-show="allowEditVaccination" type="button" class="btn btn-md" @click="deleteExistingVaccineSelection(index)">
+                  <button v-show="editVaccination" type="button" class="btn btn-md" @click="deleteExistingVaccineSelection(index)">
                     <md-icon class="fa fa-minus-circle" ></md-icon>
                   </button>                  
                 </md-table-cell>
@@ -279,13 +260,62 @@
             </md-table>
           </div>
         </md-content>
+
+
+
+        <md-content v-if="vaccineEditTab==2" class="mt-3">          
+          <div id="vaccination-records">
+            <button type="button" class="btn btn-md" @click="editVaccination = true; formatVaccinationDate()">
+              <md-icon class="fa fa-edit"></md-icon>
+            </button>  
+
+            <md-table v-model="vaccinationsToDisplay" class="mt-3 md-elevation-1" md-card>
+              <md-table-toolbar>
+                <h3 class="md-title">Vaccination to update</h3>
+              </md-table-toolbar>
+              <md-table-row slot="md-table-row" slot-scope="{ item }">
+                <md-table-cell md-label="Date">
+                  {{showDisplayDate(item.date, 'll')}}                
+                </md-table-cell>
+                <md-table-cell md-label="Manufacturer">
+                  <span>{{ item.manufacturer }}</span>                
+                </md-table-cell>                
+              </md-table-row>    
+            </md-table>
+
+            <!-- Vaccination to delete -->
+            <md-table v-if="vaccinationsToDelete" v-model="vaccinationsToDelete" class="mt-3 md-elevation-1" md-card>
+              <md-table-toolbar>
+                <h3 class="md-title">Vaccination to delete</h3>
+              </md-table-toolbar>
+              <md-table-row slot="md-table-row" slot-scope="{ item }">
+                <md-table-cell md-label="Date">
+                  {{showDisplayDate(item.date, 'll')}}                
+                </md-table-cell>
+                <md-table-cell md-label="Manufacturer">
+                  <span>{{ item.manufacturer }}</span>                
+                </md-table-cell>                
+              </md-table-row>    
+            </md-table>
+
+            
+          </div>
+        </md-content>
       </md-dialog-content>
 
       <md-dialog-actions>
-        <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="launchVaccinationDetails = false; clearUnsavedVaccinationEdit()">Go Back</button>
-        <button v-show="allowEditVaccination" type="button" class="btn btn-md text-white" style="background-color:blue" @click="launchVaccinationForm = false;updateVaccinationChanges();">
-          Save
+        <button v-show="vaccineEditTab != 2" style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="launchVaccinationDetails = false; clearUnsavedVaccinationEdit()">Go Back</button>
+        <button v-show="editVaccination && vaccineEditTab == 1" type="button" class="btn btn-md text-white" style="background-color:blue" @click="vaccineEditTab= 2;updateVaccinationChanges();">
+          Review
         </button>
+        <div v-show="editVaccination && vaccineEditTab == 2" >
+          <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="vaccineEditTab=1">Go Back</button>
+
+          <button type="button" class="btn btn-md text-white" style="background-color:blue" :disabled="disableSubmittingRevisedVaccination" @click="launchVaccinationForm = false;submitReviewedVaccinationChagnes()">
+            Submit
+          </button>
+        </div>
+        
       </md-dialog-actions>
   </md-dialog>
 </div>
@@ -294,7 +324,8 @@
 // import store from "store/index.js";
 const statusColors = ["#00C851", "#FF9800", "#DC3545"]
 
-import Vuex from 'vuex';
+// import Vuex from 'vuex';
+import { mapState } from 'vuex'
 import VaccinationDropDown from '@/partials/VaccinationDropdown.vue'
 
 export default {
@@ -418,14 +449,42 @@ export default {
         return date >= today;
       },
       vaccinationsToDisplay:[],
+      vaccinationsToDelete:[],
       vaccineTab:1,
+      vaccineEditTab:1,
       launchVaccinationDetails: false,
-      allowEditVaccination:false
+      editVaccination:false,
+      disableSubmittingRevisedVaccination : false
     };
   },
-  computed: Vuex.mapState({
-    user: state => state.user,
-  }),
+  // computed: Vuex.mapState({
+  //   user: state => state.user,
+  // }),  
+  watch: {
+    dataReadyForSave: function () {
+      const notAllowedItem = this.vaccinationsToDisplay.filter(vac => {
+        console.log("vac", vac);
+        if (!vac.date || !vac.manufacturer) return true;
+      })
+
+      if (notAllowedItem.length == 0) return true;
+      else return false;
+    },
+  },
+  computed: {
+    // dataReadyForSave: function () {
+    //   const notAllowedItem = this.vaccinationsToDisplay.filter(vac => {
+    //     console.log("vac", vac);
+    //     if (!vac.date || !vac.manufacturer) return true;
+    //   })
+
+    //   if (notAllowedItem.length == 0) return true;
+    //   else return false;
+    // },
+    ...mapState({
+      user: state => state.user,
+    })
+  },
   methods: {
     submit() {
       let reqBody = {
@@ -469,25 +528,38 @@ export default {
       this.vaccinationsToDisplay.splice(index, 1);
     },
     deleteExistingVaccineSelection(index) {
-      console.log("deleting existing", index);
+      console.log("deleting existing", index);   
+      
 
       let curItem = this.vaccinationsToDisplay.splice(index, 1)[0];
-      console.log("curitem", curItem);
       curItem.delete = true;
-      this.$api.post("/api/vaccination/delete-vaccination-record", curItem).then(record => {
+      console.log("curitem", curItem);
+
+      this.vaccinationsToDelete.push(curItem);
+      // this.submitVaccinationDeletion(curItem);
+      // this.$api.post("/api/vaccination/delete-vaccination-record", curItem).then(record => {
+      //   console.log("record.data", record.data);
+      //   // this.vaccinationsToDisplay = record.data;
+      // });
+    },
+    submitVaccinationDeletion() {
+      // let curItem = this.vaccinationsToDisplay.splice(index, 1)[0];
+      // curItem.delete = true;
+      // console.log("curitem", curItem);
+      if (!this.vaccinationsToDelete || this.vaccinationsToDelete.length == 0) return; //skipping
+      this.$api.post("/api/vaccination/delete-vaccination-record", this.vaccinationsToDelete).then(record => {
         console.log("record.data", record.data);
-        // this.vaccinationsToDisplay = record.data;
+        this.vaccinationsToDelete = [];
       });
     },
     submitVaccinationRecord() {
-      // console.log("pre submitting", this.vaccinationsToDisplay);
-      // const newVaccination = this.vaccinationsToDisplay.filter(v=> {
-      //   return v.new == true;
-      // });
+      const reqBody = {
+        sender: "User",
+        target: this.user.email,
+        content: this.vaccinationsToDisplay
+      };
 
-      // console.log("newvaccination", newVaccination);
-
-      this.$api.post("/api/vaccination/update-vaccination-records", this.vaccinationsToDisplay).then(record => {
+      this.$api.post("/api/vaccination/update-vaccination-records", reqBody).then(record => {
         console.log("record.data", record.data);
         this.vaccinationsToDisplay = record.data;
       });
@@ -506,25 +578,40 @@ export default {
     },
     clearUnsavedVaccinationEdit() {
       this.getAllVaccination();
-      this.allowEditVaccination = false;
+      this.editVaccination = false;
+      this.vaccineEditTab = 1;
+      this.vaccinationsToDelete = [];
     },
     getAllVaccination() {
       this.$api.get("/api/vaccination/get-all").then(returnedVac => {
-      this.vaccinationsToDisplay = returnedVac.data;
-      console.log(this.vaccinationsToDisplay);
-    });
+        this.vaccinationsToDisplay = returnedVac.data;
+        console.log(this.vaccinationsToDisplay);
+      });
     },
     updateVaccinationChanges() {
       console.log("thhis.vaccinatetodisplay", this.vaccinationsToDisplay);
       this.vaccinationsToDisplay.forEach(vac=> {
-        vac.date = vac.formattedDate;
+        console.log("vac.formattedDate", vac.formattedDate);
+
+        if (!vac.formattedDate) {
+          this.disableSubmittingRevisedVaccination = true;
+          vac.date = null;
+          // vac.date = "Invalid Date, please go back and select a different one";
+        }
+        else {
+          vac.date = vac.formattedDate;
+        }        
       });
 
-      console.log("thhis.modified", this.vaccinationsToDisplay);
-      this.submitVaccinationRecord();
-      this.launchVaccinationDetails = false;
-      this.allowEditVaccination = false;
+      console.log("thhis.modified", this.vaccinationsToDisplay);      
     },
+    submitReviewedVaccinationChagnes() {
+      this.submitVaccinationRecord();
+      this.submitVaccinationDeletion();
+      this.launchVaccinationDetails = false;
+      this.editVaccination = false;
+      this.vaccineEditTab = 1;
+    }
   }
 };
 </script>

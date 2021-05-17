@@ -295,7 +295,7 @@
         </md-dialog-title>
 
 
-        <md-dialog-content style="height: 70vh; min-width: 50vw">        
+        <md-dialog-content v-if="vaccineEditTab==1" style="height: 70vh; min-width: 50vw">        
           <md-content class="mt-3">          
             <div id="vaccination-records">
               <button type="button" class="btn btn-md" @click="allowEditVaccination = true;">
@@ -338,9 +338,7 @@
                       <button type="button" class="btn btn-md text-white md-accent mt-1 ml-auto" @click="addNewVaccinateToRecord()" :disabled="newVaccine.manufacturer == null || newVaccine.date == null">
                         Add Date
                       </button>
-                    </div>
-
-                    
+                    </div>                    
 
                   </md-card-content>
                 </md-card>
@@ -348,9 +346,6 @@
               </div>
 
 
-
-
-              
 
               <md-table v-if="allowEditVaccination != true" v-model="curSelectedVaccinations" class="mt-5 md-elevation-1" md-card>
                 <!-- <md-table-toolbar >
@@ -362,7 +357,8 @@
                     {{showDisplayDate(item.date, 'll')}}                
                   </md-table-cell>
                   <md-table-cell md-label="Manufacturer">
-                    <span>{{ item.manufacturer }}</span>                
+                    <span>{{ item.manufacturer }}</span>  
+                    <small v-if="item.new == true"> [Pending...] </small>              
                   </md-table-cell>                
                 </md-table-row>
               </md-table>
@@ -395,11 +391,62 @@
           </md-content>
         </md-dialog-content>
 
+
+        <md-dialog-content v-if="vaccineEditTab==2" class="mt-3">          
+          <div id="vaccination-records">
+            <button type="button" class="btn btn-md" @click="editVaccination = true; formatVaccinationDate()">
+              <md-icon class="fa fa-edit"></md-icon>
+            </button>  
+
+            <md-table v-model="curSelectedVaccinations" class="mt-3 md-elevation-1" md-card>
+              <md-table-toolbar>
+                <h3 class="md-title">Vaccination to update</h3>
+              </md-table-toolbar>
+              <md-table-row slot="md-table-row" slot-scope="{ item }">
+                <md-table-cell md-label="Date">
+                  {{showDisplayDate(item.date, 'll')}}                
+                </md-table-cell>
+                <md-table-cell md-label="Manufacturer">
+                  <span>{{ item.manufacturer }}</span>   
+                  <small v-if="item.new == true"> [Pending...] </small>             
+                </md-table-cell>                
+              </md-table-row>    
+            </md-table>
+
+            <!-- Vaccination to delete -->
+            <md-table v-if="vaccinationsToDelete" v-model="vaccinationsToDelete" class="mt-3 md-elevation-1" md-card>
+              <md-table-toolbar>
+                <h3 class="md-title">Vaccination to delete</h3>
+              </md-table-toolbar>
+              <md-table-row slot="md-table-row" slot-scope="{ item }">
+                <md-table-cell md-label="Date">
+                  {{showDisplayDate(item.date, 'll')}}                
+                </md-table-cell>
+                <md-table-cell md-label="Manufacturer">
+                  <span>{{ item.manufacturer }}</span>                
+                </md-table-cell>                
+              </md-table-row>    
+            </md-table>
+
+            
+          </div>
+        </md-dialog-content >
+
         <md-dialog-actions>
-          <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="dismissResetVaccinationDetails()">Go Back</button>
-          <button v-show="allowEditVaccination" type="button" class="btn btn-md text-white" style="background-color:blue" @click="updateVaccinationChanges();">
-            Save
-          </button>
+          <button v-if="vaccineEditTab != 2" style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="dismissResetVaccinationDetails()">Go Back</button>
+
+          <div v-if="vaccineEditTab == 1 && allowEditVaccination">
+            <button type="button" class="btn btn-md text-white" style="background-color:blue" @click="vaccineEditTab = 2">
+              Next
+            </button>
+          </div>
+          <div v-if="vaccineEditTab == 2">
+            <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="vaccineEditTab=1">Go Back</button>
+            <button v-show="allowEditVaccination" type="button" class="btn btn-md text-white" style="background-color:blue" @click="updateVaccinationChanges();">
+              Submit
+            </button>
+          </div>
+          
         </md-dialog-actions>
     </md-dialog>
 
@@ -759,12 +806,17 @@
             <td style="width: 15%">
               {{ user.lastUpdatedFormatted }}
             </td>
-            <td style="width: 15%">
+            <td style="width: 15%;text-align: center;">
               <!-- {{ user.lastVaccinated }} -->
-              <a style="cursor:pointer" class="mx-auto" @click="curSelectedUserIndex = index">{{ user.lastVaccinated }}</a>
+              <button type="button" class="btn btn-sm btn-block py-0" style="color:white;background-color:gray" @click="curSelectedUserIndex = index">
+                <small>{{ user.lastVaccinated }}</small>
+              </button>
             </td>
             <td style="width: 10%;">
-              <a style="cursor:pointer" class="mx-auto" @click="curSelectedUserIndex = index">{{ user.vaccinationCount }}</a>
+              <!-- <a style="color:#1a0dab; cursor:pointer" class="mx-auto" @click="curSelectedUserIndex = index">{{ user.vaccinationCount }}</a> -->
+              <button type="button" class="btn btn-sm btn-block py-0" style="color:white;background-color:gray" @click="curSelectedUserIndex = index">
+                <small>{{ user.vaccinationCount }}</small>
+              </button>
             </td>
             <td style="width: 15%">
               {{ user.dateOfConsentFormatted }}
@@ -891,13 +943,16 @@ export default {
       },
       newVaccine: {
         manufacturer: null,
-        date: new Date()
-      }
+        date: new Date(),
+        new: true
+      },
+      vaccineEditTab: 1,
+      vaccinationsToDelete: [],
+      curSelectedVaccinations: []
     };
   },
-  computed: {
-    curSelectedVaccinations() {
-      console.log("curSelectedVaccinations", this.curSelectedUserIndex, this.users[this.curSelectedUserIndex]);
+  watch: {
+    curSelectedUserIndex: function () {
       if (this.curSelectedUserIndex == null) return [];
 
       let vacs = this.users[this.curSelectedUserIndex].vaccination? this.users[this.curSelectedUserIndex].vaccination: null;
@@ -905,11 +960,30 @@ export default {
 
       vacs.forEach(vac=> {
         vac.formattedDate = new Date(vac.date);
+
+        if (vac.hasOwnProperty("new")) delete vac.new;
       });
 
-      console.log("vacs", vacs);
-      return vacs;
-    },
+      vacs.sort((a, b) => a.formattedDate - b.formattedDate);
+
+      this.curSelectedVaccinations = vacs;
+    }
+  },
+  computed: {
+    // curSelectedVaccinations() {
+    //   console.log("curSelectedVaccinations", this.curSelectedUserIndex, this.users[this.curSelectedUserIndex]);
+    //   if (this.curSelectedUserIndex == null) return [];
+
+    //   let vacs = this.users[this.curSelectedUserIndex].vaccination? this.users[this.curSelectedUserIndex].vaccination: null;
+    //   if (vacs == null) return [];
+
+    //   vacs.forEach(vac=> {
+    //     vac.formattedDate = new Date(vac.date);
+    //   });
+
+    //   console.log("vacs", vacs);
+    //   return vacs;
+    // },
     officesSelectedCount() {
       let i = 0;
       this.regions.forEach(r => {
@@ -1168,22 +1242,54 @@ export default {
       this.curSelectedVaccinations[index].manufacturer = newVal;
       // this.users[this.curSelectedUserIndex].vaccination[index].manufacturer = newVal;
     },
-    deleteExistingVaccineSelection(index) {
-      console.log("deleting existing", index);
+    // deleteExistingVaccineSelection(index) {
+    //   console.log("deleting existing", index);
 
+    //   let curItem = this.curSelectedVaccinations.splice(index, 1)[0];
+    //   console.log("curitem", curItem);
+    //   curItem.delete = true;
+
+    //   this.$api.post("/api/vaccination/delete-vaccination-record", curItem).then(record => {
+    //     console.log("record.data", record.data);
+    //     this.reformatVaccineMeta();
+    //   });
+    // },
+    deleteExistingVaccineSelection(index) {    
       let curItem = this.curSelectedVaccinations.splice(index, 1)[0];
-      console.log("curitem", curItem);
       curItem.delete = true;
-
-      this.$api.post("/api/vaccination/delete-vaccination-record", curItem).then(record => {
+      this.vaccinationsToDelete.push(curItem);
+    },
+    submitVaccinationDeletion() {
+      if (!this.vaccinationsToDelete || this.vaccinationsToDelete.length == 0) return; //skipping
+      this.$api.post("/api/vaccination/delete-vaccination-record", this.vaccinationsToDelete).then(record => {
         console.log("record.data", record.data);
-        this.reformatVaccineMeta();
+        this.vaccinationsToDelete = null;
       });
     },
     dismissResetVaccinationDetails() {
       console.log("thhis.curSelectedVaccinations", this.curSelectedVaccinations);
       console.log("going bnack", this.users[this.curSelectedUserIndex].vaccination );
       // this.users[this.curSelectedUserIndex].vaccination = curSelectedVaccinations; //update to global users
+      // this.curSelectedVaccinations = this.curSelectedVaccinations.concat(this.vaccinationsToDelete).sort((a, b) => b.date - a.date);
+
+      var sortedSelectedVaccines;
+      if (this.vaccinationsToDelete.length > 0) {
+        sortedSelectedVaccines = this.curSelectedVaccinations.concat(this.vaccinationsToDelete).sort((a, b) => a.formattedDate - b.formattedDate);
+      }
+      else {
+        sortedSelectedVaccines = this.curSelectedVaccinations;
+      }      
+
+
+      console.log("sortedselectedvaccines", sortedSelectedVaccines);
+
+
+      this.users[this.curSelectedUserIndex].vaccination = sortedSelectedVaccines; // reset this in global
+
+      // const curIndex = this.curSelectedUserIndex;
+
+      // this.curSelectedUserIndex = curIndex;// re-trigger curSelectedVaccinations
+      this.vaccinationsToDelete = [];
       this.curSelectedUserIndex = null; // turnoff dialog
       console.log("gone", this.users);
     },
@@ -1203,38 +1309,56 @@ export default {
 
       console.log("thhis.modified", this.curSelectedVaccinations);
       this.reformatVaccineMeta();
+      this.submitVaccinationDeletion();
       this.submitVaccinationRecord();
       this.allowEditVaccination = false;      
+      this.vaccineEditTab = 1;
+
+
+      
+
+     
       this.curSelectedUserIndex = null;//dismiss modal
     },
     submitVaccinationRecord() {
-      this.$api.post("/api/vaccination/update-vaccination-records", this.curSelectedVaccinations).then(record => {
-        console.log("record.data", record.data);
-        // this.vaccinationsToDisplay = record.data;
-        
-      });
-    },
-    addNewVaccinateToRecord() {
-      // this.curSelectedVaccinations.push(this.newVaccine)
-
+      // console.log("this.users[this.curSelectedUserIndex]", this.users[this.curSelectedUserIndex]);
+      console.log("PRE SUBMIT", this.curSelectedVaccinations);
       const reqBody = {
-        vaccine: this.newVaccine,
-        userId: this.users[this.curSelectedUserIndex].id
+        sender: "Admin",
+        target: this.users[this.curSelectedUserIndex].email,
+        content: this.curSelectedVaccinations
       }
+      this.$api.post("/api/vaccination/update-vaccination-records", reqBody).then(record => {
+        console.log("record.data", record.data);
+        // this.curSelectedVaccinations = record.data; 
 
-      console.log("reqbody", reqBody, this.users[this.curSelectedUserIndex]);
-      
-      this.$api.post("/api/vaccination/add-one", reqBody).then(newVac => {
-        // this.vaccinationsToDisplay = record.data;
 
-        this.curSelectedVaccinations.push(newVac.data);
-
-        console.log("this.uersssss", this.users[this.curSelectedUserIndex]);
-
-        this.reformatVaccineMeta();
         
       });
+    },    
+    addNewVaccinateToRecord() {
+      this.newVaccine.formattedDate = new Date(this.newVaccine.date);
+      this.curSelectedVaccinations.push(this.newVaccine);
+      console.log("added!!", this.curSelectedVaccinations);
+      // const reqBody = {
+      //   vaccine: this.newVaccine,
+      //   userId: this.users[this.curSelectedUserIndex].id,
+      //   sender: "Admin",
+      //   target: this.users[this.curSelectedUserIndex].email
+      // }
 
+      // console.log("reqbody", reqBody, this.users[this.curSelectedUserIndex]);
+      
+      // this.$api.post("/api/vaccination/add-one", reqBody).then(newVac => {
+      //   // this.curSelectedVaccinations = record.data;
+
+      //   this.curSelectedVaccinations.push(newVac.data);
+
+      //   console.log("this.uersssss", this.users[this.curSelectedUserIndex]);
+
+      //   this.reformatVaccineMeta();
+        
+      // });
     },
     setNewVaccineManuFacturer(manufacturer) {
       this.newVaccine.manufacturer = manufacturer;
