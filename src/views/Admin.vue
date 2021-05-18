@@ -436,13 +436,13 @@
           <button v-if="vaccineEditTab != 2" style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="dismissResetVaccinationDetails()">Go Back</button>
 
           <div v-if="vaccineEditTab == 1 && allowEditVaccination">
-            <button type="button" class="btn btn-md text-white" style="background-color:blue" @click="vaccineEditTab = 2">
+            <button type="button" class="btn btn-md text-white md-accent"  @click="vaccineEditTab = 2">
               Next
             </button>
           </div>
           <div v-if="vaccineEditTab == 2">
             <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="vaccineEditTab=1">Go Back</button>
-            <button v-show="allowEditVaccination" type="button" class="btn btn-md text-white" style="background-color:blue" @click="updateVaccinationChanges();">
+            <button v-show="allowEditVaccination" type="button" class="btn btn-md text-white" style="background-color:#00a3ad;" @click="updateVaccinationChanges();">
               Submit
             </button>
           </div>

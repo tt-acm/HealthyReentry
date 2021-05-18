@@ -197,7 +197,7 @@
         <div v-else>
           <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="vaccineTab=1">Go Back</button>
 
-          <button type="button" class="btn btn-md text-white" style="background-color:blue" @click="launchVaccinationForm = false;submitVaccinationRecord()">
+          <button type="button" class="btn btn-md text-white" style="background-color:#00a3ad;" @click="launchVaccinationForm = false;submitVaccinationRecord()">
             Submit
           </button>
 
@@ -308,13 +308,13 @@
 
       <md-dialog-actions>
         <button v-show="vaccineEditTab != 2" style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="launchVaccinationDetails = false; clearUnsavedVaccinationEdit()">Go Back</button>
-        <button v-show="editVaccination && vaccineEditTab == 1" type="button" class="btn btn-md text-white" style="background-color:blue" @click="vaccineEditTab= 2;updateVaccinationChanges();">
+        <button v-show="editVaccination && vaccineEditTab == 1" type="button" class="btn btn-md text-white md-accent" @click="vaccineEditTab= 2;updateVaccinationChanges();">
           Next
         </button>
         <div v-show="editVaccination && vaccineEditTab == 2" >
           <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="vaccineEditTab=1">Go Back</button>
 
-          <button type="button" class="btn btn-md text-white" style="background-color:blue" :disabled="disableSubmittingRevisedVaccination" @click="launchVaccinationForm = false;submitReviewedVaccinationChagnes()">
+          <button type="button" class="btn btn-md text-white" style="background-color:#00a3ad;" :disabled="disableSubmittingRevisedVaccination" @click="launchVaccinationForm = false;submitReviewedVaccinationChagnes()">
             Submit
           </button>
         </div>
