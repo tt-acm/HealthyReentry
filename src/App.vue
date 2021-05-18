@@ -9,17 +9,17 @@
 
   <!-- Notifications -->
   <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showDisclosureMsg" md-persistent class="px-2" style="margin-bottom:55px; background-color: #004050">
-    <span> Your consent has been submitted. A copy of the disclosure and consent has been sent to your {{companyInitials}} email for reference (keep an eye out for an email from {{sender}}).</span>
+    <span class="mx-auto"> Your consent has been submitted. A copy of the disclosure and consent has been sent to your {{companyInitials}} email for reference (keep an eye out for an email from {{sender}}).</span>
   </md-snackbar>
   <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showStatusMsg" md-persistent style="margin-bottom:55px; background-color: #004050">
-    <span> Status successfully recorded.</span>
+    <span class="mx-auto"> Status successfully recorded.</span>
   </md-snackbar>
   <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showEncounterMsg" md-persistent style="margin-bottom:55px; background-color: #004050">
-    <span> Encounter submitted successfully.</span>
+    <span class="mx-auto"> Encounter submitted successfully.</span>
   </md-snackbar>
 
   <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showVaccinationMsg" md-persistent style="margin-bottom:55px; background-color: #004050">
-    <span> Vaccination record updated successfully.</span>
+    <span class="mx-auto"> Vaccination record updated successfully.</span>
   </md-snackbar>
 
   <Footer />
