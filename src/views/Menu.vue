@@ -35,27 +35,21 @@
         </router-link>
       </md-list-item>
 
-      <md-list-item>
+      <!-- <md-list-item>
         <router-link class="mx-auto" :to="{ name: 'encounter', params: { id: user._id}}">
           <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
           Record a TT Encounter
         </button>
-          <!-- <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;">
-            <h6 class="mb-0 text-white">Record a TT Encounter</h6>
-          </md-button> -->
         </router-link>
-      </md-list-item>
+      </md-list-item> -->
 
-      <md-list-item>
+      <!-- <md-list-item>
         <router-link class="mx-auto" :to="{ name: 'displayqr', params: { id: user._id}}">
           <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
           Display QR Code
         </button>
-          <!-- <md-button class="md-raised md-accent menu-button" style="margin-top: 16px;">
-            <h6 class="mb-0 text-white">Display QR Code</h6>
-          </md-button> -->
         </router-link>
-      </md-list-item>
+      </md-list-item> -->
 
       <md-list-item>
           <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent" @click="launchVaccinationForm=true;vaccineTab=1">
