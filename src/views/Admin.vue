@@ -381,7 +381,7 @@
 
                   <md-table-cell md-label="">                
                     <button v-show="allowEditVaccination" type="button" class="btn btn-md" @click="deleteExistingVaccineSelection(index)">
-                      <md-icon class="fa fa-minus-circle" ></md-icon>
+                      <md-icon class="fa fa-minus-circle" style="color:red"></md-icon>
                     </button>                  
                   </md-table-cell>
                 </md-table-row>      

@@ -183,7 +183,7 @@
                 </md-table-cell>
                 <md-table-cell md-label="">                  
                   <button v-show="item.new" type="button" class="btn btn-md" @click="deleteVaccineSelection(index)">                    
-                    <md-icon class="fa fa-minus-circle" ></md-icon>                    
+                    <md-icon class="fa fa-minus-circle" style="color:red"></md-icon>                    
                   </button>
                 </md-table-cell>
               </md-table-row>
@@ -194,20 +194,28 @@
       </md-dialog-content>
 
       <md-dialog-actions>
-        <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="setVaccineTab()">Go Back</button>
-        <button v-if="vaccineTab == 1" type="button" class="btn btn-md text-white md-accent" @click="vaccineTab = 2" :disabled="this.vaccinationsToDisplay.length < 1">
-          Next
-        </button>
-        <button v-else type="button" class="btn btn-md text-white" style="background-color:blue" @click="launchVaccinationForm = false;submitVaccinationRecord()">
-          Submit
-        </button>
+        <div v-if="vaccineTab == 1">
+          <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="setVaccineTab()">Go Back</button>
+          <button type="button" class="btn btn-md text-white md-accent" @click="vaccineTab = 2" :disabled="this.vaccinationsToDisplay.length < 1">
+            Next
+          </button>
+        </div>
+        <div v-else>
+          <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="vaccineTab=1">Go Back</button>
+
+          <button type="button" class="btn btn-md text-white" style="background-color:blue" @click="launchVaccinationForm = false;submitVaccinationRecord()">
+            Submit
+          </button>
+
+        </div>       
+        
       </md-dialog-actions>
   </md-dialog>
 
   <!-- Vaccination edit modal -->
   <md-dialog :md-active.sync="launchVaccinationDetails" :md-fullscreen="true">
       <md-dialog-title class="pb-0 mb-2">
-        Your Vaccination Record {{vaccineEditTab}}
+        Your Vaccination Record
       </md-dialog-title>
 
 
@@ -215,8 +223,9 @@
         <md-content v-if="vaccineEditTab==1" class="mt-3">
           
           <div id="vaccination-records">
-            <button type="button" class="btn btn-md" @click="editVaccination = true; formatVaccinationDate()">
-              <md-icon class="fa fa-edit"></md-icon>
+            <button type="button" v-if="!editVaccination" class="btn btn-md md-accent" @click="editVaccination = true; formatVaccinationDate()">
+              <!-- <md-icon class="fa fa-edit"></md-icon> -->
+              <span style="color:white">Edit</span>
             </button>  
 
             <md-table v-if="editVaccination != true" v-model="vaccinationsToDisplay" class="mt-3 md-elevation-1" md-card>
@@ -251,7 +260,7 @@
 
                 <md-table-cell md-label="">                
                   <button v-show="editVaccination" type="button" class="btn btn-md" @click="deleteExistingVaccineSelection(index)">
-                    <md-icon class="fa fa-minus-circle" ></md-icon>
+                    <md-icon class="fa fa-minus-circle" style="color:red" ></md-icon>
                   </button>                  
                 </md-table-cell>
               </md-table-row>            
@@ -306,7 +315,7 @@
       <md-dialog-actions>
         <button v-show="vaccineEditTab != 2" style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="launchVaccinationDetails = false; clearUnsavedVaccinationEdit()">Go Back</button>
         <button v-show="editVaccination && vaccineEditTab == 1" type="button" class="btn btn-md text-white" style="background-color:blue" @click="vaccineEditTab= 2;updateVaccinationChanges();">
-          Review
+          Next
         </button>
         <div v-show="editVaccination && vaccineEditTab == 2" >
           <button style="background-color:white; border:0px; font-size:16px; margin-right:15px" @click="vaccineEditTab=1">Go Back</button>
@@ -513,6 +522,8 @@ export default {
         date: this.curVaccineDate,
         new: true
       });
+
+      this.curVaccineDate = null;
     },
     setVaccineTab() {
       if (this.vaccineTab == 1) this.launchVaccinationForm = false;
@@ -549,7 +560,7 @@ export default {
       if (!this.vaccinationsToDelete || this.vaccinationsToDelete.length == 0) return; //skipping
       this.$api.post("/api/vaccination/delete-vaccination-record", this.vaccinationsToDelete).then(record => {
         console.log("record.data", record.data);
-        this.vaccinationsToDelete = [];
+        this.vaccinationsToDelete = [];        
       });
     },
     submitVaccinationRecord() {
@@ -562,6 +573,7 @@ export default {
       this.$api.post("/api/vaccination/update-vaccination-records", reqBody).then(record => {
         console.log("record.data", record.data);
         this.vaccinationsToDisplay = record.data;
+        this.$emit("vaccinationMsg");
       });
     },
     overwriteVacinemanufacturer(item) {

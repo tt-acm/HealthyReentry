@@ -4,7 +4,7 @@
   <!-- <hr /> -->
   <!-- <md-content class="mx-3" style="max-width:600px"> -->
   <md-content class="mx-auto" style="padding-top:75px;padding-bottom:40px;">
-    <router-view class="px-3" @disclosureMsg="disclosureMsg" @statusMsg="statusMsg" @encounterMsg="encounterMsg"/>
+    <router-view class="px-3" @disclosureMsg="disclosureMsg" @statusMsg="statusMsg" @encounterMsg="encounterMsg" @vaccinationMsg="vaccinationMsg"/>
   </md-content>
 
   <!-- Notifications -->
@@ -16,6 +16,10 @@
   </md-snackbar>
   <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showEncounterMsg" md-persistent style="margin-bottom:55px; background-color: #004050">
     <span> Encounter submitted successfully.</span>
+  </md-snackbar>
+
+  <md-snackbar md-position="center" :md-duration="notificationDuration" :md-active.sync="showVaccinationMsg" md-persistent style="margin-bottom:55px; background-color: #004050">
+    <span> Vaccination record updated successfully.</span>
   </md-snackbar>
 
   <Footer />
@@ -38,6 +42,7 @@ export default {
       showDisclosureMsg: false,
       showStatusMsg: false,
       showEncounterMsg: false,
+      showVaccinationMsg: false,
       companyInitials: process.env.VUE_APP_COMPANY_INITIALS,
       sender:process.env.SENDGRID_EMAIL
     };
@@ -48,6 +53,7 @@ export default {
     statusMsg: function(alerts) { this.showStatusMsg = true; },
     disclosureMsg: function() { this.showDisclosureMsg = true; },
     encounterMsg: function() { this.showEncounterMsg = true; },
+    vaccinationMsg: function() { this.showVaccinationMsg = true; },
   }
 }
 </script>
