@@ -209,7 +209,9 @@
   <!-- Vaccination edit modal -->
   <md-dialog :md-active.sync="launchVaccinationDetails" :md-fullscreen="true">
       <md-dialog-title class="pb-0 mb-2">
-        Your Vaccination Record
+        <span v-if="editVaccination && vaccineEditTab == 2">Review Your Edited Vaccination Record</span>
+        <span v-else>Your Vaccination Record</span>
+        
       </md-dialog-title>
 
 
@@ -268,9 +270,9 @@
 
         <md-content v-if="vaccineEditTab==2" class="mt-3">          
           <div id="vaccination-records">
-            <button type="button" class="btn btn-md" @click="editVaccination = true; formatVaccinationDate()">
+            <!-- <button type="button" class="btn btn-md" @click="editVaccination = true; formatVaccinationDate()">
               <md-icon class="fa fa-edit"></md-icon>
-            </button>  
+            </button>   -->
 
             <md-table v-model="vaccinationsToDisplay" class="mt-3 md-elevation-1" md-card>
               <md-table-toolbar>
