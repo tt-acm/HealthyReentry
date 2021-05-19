@@ -91,7 +91,8 @@ router.get("/consent-signed", function (req, res) {
       var firstName = userName.split(' ')[0];
       var thisHTML = "<div><p>"+ firstName+ ",<br><br>Thank you for enrolling in the " + process.env.VUE_APP_NAME + " application. Attached is the disclosure and consent file you reviewed and agreed to.</p></div>";
 
-      const path = './server/assets/Disclosure.pdf';
+      // const path = './server/assets/Disclosure.pdf';
+      const path = './server/assets/Disclosure_Consent_5.19.21 FINAL.pdf';
       var attachment = fs.readFileSync(path);
 
 

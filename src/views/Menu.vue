@@ -27,7 +27,7 @@
       <md-list-item>
         <router-link class="mx-auto" :to="{ name: 'status', params: { id: user._id}}">
           <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent">
-            Report Your Health Status
+            Record Your Health Status
           </button>
           <!-- <md-button class="md-raised md-accent menu-button">
             <h6 class="my-3 text-white">Report Your Health Status</h6>
@@ -53,7 +53,7 @@
 
       <md-list-item>
           <button type="button" class="btn btn-lg btn-block text-center text-white my-2 md-accent" @click="launchVaccinationForm=true;vaccineTab=1">
-            Record Your Vaccination Status
+            Record Your Vaccination Data
           </button>
       </md-list-item>
       <!-- </div> -->
@@ -115,7 +115,7 @@
   <md-dialog :md-active.sync="launchVaccinationForm" :md-click-outside-to-close="false" :md-close-on-esc="false">
   <!-- <md-dialog :md-active.sync="launchVaccinationForm"> -->
       <md-dialog-title class="pb-0 mb-2">
-        Record Your Vaccination Status
+        Record Your Vaccination Data
       </md-dialog-title>
 
 
@@ -173,7 +173,7 @@
                 <md-table-cell md-label="Date">{{showDisplayDate(item.date, 'll')}}</md-table-cell>
                 <md-table-cell md-label="Manufacturer">
                   {{ item.manufacturer }}
-                  <small v-if="item.new == true"> [Pending...] </small>
+                  <!-- <small v-if="item.new == true"> [Pending...] </small> -->
                 </md-table-cell>
                 <md-table-cell md-label="">                  
                   <button v-show="item.new" type="button" class="btn btn-md" @click="deleteVaccineSelection(index)">                    

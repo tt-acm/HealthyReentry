@@ -358,7 +358,7 @@
                   </md-table-cell>
                   <md-table-cell md-label="Manufacturer">
                     <span>{{ item.manufacturer }}</span>  
-                    <small v-if="item.new == true"> [Pending...] </small>              
+                    <!-- <small v-if="item.new == true"> [Pending...] </small>               -->
                   </md-table-cell>                
                 </md-table-row>
               </md-table>
@@ -408,7 +408,7 @@
                 </md-table-cell>
                 <md-table-cell md-label="Manufacturer">
                   <span>{{ item.manufacturer }}</span>   
-                  <small v-if="item.new == true"> [Pending...] </small>             
+                  <!-- <small v-if="item.new == true"> [Pending...] </small>              -->
                 </md-table-cell>                
               </md-table-row>    
             </md-table>
