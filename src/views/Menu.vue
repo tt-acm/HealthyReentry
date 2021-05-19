@@ -121,7 +121,7 @@
 
       <md-dialog-content style="height: 70vh; max-width: 550px">
         <span v-if="vaccineTab==1" class="text-muted">
-          Select your vaccine manufacturer from the drop down, then select the date of your dose and click the <b>Add Date</b> button. 
+          Select your vaccine manufacturer from the dropdown, then select the date of your dose and click the <b>Add Date</b> button. 
           Repeat this step to add the dates of each dose, including booster shots (if applicable).
         </span>
         <span v-else class="text-muted">
