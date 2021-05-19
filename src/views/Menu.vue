@@ -115,7 +115,8 @@
   <md-dialog :md-active.sync="launchVaccinationForm" :md-click-outside-to-close="false" :md-close-on-esc="false">
   <!-- <md-dialog :md-active.sync="launchVaccinationForm"> -->
       <md-dialog-title class="pb-0 mb-2">
-        Record Your Vaccination Data
+        <span v-if="vaccineTab==1">Record Your Vaccination Data </span>
+        <span v-else>Review Your Vaccination Data </span>
       </md-dialog-title>
 
 

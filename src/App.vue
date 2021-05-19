@@ -44,7 +44,7 @@ export default {
       showEncounterMsg: false,
       showVaccinationMsg: false,
       companyInitials: process.env.VUE_APP_COMPANY_INITIALS,
-      sender:process.env.SENDGRID_EMAIL
+      sender:"healthyreentry-notifications@thorntontomasetti.com"
     };
   },
   mounted() {
