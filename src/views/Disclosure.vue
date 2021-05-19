@@ -34,7 +34,9 @@
           <p class="mb-1">
             Your consent is requested to record your status on Healthy Reentry. Please read and accept the terms below.
             <br>
-            <i class="text-muted">The information you provide should strictly relate to COVID-19 and will be used for the sole purpose of protecting you and your colleagues.</i>
+            <i class="text-muted">
+              The information you provide should strictly relate to COVID-19 and will be used for the purpose of protecting you and your colleagues while continuing to run the business.
+            </i>
           </p>
 
           <p class="card-text p-1 mt-4">
