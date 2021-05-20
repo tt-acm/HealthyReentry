@@ -216,7 +216,7 @@
       </md-dialog-title>
 
 
-      <md-dialog-content style="height: 70vh; min-width: 50vw">        
+      <md-dialog-content style="height: 70vh; min-width: 900px">        
         <md-content v-if="vaccineEditTab==1" class="mt-3">
           
           <div id="vaccination-records">
@@ -342,7 +342,6 @@ export default {
   created() {
     this.$api.get("/api/status/get-current").then(returnedStatus => {
       this.latestStatus = returnedStatus.data;
-      console.log("latest status", this.latestStatus);
       this.styleObject.backgroundColor = statusColors[returnedStatus.data.status];
     });
 
@@ -469,7 +468,6 @@ export default {
   watch: {
     dataReadyForSave: function () {
       const notAllowedItem = this.vaccinationsToDisplay.filter(vac => {
-        console.log("vac", vac);
         if (!vac.date || !vac.manufacturer) return true;
       })
 
@@ -535,28 +533,15 @@ export default {
     deleteVaccineSelection(index) {
       this.vaccinationsToDisplay.splice(index, 1);
     },
-    deleteExistingVaccineSelection(index) {
-      console.log("deleting existing", index);   
-      
-
+    deleteExistingVaccineSelection(index) {    
       let curItem = this.vaccinationsToDisplay.splice(index, 1)[0];
       curItem.delete = true;
-      console.log("curitem", curItem);
 
       this.vaccinationsToDelete.push(curItem);
-      // this.submitVaccinationDeletion(curItem);
-      // this.$api.post("/api/vaccination/delete-vaccination-record", curItem).then(record => {
-      //   console.log("record.data", record.data);
-      //   // this.vaccinationsToDisplay = record.data;
-      // });
     },
     submitVaccinationDeletion() {
-      // let curItem = this.vaccinationsToDisplay.splice(index, 1)[0];
-      // curItem.delete = true;
-      // console.log("curitem", curItem);
       if (!this.vaccinationsToDelete || this.vaccinationsToDelete.length == 0) return; //skipping
       this.$api.post("/api/vaccination/delete-vaccination-record", this.vaccinationsToDelete).then(record => {
-        console.log("record.data", record.data);
         this.vaccinationsToDelete = [];        
       });
     },
@@ -568,7 +553,6 @@ export default {
       };
 
       this.$api.post("/api/vaccination/update-vaccination-records", reqBody).then(record => {
-        console.log("record.data", record.data);
         this.vaccinationsToDisplay = record.data;
         this.$emit("vaccinationMsg");
       });
@@ -577,7 +561,6 @@ export default {
       this.curVaccineManufacturer = item;
     },
     overwriteExistingVacinemanufacturer(newVal, index) {
-      console.log("ovwerwriting...", newVal, index);
       this.vaccinationsToDisplay[index].manufacturer = newVal;
     },
     formatVaccinationDate() {
@@ -594,14 +577,10 @@ export default {
     getAllVaccination() {
       this.$api.get("/api/vaccination/get-all").then(returnedVac => {
         this.vaccinationsToDisplay = returnedVac.data;
-        console.log(this.vaccinationsToDisplay);
       });
     },
     updateVaccinationChanges() {
-      console.log("thhis.vaccinatetodisplay", this.vaccinationsToDisplay);
       this.vaccinationsToDisplay.forEach(vac=> {
-        console.log("vac.formattedDate", vac.formattedDate);
-
         if (!vac.formattedDate) {
           this.disableSubmittingRevisedVaccination = true;
           vac.date = null;
@@ -611,8 +590,6 @@ export default {
           vac.date = vac.formattedDate;
         }        
       });
-
-      console.log("thhis.modified", this.vaccinationsToDisplay);      
     },
     submitReviewedVaccinationChagnes() {
       this.submitVaccinationRecord();

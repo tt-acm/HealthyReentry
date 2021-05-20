@@ -965,25 +965,10 @@ export default {
       });
 
       vacs.sort((a, b) => a.formattedDate - b.formattedDate);
-
       this.curSelectedVaccinations = vacs;
     }
   },
   computed: {
-    // curSelectedVaccinations() {
-    //   console.log("curSelectedVaccinations", this.curSelectedUserIndex, this.users[this.curSelectedUserIndex]);
-    //   if (this.curSelectedUserIndex == null) return [];
-
-    //   let vacs = this.users[this.curSelectedUserIndex].vaccination? this.users[this.curSelectedUserIndex].vaccination: null;
-    //   if (vacs == null) return [];
-
-    //   vacs.forEach(vac=> {
-    //     vac.formattedDate = new Date(vac.date);
-    //   });
-
-    //   console.log("vacs", vacs);
-    //   return vacs;
-    // },
     officesSelectedCount() {
       let i = 0;
       this.regions.forEach(r => {
@@ -1130,9 +1115,6 @@ export default {
       this.filteredUsersCount = userData.data.filteredCount;
       let users = userData.data.users;
 
-      console.log("users", users);
-
-
       this.users = users.map(u => {
         let hasStatus = u.status && u.status.status !== null && u.status.status !== undefined;
         let code = (hasStatus) ? u.status.status : -1;
@@ -1157,16 +1139,12 @@ export default {
         return user;
       });
 
-      console.log("this.user", this.users);
-
-
       this.isLoading = false;
 
     },
     async sendUpdateData() {
 
-      this.userUpdateData.selectedUserIds = this.selectedUsers
-                                                .map(u => { return { userId: u.id }});
+      this.userUpdateData.selectedUserIds = this.selectedUsers.map(u => { return { userId: u.id }});
 
       this.isLoading = true;
       let res = await this.$api.post("/api/admin/update-users", this.userUpdateData);
@@ -1238,22 +1216,9 @@ export default {
       return this.moment(date).format(format);
     },
     overwriteExistingVacinemanufacturer(newVal, index) {
-      console.log("ovwerwriting...", newVal, index);
+      // console.log("ovwerwriting...", newVal, index);
       this.curSelectedVaccinations[index].manufacturer = newVal;
-      // this.users[this.curSelectedUserIndex].vaccination[index].manufacturer = newVal;
     },
-    // deleteExistingVaccineSelection(index) {
-    //   console.log("deleting existing", index);
-
-    //   let curItem = this.curSelectedVaccinations.splice(index, 1)[0];
-    //   console.log("curitem", curItem);
-    //   curItem.delete = true;
-
-    //   this.$api.post("/api/vaccination/delete-vaccination-record", curItem).then(record => {
-    //     console.log("record.data", record.data);
-    //     this.reformatVaccineMeta();
-    //   });
-    // },
     deleteExistingVaccineSelection(index) {    
       let curItem = this.curSelectedVaccinations.splice(index, 1)[0];
       curItem.delete = true;
@@ -1262,13 +1227,10 @@ export default {
     submitVaccinationDeletion() {
       if (!this.vaccinationsToDelete || this.vaccinationsToDelete.length == 0) return; //skipping
       this.$api.post("/api/vaccination/delete-vaccination-record", this.vaccinationsToDelete).then(record => {
-        console.log("record.data", record.data);
         this.vaccinationsToDelete = null;
       });
     },
     dismissResetVaccinationDetails() {
-      console.log("thhis.curSelectedVaccinations", this.curSelectedVaccinations);
-      console.log("going bnack", this.users[this.curSelectedUserIndex].vaccination );
       // this.users[this.curSelectedUserIndex].vaccination = curSelectedVaccinations; //update to global users
       // this.curSelectedVaccinations = this.curSelectedVaccinations.concat(this.vaccinationsToDelete).sort((a, b) => b.date - a.date);
 
@@ -1281,17 +1243,13 @@ export default {
       }      
 
 
-      console.log("sortedselectedvaccines", sortedSelectedVaccines);
-
 
       this.users[this.curSelectedUserIndex].vaccination = sortedSelectedVaccines; // reset this in global
 
       // const curIndex = this.curSelectedUserIndex;
-
       // this.curSelectedUserIndex = curIndex;// re-trigger curSelectedVaccinations
       this.vaccinationsToDelete = [];
       this.curSelectedUserIndex = null; // turnoff dialog
-      console.log("gone", this.users);
     },
     reformatVaccineMeta() {
 
@@ -1302,12 +1260,10 @@ export default {
       this.users[this.curSelectedUserIndex].lastVaccinated = vacCount > 0 ? new Date(this.curSelectedVaccinations[vacCount-1].date).toDateString() : 'Not Available';
     },
     updateVaccinationChanges() {
-      console.log("thhis.curSelectedVaccinations", this.curSelectedVaccinations);
       this.curSelectedVaccinations.forEach(vac=> {
         vac.date = vac.formattedDate;
       });
 
-      console.log("thhis.modified", this.curSelectedVaccinations);
       this.reformatVaccineMeta();
       this.submitVaccinationDeletion();
       this.submitVaccinationRecord();
@@ -1321,44 +1277,18 @@ export default {
       this.curSelectedUserIndex = null;//dismiss modal
     },
     submitVaccinationRecord() {
-      // console.log("this.users[this.curSelectedUserIndex]", this.users[this.curSelectedUserIndex]);
-      console.log("PRE SUBMIT", this.curSelectedVaccinations);
       const reqBody = {
         sender: "Admin",
         target: this.users[this.curSelectedUserIndex].email,
         content: this.curSelectedVaccinations
       }
       this.$api.post("/api/vaccination/update-vaccination-records", reqBody).then(record => {
-        console.log("record.data", record.data);
         // this.curSelectedVaccinations = record.data; 
-
-
-        
       });
     },    
     addNewVaccinateToRecord() {
       this.newVaccine.formattedDate = new Date(this.newVaccine.date);
       this.curSelectedVaccinations.push(this.newVaccine);
-      console.log("added!!", this.curSelectedVaccinations);
-      // const reqBody = {
-      //   vaccine: this.newVaccine,
-      //   userId: this.users[this.curSelectedUserIndex].id,
-      //   sender: "Admin",
-      //   target: this.users[this.curSelectedUserIndex].email
-      // }
-
-      // console.log("reqbody", reqBody, this.users[this.curSelectedUserIndex]);
-      
-      // this.$api.post("/api/vaccination/add-one", reqBody).then(newVac => {
-      //   // this.curSelectedVaccinations = record.data;
-
-      //   this.curSelectedVaccinations.push(newVac.data);
-
-      //   console.log("this.uersssss", this.users[this.curSelectedUserIndex]);
-
-      //   this.reformatVaccineMeta();
-        
-      // });
     },
     setNewVaccineManuFacturer(manufacturer) {
       this.newVaccine.manufacturer = manufacturer;

@@ -22,7 +22,7 @@ const mongoose = require('mongoose');
  *            description: Date of the vaccination.
  *        example:
  *           user: $ref to User
- *           status: 0
+ *           manufacturer: Moderna
  *           date: Wed Jun 29 2011 11:52:48 GMT-0500 (Central Daylight Time)
  */
 var vaccinationSchema = new mongoose.Schema({
