@@ -3,9 +3,9 @@
     <md-field class="mb-3">
         <label for="font">Choose the manufacturer</label>
         <md-select v-model="curVaccineManufacturer" name="vaccine" id="vaccine" placeholder="Choose the manufacturer" :md-selected="$emit('vaccineSelected', curVaccineManufacturer, curIndex)">
-            <md-option value="AstraZeneca">Oxford-AstraZeneca</md-option>
             <md-option value="JohnsonJohnson">Johnson & Johnson</md-option>
             <md-option value="Moderna">Moderna</md-option>
+            <md-option value="AstraZeneca">Oxford-AstraZeneca</md-option>          
             <md-option value="Pfizer">Pfizer-BioNTech</md-option>
             <md-option value="Bharat Biotech">Bharat Biotech</md-option>
             <md-option value="CanSinoBIO">CanSinoBIO</md-option>
