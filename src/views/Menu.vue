@@ -290,7 +290,7 @@
             </md-table>
 
             <!-- Vaccination to delete -->
-            <md-table v-if="vaccinationsToDelete" v-model="vaccinationsToDelete" class="mt-3 md-elevation-1" md-card>
+            <md-table v-if="vaccinationsToDelete && vaccinationsToDelete.length > 0" v-model="vaccinationsToDelete" class="mt-3 md-elevation-1" md-card>
               <md-table-toolbar>
                 <h3 class="md-title">Vaccination to delete</h3>
               </md-table-toolbar>
