@@ -7,10 +7,10 @@
             <md-option value="Moderna">Moderna</md-option>
             <md-option value="AstraZeneca">Oxford-AstraZeneca</md-option>          
             <md-option value="Pfizer">Pfizer-BioNTech</md-option>
-            <md-option value="Bharat Biotech">Bharat Biotech</md-option>
+            <md-option value="COVAXIN">Bharat Biotech (COVAXIN)</md-option>
             <md-option value="CanSinoBIO">CanSinoBIO</md-option>
             <md-option value="Covishield">Covishield</md-option> 
-            <md-option value="CVnCoV">CVnCoV</md-option>               
+            <md-option value="CVnCoV">CureVac(CVnCoV)</md-option>               
             <md-option value="Novavax">Novavax</md-option>  
             <md-option value="Sinopharm">Sinopharm</md-option>                 
             <md-option value="Sinovac">Sinovac</md-option>   
