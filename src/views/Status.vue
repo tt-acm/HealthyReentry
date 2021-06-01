@@ -1,7 +1,7 @@
 <template>
 <div>
   <!-- <div class="d-flex"> -->
-  <h4 class="text-muted">Report Your Health Status</h4>
+  <h4 class="text-muted">Record Your Health Status</h4>
   <p v-if="latestStatus" class="ml-auto mt-auto mb-0"> <b>Last Updated on:</b> {{showDisplayDate(new Date(latestStatus.date))}} as {{status[latestStatus.status]}}</p>
   <!-- </div> -->
 

@@ -2,6 +2,7 @@ const router = require('express').Router();
 
 const User = require('../../models/User');
 const Status = require('../../models/Status');
+const Vaccination = require('../../models/Vaccination');
 
 const eg = require('../../lib/build_encounter_graph');
 const triggerUpdates = require('../../lib/trigger_updates');
@@ -136,6 +137,15 @@ router.post("/get-users-by-filters", async function(req, res) {
       })
       .limit(1);
     nu.status = st[0];
+
+    const vacs = await Vaccination.find({
+      "user": u._id
+    }).sort({
+      date: 1
+    });
+
+    nu.vaccination = vacs;
+
     users.push(nu)
   }
 

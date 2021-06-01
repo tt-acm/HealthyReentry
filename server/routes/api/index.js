@@ -41,6 +41,7 @@ router.use('/admin', [errHandler], require('./admin'));
 router.use('/encounters', [errHandler], require('./encounters'));
 router.use('/status', [errHandler], require('./status'));
 router.use('/workPreference', [errHandler], require('./workPreference'));
+router.use('/vaccination', [errHandler], require('./vaccination'));
 
 
 
