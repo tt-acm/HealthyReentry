@@ -68,7 +68,6 @@ async function main() {
         }
           // if (to.name === "home" || to.name === "disclosure") return next("/menu");//route signed user to menu
           // else return next();
-
       }
 
       Vue.prototype.$api.get("/api/session").then(session => {
