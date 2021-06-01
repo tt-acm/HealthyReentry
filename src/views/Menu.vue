@@ -327,15 +327,13 @@
 </div>
 </template>
 <script>
-// import store from "store/index.js";
+
 const statusColors = ["#00C851", "#FF9800", "#DC3545"]
 
-// import Vuex from 'vuex';
 import { mapState } from 'vuex'
 import VaccinationDropDown from '@/partials/VaccinationDropdown.vue'
 
 export default {
-  // props: ["user"],
   components: {
     VaccinationDropDown
   },
@@ -346,14 +344,6 @@ export default {
     });
 
     this.getAllVaccination();
-
-    // this.$api.get("/api/user/get-available-offices").then(offices => {
-    //   this.offices = offices.data;
-    //   if (this.offices && this.offices.length > 0) {
-    //     const officeIndex = this.offices.indexOf(this.user.location);
-    //     if (officeIndex !== -1) this.userOffice = this.offices[officeIndex];
-    //   }
-    // });
 
     this.$api.get("/api/workPreference/get-latest-preference").then(preference => {
       this.showDialog = true;
@@ -371,8 +361,6 @@ export default {
   },
   mounted() {
     this.mapButtonCSS();
-
-    // this.userOffice = this.user.location;
   },
   updated() {
     this.mapButtonCSS();
@@ -476,15 +464,6 @@ export default {
     },
   },
   computed: {
-    // dataReadyForSave: function () {
-    //   const notAllowedItem = this.vaccinationsToDisplay.filter(vac => {
-    //     console.log("vac", vac);
-    //     if (!vac.date || !vac.manufacturer) return true;
-    //   })
-
-    //   if (notAllowedItem.length == 0) return true;
-    //   else return false;
-    // },
     ...mapState({
       user: state => state.user,
     })
