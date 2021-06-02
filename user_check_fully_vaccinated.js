@@ -41,7 +41,6 @@ MongoClient.connect(url, {
                         if (err) return;
 
                         let promises = [];
-                        const totalUserCount = users.length;
 
                         // Loop through all users and see what vaccination do they have
                         users.forEach(u => {
@@ -56,8 +55,9 @@ MongoClient.connect(url, {
                         })
 
                         Promise.all(promises).then((usersWithVacs) => {
+                            const updateUserPromises = [];
 
-                            usersWithVacs.forEach(async function(vaccine, index) {
+                            usersWithVacs.forEach(function(vaccine, index) {
                                 // users[index].fullyVaccinated = true;
                                 if (!vaccine || vaccine.length == 0) return;
 
@@ -85,26 +85,23 @@ MongoClient.connect(url, {
 
                                 if (diffDate < 14) {
                                     // console.log("Still within the 14 day incubation: ", users[index].email);
-                                    // console.log("currently it has been: ", diffDate);
                                     return;
                                 }
 
 
-                                // console.log("diffDate", diffDate, diffDate / (1000 * 60 * 60 * 24));
-                                // console.log("truelly fully vaccinated --- ", users[index].email);
-                                // console.log("users[index]", users[index]);
-
-                                await userCollection.updateOne({_id: users[index]._id}, { $set:{fullyVaccinated: true}});
+                                const thisUpdate =  userCollection.updateOne({_id: users[index]._id}, { $set:{fullyVaccinated: true}});
                                 fullyVaccinatedCount += 1;
 
-                                if (index == totalUserCount-1) {
-                                    console.log("Vaccination Check Completed, closing db...");
-                                    console.log("Total Fully Vaccinated --- ", fullyVaccinatedCount);
-                                    client_db.close();
-                                }
+                                updateUserPromises.push(thisUpdate);
+                            });
 
-
+                            Promise.all(updateUserPromises).then((result) => {
+                                console.log("Vaccination Check Completed, closing db...");
+                                console.log("Total Fully Vaccinated --- ", fullyVaccinatedCount);   
+                                client_db.close();
                             })
+
+                            
                             //   resolve(users)
 
 
