@@ -37,8 +37,6 @@ router.post("/update-vaccination-records", function (req, res) {
   const allPromises = [];
   body.forEach(v => {
     if (v.new == true){
-      console.log("THIS IS NEW", v);
-
       if (!v.manufacturer || !v.date) return;
       const vac = new Vaccination({    
         user: req.user,
