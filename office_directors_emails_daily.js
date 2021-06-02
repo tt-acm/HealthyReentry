@@ -9,10 +9,8 @@ moment().format();
 
 const sgClient = require('@sendgrid/mail');
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
-// var sender = process.env.SENDGRID_EMAIL;
 var sender ="healthyreentry-notifications@thorntontomasetti.com"
 var url = process.env.MONGO_URL;
-
 
 const fs = require('fs');
 var templateContent = fs.readFileSync("./server/assets/email_templates/officeDirectorsReport_daily.html").toString("utf-8");
@@ -26,7 +24,7 @@ let directors = {
     "Beijing": "pfu@thorntontomasetti.com",
     "Boston": ["ldavey@thorntontomasetti.com", "bvollenweider@thorntontomasetti.com"],
     "Bristol": "nmisselbrook@thorntontomasetti.com",
-    "Chicago": "dweihing@thorntontomasetti.com",
+    "Chicago": ["rshiltagh@thorntontomasetti.com", "jperonto@thorntontomasetti.com"],
     "Copenhagen": "learl@thorntontomasetti.com",
     "Dallas": "jelliott@thorntontomasetti.com",
     "Denver": "jdandrea@thorntontomasetti.com",
@@ -62,7 +60,7 @@ let directors = {
     "Seattle": ["bmacrae@thorntontomasetti.com", "bmorgen@thorntontomasetti.com"],
     "Tampa": "DFusco@thorntontomasetti.com",
     "Toronto": "cminerva@thorntontomasetti.com",
-    "Warrington": "pwoelke@thorntontomasetti.com",
+    "Warrington": ["pwoelke@thorntontomasetti.com", "jaevans@thorntontomasetti.com"],
     'Washington': "pvaneepoel@thorntontomasetti.com",
     "West Hartford": "ebaumgartner@thorntontomasetti.com",
     'Wellington': "pwrona@thorntontomasetti.com",
@@ -126,7 +124,7 @@ let zones = {};
 zones["-7"] = ["Los Angeles", "San Francisco", "Seattle", "San Diego", 'Santa Clara'];
 zones["-6"] = ["Denver", "Albuquerque", "Phoenix"];
 zones["-5"] = ["Chicago", "Kansas City", "Milwaukee", "Houston", "Dallas", "Austin"];
-zones["-4"] = ["New York - 120 Broadway", "New York - Downtown", "New York - Madison", "Newark", "Philadelphia", "Washington", "Fort Lauderdale", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
+zones["-4"] = ["New York - 120 Broadway", "New York - Downtown", "Newark", "Philadelphia", "Washington", "Fort Lauderdale", "Portland", "Boston", "Toronto", "Mississauga", "West Hartford", "Ottawa", "Tampa", "Miami", "Atlanta"];
 zones["-3"] = ["Halifax"];
 // zones["1"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen"];
 zones["0"] = ["London", "Edinburgh", "Edinburgh - Limehillock", "Warrington", "Romsey", "Aberdeen", "Bristol"];
@@ -159,10 +157,21 @@ function calcLocalTime(offset) {
 let allWorkPreferences = [];
 let colorDict = ["Green", "Orange", "Red"]
 //"Name,Email\r\n";
-function nodeToCsv(node) {
-    return `${node.name},${node.email},${colorDict[node.status.status]}, ${moment(node.status.date).format('MMMM Do YYYY')}\r\n`;
+// function nodeToCsv(node, vaccinationData) {
+//     if (vaccinationData) return `${node.name},${node.email},${colorDict[node.status.status]}, ${moment(node.status.date).format('MMMM DD YYYY')}, ${vaccinationData.count}, ${moment(vaccinationData.lastDate).format('MMMM DD YYYY')}, ${vaccinationData.manufacturer}\r\n`;
+//     else return `${node.name},${node.email},${colorDict[node.status.status]}, ${moment(node.status.date).format('MMMM DD YYYY')}\r\n`;
+// }
+function nodeToCsv(node, vaccinationData) {
+  return `${node.name},${node.email},${colorDict[node.status.status]}, ${moment(node.status.date).format('MMMM DD YYYY')}\r\n`;
 }
 
+function nodeToCsvVac(user) {
+    return `${user.name},${user.email},${user.vaccination.count}, ${moment(user.vaccination.lastDate).format('MMMM DD YYYY')}, ${user.vaccination.manufacturer}\r\n`;
+}
+
+
+var curTimeZoneOfficeCount = null;
+var finishedOfficeCount = 0;
 
 MongoClient.connect(url, {
     useUnifiedTopology: true
@@ -177,6 +186,10 @@ MongoClient.connect(url, {
             // 2. Check local time
             if (localtime == 10) {
 
+                curTimeZoneOfficeCount = zones[key].length;
+                finishedOfficeCount = 0;
+
+
                 console.log("There offices are currently at 10AM: ", zones[key]);
                 //3.  loop over offices in the zone
                 var offices = zones[key];
@@ -186,46 +199,83 @@ MongoClient.connect(url, {
                     // else
                     // 5. create cvs of user name and email
                     // 6. send email to OD
-                    const wpbyOffice = allWorkPreferences.filter(wp => wp.office === office);
 
-                    if (wpbyOffice.length === 0) {
-                      console.log("No employee reported in this office:", office);
-                      return;
-                    }
+                    getOfficeUserVaccination(db, office).then(usersWithVacs => {
 
-                    let uniqueUpbyOffice = [];
-                    let namesPerOffice = [];
+                      const wpbyOffice = allWorkPreferences.filter(wp => wp.office === office);
 
-                    wpbyOffice.forEach(o => {
-                      if (!namesPerOffice.includes(String(o.user))) {
-                        uniqueUpbyOffice.push(o);
-                        namesPerOffice.push(String(o.user));
-                      }
-                    });
+                      // if (wpbyOffice.length === 0) {
+                      //   console.log("No employee reported in this office:", office);
+                      //   return;
+                      // }
+
+                      let uniqueUpbyOffice = [];
+                      let namesPerOffice = [];
+
+                      wpbyOffice.forEach(o => {
+                        if (!namesPerOffice.includes(String(o.user))) {
+                          uniqueUpbyOffice.push(o);
+                          namesPerOffice.push(String(o.user));
+                        }
+                      });
 
 
-                    // const uniqueUpbyOffice =  [...new Map(wpbyOffice.map(item => [item[user], item])).values()]
-                    console.log("Some employees reported in this office:", office, uniqueUpbyOffice.length);
+                      // const uniqueUpbyOffice =  [...new Map(wpbyOffice.map(item => [item[user], item])).values()]
+                      // console.log("Some employees reported in this office:", office, uniqueUpbyOffice.length);
 
-                    // wpbyOffice.forEach(function(wp) {
-                    //   getUser(db, wp).then(function(u){
-                    //     // console.log("u", u);
-                    //     csv += nodeToCsv(u);
-                    //   })
-                    // })
-                    generateODContent(db, uniqueUpbyOffice).then(function(csv){
-                      let attachment = Buffer.from(csv).toString('base64');
+                      // wpbyOffice.forEach(function(wp) {
+                      //   getUser(db, wp).then(function(u){
+                      //     // console.log("u", u);
+                      //     csv += nodeToCsv(u);
+                      //   })
+                      // })
+                      generateODContent(db, uniqueUpbyOffice, usersWithVacs).then(function(csv){
+                        let attachment = Buffer.from(csv).toString('base64'); 
+                        let attachmentVac = null                       
 
-                      var email = directors[office];
-                      // console.log("email", email);
-                      let thisOfficeUserCount = userCountByOffice[office];
-                      let percentage = (uniqueUpbyOffice.length / thisOfficeUserCount * 100).toFixed(2);
+                        var email = directors[office];
+                        let thisOfficeUserCount = userCountByOffice[office];
+                        let inOfficePercentage = (uniqueUpbyOffice.length / thisOfficeUserCount * 100).toFixed(2);
 
-                      let content = templateContent.replace('<USER_COUNT>', thisOfficeUserCount).replace('<ATTENDANCE_PERCENT>', percentage).replace('<ATTENDANCE_COUNT>', uniqueUpbyOffice.length);
+                        var vaccedPercentage = 0;
+                        var vaccinatedCount = 0
+                        let csvHeaderVac = "Name,Email, Vaccination Count, Last Vaccinated, Vaccine Manufacturer\r\n";
 
-                      // email = 'hsun@thorntontomassetti.com' //// TEST
-                      sendEmail(email, office, attachment, content);
+
+                        if (usersWithVacs && usersWithVacs.length > 0) {
+                          const vaccedUser = usersWithVacs.filter(u=> u.vaccination);
+                          vaccinatedCount = vaccedUser.length;
+
+                          if (vaccedUser.length > 0) {
+                            vaccedPercentage = (vaccedUser.length / thisOfficeUserCount * 100).toFixed(2);                            
+                            
+                            vaccedUser.sort((a,b) => {
+                              return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;
+                            });
+
+                            vaccedUser.forEach(u => {
+                              csvHeaderVac += nodeToCsvVac(u);
+                            });                           
+                          }
+                        }
+
+                        attachmentVac = Buffer.from(csvHeaderVac).toString('base64');
+                        
+
+                        let content = templateContent
+                        .replace('<USER_COUNT>', thisOfficeUserCount)
+                        .replace('<ATTENDANCE_PERCENT>', inOfficePercentage)
+                        .replace('<ATTENDANCE_COUNT>', uniqueUpbyOffice.length)
+                        .replace('<VACCINATION_COUNT>', vaccinatedCount)
+                        .replace('<VACCINATION_PERCENT>', vaccedPercentage);
+
+                        email = 'hsun@thorntontomassetti.com' //// TEST
+                        sendEmail(email, office, attachment, attachmentVac,content, db);
+                      })
+
+
                     })
+                    
 
                 });
 
@@ -242,14 +292,24 @@ MongoClient.connect(url, {
     console.error(err);
 });
 
-function generateODContent(db, wpbyOffice) {
+function generateODContent(db, wpbyOffice, usersWithVacs) {
   return new Promise((resolve, reject) => {
+    // let csvHeader = "Name,Email, Status, Status Last Updated, Vaccination Count, Last Vaccinated, Vaccine Manufacturer\r\n";
     let csvHeader = "Name,Email, Status, Status Last Updated\r\n";
     let csv = csvHeader;
     let counter = 0;
+
+
+    if (!wpbyOffice || wpbyOffice.length == 0) return resolve(csvHeader);
+
+
     wpbyOffice.forEach(function(wp) {
       getUser(db, wp).then(function(u){
-        csv += nodeToCsv(u)
+        const userWithVac = usersWithVacs.filter(uVac => String(uVac._id) == String(u._id))[0];
+
+        // if (userWithVac && userWithVac.vaccination) csv += nodeToCsv(u, userWithVac.vaccination);
+        // else csv += nodeToCsv(u);
+        csv += nodeToCsv(u);        
         counter += 1;
         if (counter === wpbyOffice.length) resolve(csv);
       })
@@ -280,10 +340,80 @@ function getUser(client_db, wp) {
             date: -1
           })
           .limit(1).toArray(function (error, st) {
+            if (!st) console.log("invalid status", user.name);
             currentUser.status = st[0];
             resolve (currentUser);
           });
         }
+    });
+  })
+}
+
+function getOfficeUserVaccination(client_db, curOffice) {
+  return new Promise((resolve, reject) => {
+    var officeToSearch = curOffice;
+    if (curOffice == "New York - 120 Broadway") officeToSearch = "New York";
+    else if (curOffice == "New York - Downtown" || curOffice == "New York - Madison") resolve(null);
+    
+    let db = client_db.db();
+    let userCollection = db.collection('users');
+    let vaccinationCollection = db.collection('vaccinations');
+
+    let includeUser = {
+        "_id": 1,
+        "email": 1,
+        "name":1
+    }
+    // Search all users in this office
+    userCollection
+      .find({location: officeToSearch}, includeUser)
+      .toArray( function (err, users) {
+        if (err) reject();
+        if (!users || users.length == 0) resolve([]);
+
+        let promises = [];
+
+        users.forEach(u => {
+          let curP = vaccinationCollection.find({
+            "user": u._id
+          })
+          .sort({
+            date: -1
+          }).toArray();
+
+          promises.push(curP);
+        })
+
+        Promise.all(promises).then((usersWithVacs) => {
+
+          usersWithVacs.forEach((vaccine, index) => {
+            var curVac = {
+              manufacturer:null,
+              lastDate: null,
+              count: 0
+            }
+            if (!vaccine || vaccine.length == 0) return;
+
+            const uniqueManufacturer = [];
+
+            vaccine.forEach(v => {
+              if (!uniqueManufacturer.includes(v.manufacturer)) uniqueManufacturer.push(v.manufacturer);
+            })
+            
+            
+            curVac.count = vaccine.length;
+            if (vaccine.length == 1) {
+              curVac.manufacturer = vaccine[0].manufacturer    
+            }
+            else {
+              curVac.manufacturer = uniqueManufacturer.join("; ");
+            }
+
+            curVac.lastDate = vaccine[0].date;                    
+            users[index].vaccination = curVac;
+          })
+          resolve(users)
+        });        
     });
   })
 }
@@ -310,7 +440,6 @@ function getWorkPreferences(client_db) {
             office: { $ne: "Remote" }
           }, include)
           .toArray(function (err, allWps) {
-            // console.log("Work Preferences", allWps);
             allWorkPreferences = allWps;
             resolve(true);
 
@@ -321,27 +450,29 @@ function getWorkPreferences(client_db) {
 
 }
 
-function sendEmail(emails, location, attachment, emailContent) {
-    const toEmails = Array.isArray(emails)? emails : [emails];
+function sendEmail(emails, location, attachment, attachmentVac, emailContent, db) {
+    var toEmails = Array.isArray(emails)? emails : [emails];
 
     const mailOptions = {
         // to: toEmail,
         // to: "hsun@thorntontomasetti.com",
         from: sender,
         bcc: 'hsun@thorntontomasetti.com',
-        subject: "Daily 'In the Office' Employee Update - " + location,
+        subject: "Daily Office Update – " + location,
         html: emailContent
     };
-    // console.log("mailOptions", mailOptions);
 
     if (attachment) {
         mailOptions.attachments = [{
             "content": attachment,
             "filename": "Employees Who Will Be Working in the Office.csv",
             "type": "text/csv"
-        }]
+        },{
+            "content": attachmentVac,
+            "filename": "Employees Who Have a Vaccination Record.csv",
+            "type": "text/csv"
+        }];
     }
-    // console.log("mailOptions", mailOptions);
     const messages = [];
     toEmails.forEach(function(toEmail){
       var curOption = JSON.parse(JSON.stringify(mailOptions))
@@ -349,11 +480,21 @@ function sendEmail(emails, location, attachment, emailContent) {
       messages.push(curOption);
     })
 
+
     sgClient.send(messages).then(() => {
       console.log('emails sent successfully to: ', toEmails);
     }).catch(error => {
       console.log(error);
     });
+
+
+    finishedOfficeCount += 1;
+
+    if (finishedOfficeCount == curTimeZoneOfficeCount) {
+      console.log("finished, closing db...");
+
+      db.close();
+    }
 
     // sgClient.send(mailOptions, function (err) {
     //     console.log("err?", err)

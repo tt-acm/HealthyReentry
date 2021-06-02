@@ -67,6 +67,10 @@ const UserSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     }
+  },
+  fullyVaccinated: {
+    type: Boolean,
+    default: false
   }
 }, {timestamps: true});
 
