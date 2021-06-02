@@ -1,4 +1,3 @@
-const checkFullyVaccinated = require('./server/lib/check_fully_vaccinated');
 var MongoClient = require('mongodb').MongoClient;
 var url = process.env.MONGO_URL;
 var fullyVaccinatedCount = 0;
