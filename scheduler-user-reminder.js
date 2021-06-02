@@ -39,7 +39,8 @@ function checkUsersStatus(client_db) {
     collection.find({
       email: { $nin: ["amenchaca@thorntontomasetti.com", "marndell@thorntontomasetti.com"] },
       location: { $nin: [ "Sydney", "Perth"] },
-      dateOfConsent:{ $gt: new Date('2019-01-01') }
+      dateOfConsent:{ $gt: new Date('2019-01-01') },
+      fullyVaccinated: false
      }).count().then(function (count) {
         console.log("Total users count :", count);
 
