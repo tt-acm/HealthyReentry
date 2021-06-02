@@ -203,12 +203,6 @@ MongoClient.connect(url, {
                     getOfficeUserVaccination(db, office).then(usersWithVacs => {
 
                       const wpbyOffice = allWorkPreferences.filter(wp => wp.office === office);
-
-                      // if (wpbyOffice.length === 0) {
-                      //   console.log("No employee reported in this office:", office);
-                      //   return;
-                      // }
-
                       let uniqueUpbyOffice = [];
                       let namesPerOffice = [];
 
@@ -220,15 +214,6 @@ MongoClient.connect(url, {
                       });
 
 
-                      // const uniqueUpbyOffice =  [...new Map(wpbyOffice.map(item => [item[user], item])).values()]
-                      // console.log("Some employees reported in this office:", office, uniqueUpbyOffice.length);
-
-                      // wpbyOffice.forEach(function(wp) {
-                      //   getUser(db, wp).then(function(u){
-                      //     // console.log("u", u);
-                      //     csv += nodeToCsv(u);
-                      //   })
-                      // })
                       generateODContent(db, uniqueUpbyOffice, usersWithVacs).then(function(csv){
                         let attachment = Buffer.from(csv).toString('base64'); 
                         let attachmentVac = null                       
@@ -272,8 +257,6 @@ MongoClient.connect(url, {
                         email = 'hsun@thorntontomassetti.com' //// TEST
                         sendEmail(email, office, attachment, attachmentVac,content, db);
                       })
-
-
                     })
                     
 
