@@ -254,7 +254,6 @@ MongoClient.connect(url, {
                         .replace('<VACCINATION_COUNT>', vaccinatedCount)
                         .replace('<VACCINATION_PERCENT>', vaccedPercentage);
 
-                        email = 'hsun@thorntontomassetti.com' //// TEST
                         sendEmail(email, office, attachment, attachmentVac,content, db);
                       })
                     })
@@ -288,7 +287,7 @@ function generateODContent(db, wpbyOffice, usersWithVacs) {
 
     wpbyOffice.forEach(function(wp) {
       getUser(db, wp).then(function(u){
-        const userWithVac = usersWithVacs.filter(uVac => String(uVac._id) == String(u._id))[0];
+        // const userWithVac = usersWithVacs.filter(uVac => String(uVac._id) == String(u._id))[0];
 
         // if (userWithVac && userWithVac.vaccination) csv += nodeToCsv(u, userWithVac.vaccination);
         // else csv += nodeToCsv(u);
