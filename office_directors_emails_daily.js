@@ -24,7 +24,7 @@ let directors = {
     "Beijing": "pfu@thorntontomasetti.com",
     "Boston": ["ldavey@thorntontomasetti.com", "bvollenweider@thorntontomasetti.com"],
     "Bristol": "nmisselbrook@thorntontomasetti.com",
-    "Chicago": ["rshiltagh@thorntontomasetti.com", "jperonto@thorntontomasetti.com"],
+    "Chicago": ["rmichelin@thorntontomasetti.com", "jperonto@thorntontomasetti.com"],
     "Copenhagen": "learl@thorntontomasetti.com",
     "Dallas": "jelliott@thorntontomasetti.com",
     "Denver": "jdandrea@thorntontomasetti.com",
