@@ -450,13 +450,21 @@
         </md-dialog-actions>
     </md-dialog>
 
-    <h5 class="text-muted">Admin Dashboard
+    <div class="text-muted d-flex align-items-end">
+      <h5>Admin Dashboard</h5>
+
       <md-button class="md-icon-button" @click="setUserStatus = true">
         <md-icon class="fa fa-download">
           <md-tooltip md-direction="bottom">Download data by user status</md-tooltip>
         </md-icon>
       </md-button>
-    </h5>
+
+      <h5 class="ml-auto">
+            Orange: {{overviewData.orange}} || Red: {{overviewData.red}} || Fully Vaccinated: {{overviewData.fullyVaccinated}}            
+      </h5>
+    </div>
+    
+            
 
     <md-dialog :md-active.sync="setUserStatus">
       <md-dialog-title>Download user data by status</md-dialog-title>
@@ -570,6 +578,9 @@
               <option v-if="20 < totalUsersCount">20</option>
               <option v-if="50 < totalUsersCount">50</option>
               <option v-if="100 < totalUsersCount">100</option>
+              <option v-if="300 < totalUsersCount">300</option>
+              <option v-if="500 < totalUsersCount">500</option>
+              <option v-if="700 < totalUsersCount">700</option>
               <option>{{ totalUsersCount }}</option>
             </select>
           </div>
@@ -616,7 +627,6 @@
       <div class="d-flex mb-2">
 
         <div class="mr-auto">
-
           <button id="actionDropdown" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Mark Status
           </button>
@@ -634,9 +644,7 @@
             <span class="dropdown-item" data-toggle="modal" data-target="#updateConfModal"
               @click="userUpdateData.statusCodeToSet = 2;"
             ><i class="fas fa-circle fa-xs en_red"></i> &nbsp;&nbsp; Mark red</span>
-
           </div>
-
         </div>
 
         <div>
@@ -671,7 +679,7 @@
 
         <thead>
           <tr>
-            <th style="width: 10%" class="text-center">
+            <th style="width: 7%" class="text-center">
               <small><i>
                 <span
                   style="cursor: pointer;"
@@ -714,7 +722,7 @@
               </span>
               Status
             </th>
-            <th style="width: 20%">
+            <th style="width: 15%">
               <span
                 style="cursor: pointer"
                 :class="(sortBy === 'name' ? '' : ' disabled')"
@@ -734,7 +742,7 @@
               </span>
               Office
             </th>
-            <th style="width: 15%">
+            <th style="width: 10%">
               <span
                 style="cursor: pointer"
                 :class="(sortBy === 'lastUpdated' ? '' : ' disabled')"
@@ -744,7 +752,7 @@
               </span>
               Last Updated
             </th>
-            <th style="width: 15%">
+            <th style="width: 12%">
               <span
                 style="cursor: pointer"
                 :class="(sortBy === 'lastVaccinated' ? '' : ' disabled')"
@@ -764,7 +772,32 @@
               </span>
               Vaccination Count
             </th>
-            <th style="width: 15%">
+
+
+
+            <th style="width: 10%">
+              <span
+                style="cursor: pointer"
+                :class="(sortBy === 'fullyVaccinated' ? '' : ' disabled')"
+                @click="sortUsers('fullyVaccinated', !sortAsc)"
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
+              Fully Vaccinated
+            </th>
+
+            <th style="width: 11.5%">
+              <span
+                style="cursor: pointer"
+                :class="(sortBy === 'vaccinationManufacturers' ? '' : ' disabled')"
+                @click="sortUsers('vaccinationManufacturers', !sortAsc)"
+              >
+                {{ (sortAsc) ? '&#11205;' : '&#11206;' }}
+              </span>
+              Vaccine Manufacturer
+            </th>
+
+            <th style="width: 10%">
               <span
                 style="cursor: pointer"
                 :class="(sortBy === 'dateOfConsent' ? '' : ' disabled')"
@@ -777,15 +810,16 @@
           </tr>
         </thead>
 
+
         <tbody>
           <tr v-for="(user,index) in users" :key="user.id">
-            <td style="width: 10%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
+            <td style="width: 7%; cursor: pointer;" class="text-center" @click="user.selected = !user.selected">
               {{ (user.selected) ? '&#9745;' : '&#9744;' }}
             </td>
             <td style="width: 5%" class="text-center">
               <i :class="'fas fa-circle ' + user.status.css_key"></i>
             </td>
-            <td style="width: 20%">
+            <td style="width: 15%">
               <span class="pr-1" @click="deleteUser(user)">
                 <i class="fas fa-times-circle text-secondary" style="cursor: pointer;"></i>
                 <md-tooltip md-direction="top">Delete this user</md-tooltip>
@@ -803,10 +837,10 @@
               </span>
               {{ user.officeCode }}
             </td>
-            <td style="width: 15%">
-              {{ user.lastUpdatedFormatted }}
+            <td style="width: 10%">
+              <small>{{ user.lastUpdatedFormatted }}</small>
             </td>
-            <td style="width: 15%;text-align: center;">
+            <td style="width: 12%;text-align: center;">
               <!-- {{ user.lastVaccinated }} -->
               <button type="button" class="btn btn-sm btn-block py-0" style="color:white;background-color:gray" @click="curSelectedUserIndex = index">
                 <small>{{ user.lastVaccinated }}</small>
@@ -818,8 +852,23 @@
                 <small>{{ user.vaccinationCount }}</small>
               </button>
             </td>
-            <td style="width: 15%">
-              {{ user.dateOfConsentFormatted }}
+
+            <td class="text-center" style="width: 10%;">
+              <!-- <small>{{ user.fullyVaccinated }}</small> -->
+              <i v-if="user.fullyVaccinated" class="fas fa-check-square" style="cursor: pointer;"></i>
+              <i v-else class="fas fa-times text-muted" style="cursor: pointer;"></i>
+            </td>
+            <td style="width: 11.5%;">
+              <!-- <a style="color:#1a0dab; cursor:pointer" class="mx-auto" @click="curSelectedUserIndex = index">{{ user.vaccinationCount }}</a> -->
+              <button v-show="user.vaccinationManufacturers" type="button" class="btn btn-sm btn-block py-0" style="color:white;background-color:gray" @click="curSelectedUserIndex = index">
+                <small>{{ user.vaccinationManufacturers }}</small>
+              </button>
+            </td>
+            
+
+
+            <td style="width: 10%">
+              <small>{{ user.dateOfConsentFormatted }}</small>
             </td>
           </tr>
         </tbody>
@@ -885,7 +934,16 @@ function fuzzyTime(date) {
 }
 
 export default {
-  created() {},
+  created() {
+    this.$api.get("/api/admin/get-total-users-stats").then(data => {
+      this.totalUsersCount = data.data.total;
+      console.log("totalUsersCount", this.totalUsersCount);
+    })
+    this.$api.get("/api/admin/get-overview-stats").then(data => {
+      this.overviewData = data.data;
+      console.log("this.overviewData", this.overviewData);
+    })
+  },
   components: {
     VaccinationDropDown
   },
@@ -948,7 +1006,12 @@ export default {
       },
       vaccineEditTab: 1,
       vaccinationsToDelete: [],
-      curSelectedVaccinations: []
+      curSelectedVaccinations: [],
+      overviewData:{
+        orange:0,
+        red:0,
+        fullyVaccinated:0
+      }
     };
   },
   watch: {
@@ -1100,9 +1163,7 @@ export default {
           selectedLocations = selectedLocations.concat(r.offices.filter(o => o.selected).map(o => o.LocationName));
         });
       }
-
-
-      this.totalUsersCount = (await this.$api.get("/api/admin/get-total-users-stats")).data.total;
+      
 
       let postData = {
         skip: (this.pageNo-1)*this.itemsOnPage,
@@ -1120,6 +1181,16 @@ export default {
         let code = (hasStatus) ? u.status.status : -1;
         let status = enumStatusMap.filter(i => i.code === code)[0];
         let updateDate = (hasStatus) ? fuzzyTime(new Date(u.status.date)) : '---';
+
+        let uniqueVacManufacturer = [];
+
+        if (u.vaccination) {
+          u.vaccination.forEach(vac=> {
+            if (!uniqueVacManufacturer.includes(vac.manufacturer)) uniqueVacManufacturer.push(vac.manufacturer);
+          })
+        }
+
+
         let user = {
           id: u._id,
           selected: false,
@@ -1132,6 +1203,8 @@ export default {
           lastUpdated: hasStatus ? new Date(u.status.date) : null,
           lastVaccinated: u.vaccination.length > 0 ? new Date(u.vaccination[u.vaccination.length-1].date).toDateString() : 'Not Available',
           vaccinationCount: u.vaccination.length,
+          vaccinationManufacturers: uniqueVacManufacturer.length > 0? uniqueVacManufacturer.join(" & "): null,
+          fullyVaccinated: u.fullyVaccinated,
           vaccination: u.vaccination,
           dateOfConsent: u.dateOfConsent ? new Date(u.dateOfConsent) : 0,
           dateOfConsentFormatted: u.dateOfConsent ? new Date(u.dateOfConsent).toDateString() : 'Not Available'

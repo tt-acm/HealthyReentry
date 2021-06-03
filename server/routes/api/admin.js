@@ -80,7 +80,8 @@ router.post("/get-users-by-filters", async function(req, res) {
     "dateOfConsent": 1,
     "name": 1,
     "email": 1,
-    "location": 1
+    "location": 1,
+    "fullyVaccinated": 1
   };
 
   let filteredCountQuery = !Array.isArray(offices) ?
@@ -348,6 +349,37 @@ router.get("/get-total-users-stats", async function(req, res) {
   ret.total = await User.count({}).exec();
 
   res.json(ret);
+});
+
+
+router.get("/get-overview-stats", function(req, res) {
+  let include = {
+    "_id": 1,
+    // "name": 1,
+    "fullyVaccinated": 1
+  };
+
+  User.find({}, include)
+  .then (function(users) {
+    const fullyVaccedCount = users.filter(u => u.fullyVaccinated == true).length;
+
+    const allPromises = [];
+    users.forEach(u=>{
+      const latestStatusPromise = Status.findOne({"user": u._id}).sort({date: -1});
+      allPromises.push(latestStatusPromise);
+    })
+
+    Promise.all(allPromises).then((values) => {
+      const orangeCount = values.filter(v=> v.status == 1).length;
+      const redCount = values.filter(v=> v.status == 2).length;
+
+      res.json({
+        orange: orangeCount,
+        red: redCount,
+        fullyVaccinated: fullyVaccedCount
+      });
+    });       
+  }) 
 
 });
 
