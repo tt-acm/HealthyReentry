@@ -7,7 +7,6 @@ var _ = require('lodash');
 
 var moment = require('moment');
 moment().format();
-
 const sgClient = require('@sendgrid/mail');
 
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
@@ -96,16 +95,14 @@ MongoClient.connect(url, {
     getUsers(db).then(function () {
 
       getWorkPreferences(db).then(function () {
-        //console.log("allUsers", allUsers);
           var offices = _.uniq(_.map(allUsers, 'location')).sort();
-          console.log(offices);
+          // console.log("offices", offices);
 
           let csv = "Office,Name,Email\r\n";
           let csv2 = "Office,Name,Email\r\n";
-          let csv3 = "Office,Orange,Red,Total App Signups in Office,Total Number of Employees Who Have Not Updated in 7 Days, Total Employee Count, Employee in office, Employee Percentage in Office\r\n";
+          let csv3 = "Office,Orange,Red,Total App Signups in Office,Total Number of Employees Who Have Not Updated in 7 Days, Total Employee Count, Employee in office, Employee Percentage in Office, Total Vaccinated Employee Count (1+ shot), Vaccinated Employee Percentage (1+ shot)\r\n";
 
           offices.forEach(office => {
-              //console.log(office)
               // 1. employees who have signed up for the app,
               const usersbyOffice = allUsers.filter(u => u.location === office);
 
@@ -133,13 +130,12 @@ MongoClient.connect(url, {
               var total = usersbyOffice.length;
               var totalNeedsUpdate = usersneedsUpdate.length;
 
-              /////////
               var currentOfficePop1;//default container
               var currentOfficePop2;
               var currentOfficePop3;
               if (office === "New York") {
                 currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === "New York - Downtown");
-                currentOfficePop2 = allWorkPreferences.filter(wp=>wp.office === "New York - Madison");
+                // currentOfficePop2 = allWorkPreferences.filter(wp=>wp.office === "New York - Madison");
                 currentOfficePop3 = allWorkPreferences.filter(wp=>wp.office === "New York - 120 Broadway");
               }
               else if (office === "Edinburgh") {
@@ -150,7 +146,6 @@ MongoClient.connect(url, {
               }
               else currentOfficePop1 = allWorkPreferences.filter(wp=>wp.office === office);
 
-              // console.log("currentOfficePop", currentOfficePop1, currentOfficePop2);
 
               let uniqueUserinOffice1 = [];
               if (currentOfficePop1.length > 0) {
@@ -175,16 +170,17 @@ MongoClient.connect(url, {
               }
 
               var employeeInOffice = uniqueUserinOffice1.length;
-              var employeeInOffice2 = uniqueUserinOffice2.length;
+              // var employeeInOffice2 = uniqueUserinOffice2.length;
               var employeeInOffice3 = uniqueUserinOffice3.length;
 
+              const employeeWithVac = usersbyOffice.filter(u => u.vaccinationCount > 0).length;
+
               if (office === "New York") {
-                csv3 += `${office},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${''},${''}\r\n`;
-                csv3 += `${"New York-Downtown"},${''},${''},${''},${''},${userCountByOffice["New York - Downtown"]},${employeeInOffice},${String((employeeInOffice/userCountByOffice["New York - Downtown"]*100).toFixed(2)) + "%"}\r\n`;
-                csv3 += `${"New York-Midtown"},${''},${''},${''},${''},${userCountByOffice["New York - Madison"]},${employeeInOffice2}, ${String((employeeInOffice2/userCountByOffice["New York - Madison"]*100).toFixed(2)) + "%"}\r\n`;
-                csv3 += `${"New York-120 Broadway"},${''},${''},${''},${''},${userCountByOffice["New York - 120 Broadway"]},${employeeInOffice3}, ${String((employeeInOffice3/userCountByOffice["New York - Madison"]*100).toFixed(2)) + "%"}\r\n`;
+                csv3 += `${"New York-120 Broadway"},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${userCountByOffice["New York - 120 Broadway"]},${employeeInOffice3}, ${String((employeeInOffice3/userCountByOffice["New York - 120 Broadway"]*100).toFixed(2)) + "%"},${employeeWithVac}, ${String((employeeWithVac/userCountByOffice["New York - 120 Broadway"]*100).toFixed(2)) + "%"}\r\n`;
+                csv3 += `${"New York-Downtown"},${''},${''},${''},${''},${userCountByOffice["New York - Downtown"]},${employeeInOffice},${String((employeeInOffice/userCountByOffice["New York - Downtown"]*100).toFixed(2)) + "%"},${''},${''}\r\n`;
+                // csv3 += `${"New York-120 Broadway"},${''},${''},${''},${''},${''},${userCountByOffice["New York - 120 Broadway"]},${employeeInOffice3}, ${String((employeeInOffice3/userCountByOffice["New York-120 Broadway"]*100).toFixed(2)) + "%"},${''}\r\n`;
               }
-              else csv3 += `${office},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${userCountByOffice[office]},${employeeInOffice}, ${String((employeeInOffice/userCountByOffice[office]*100).toFixed(2)) + "%"}\r\n`;
+              else csv3 += `${office},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${userCountByOffice[office]},${employeeInOffice}, ${String((employeeInOffice/userCountByOffice[office]*100).toFixed(2)) + "%"},${employeeWithVac}, ${String((employeeWithVac/userCountByOffice[office]*100).toFixed(2)) + "%"}\r\n`;
 
           });
 
@@ -197,8 +193,11 @@ MongoClient.connect(url, {
           })
 
 
-          let content = contentTemplate.replace('<INOFFICE_PERCENTAGE>', ((totalUniqueName.length/1350)*100).toFixed(2)).replace('<INOFFICE_COUNT>', totalUniqueName.length);
+          const allUserVaccinated = allUsers.filter(u => u.vaccinationCount > 0);
 
+
+          let content = contentTemplate.replace('<INOFFICE_PERCENTAGE>', ((totalUniqueName.length/1350)*100).toFixed(2)).replace('<INOFFICE_COUNT>', totalUniqueName.length);
+          content = content.replace('<VACCINATED_PERCENTAGE>', ((allUserVaccinated.length/1350)*100).toFixed(2)).replace('<VACCINATED_COUNT>', allUserVaccinated.length);
           let attachment = Buffer.from(csv).toString('base64');
           let attachment2 = Buffer.from(csv2).toString('base64');
           let attachment3 = Buffer.from(csv3).toString('base64');
@@ -237,6 +236,7 @@ function getWorkPreferences(client_db) {
           .toArray(function (err, allWps) {
             // console.log("Work Preferences", allWps);
             allWorkPreferences = allWps;
+            client_db.close();
             resolve(true);
 
         });
@@ -259,6 +259,7 @@ function getUsers(client_db) {
 
         let collection = db.collection('users');
         let statusCollection = db.collection('status');
+        let vaccinationCollection = db.collection('vaccinations');
 
         collection.find({}, include).toArray(function (err, users) {
             var counter = 0;
@@ -271,8 +272,15 @@ function getUsers(client_db) {
                     })
                     .limit(1).toArray(function (error, st) {
                         u.status = st[0];
-                        allUsers.push(u);
-                        isDone();
+                        vaccinationCollection.find({
+                          "user": u._id
+                        })
+                        .count()
+                        .then(count => {
+                            u.vaccinationCount = count;
+                            allUsers.push(u);
+                            isDone();
+                        })  
 
                     });
 
@@ -299,8 +307,7 @@ function getUsers(client_db) {
 }
 
 function sendEmail(content, emails, attachment, attachment2, attachment3) {
-    const toEmails = Array.isArray(emails)? emails : [emails];
-
+    var toEmails = Array.isArray(emails)? emails : [emails];
 
     const mailOptions = {
         // to: toEmail,
