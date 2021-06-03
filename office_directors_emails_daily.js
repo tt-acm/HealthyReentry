@@ -82,6 +82,7 @@ let userCountByOffice = {
   "Denver": 24,
   "Dubai": 4,
   "Edinburgh": 27,
+  "Edinburgh - Limehillock": 27,
   "Fort Lauderdale": 25,
   "Halifax": 2,
   "Ho Chi Minh City": 17,
