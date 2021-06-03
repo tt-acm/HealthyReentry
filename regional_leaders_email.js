@@ -10,9 +10,11 @@ moment().format();
 
 const sgClient = require('@sendgrid/mail');
 
+var sender ="healthyreentry-notifications@thorntontomasetti.com"
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
-var sender = process.env.SENDGRID_EMAIL;
+// var sender = process.env.SENDGRID_EMAIL;
 var url = process.env.MONGO_URL;
+
 
 const fs = require('fs');
 var content = fs.readFileSync("./server/assets/email_templates/regionalLeadersReport.html").toString("utf-8");
@@ -26,6 +28,58 @@ let leaders = {
     "Pacific Rim": "yzhu@thorntontomasetti.com"
 }
 
+let userCountByOffice = {
+  "Aberdeen": 7,
+  "Albuquerque": 13,
+  "Atlanta": 2,
+  "Austin": 8,
+  "Beijing": 11,
+  "Boston": 49,
+  "Bristol": 4,
+  "Chicago": 76,
+  "Copenhagen": 2,
+  "Dallas": 20,
+  "Denver": 24,
+  "Dubai": 4,
+  "Edinburgh": 27,
+  "Fort Lauderdale": 25,
+  "Halifax": 2,
+  "Ho Chi Minh City": 17,
+  "Hong Kong": 1,
+  "Houston": 10,
+  "Kansas City": 42,
+  "London": 42,
+  "Los Angeles": 48,
+  "Miami": 11,
+  "Milwaukee": 4,
+  "Mississauga": 11,
+  "Moscow": 1,
+  "Mumbai": 94,
+  "New York - 120 Broadway": 403,
+  "New York - Downtown": 155,
+  "New York - Madison": 241,
+  "Newark": 31,
+  "Ottawa": 2,
+  "Perth": 9,
+  "Philadelphia": 22,
+  "Phoenix": 2,
+  "Portland": 33,
+  "Romsey": 28,
+  "San Diego": 5,
+  'San Francisco': 47,
+  "Santa Clara": 4,
+  "Seattle": 11,
+  "Shanghai": 17,
+  "Sydney": 1,
+  "Tampa": 6,
+  "Toronto": 11,
+  "Warrington": 25,
+  'Washington': 54,
+  "West Hartford": 5,
+  'Wellington': 1,
+  "York": 1
+}
+
 
 //"Office,Name,Email\r\n";
 function nodeToCsv(node) {
@@ -33,7 +87,6 @@ function nodeToCsv(node) {
 }
 
 let allUsers = [];
-
 
 
 MongoClient.connect(url, {
@@ -50,48 +103,44 @@ MongoClient.connect(url, {
     }
 
     getUsers(db).then(function () {
-        //console.log("allUsers", allUsers);
         Object.keys(regions).forEach((key, index) => {
             // 3. the number of app users in the office with a health status of Red and/or Orange.
-
-            console.log(key); // region
-            console.log(regions[key]) // offices
             var email = leaders[key];
-            console.log("Regional Leader: ", email);
+
             let csv = "Office,Name,Email\r\n";
             let csv2 = "Office,Name,Email\r\n";
-            let csv3 = "Office,Orange,Red,Total App Signups in Office\r\n";
+            let csv3 = "Office,Orange,Red, Total Office Employee Count, Total App Signups in Office, Total Office Count of Vaccinated\r\n";
             var offices = regions[key];
             offices.forEach(office => {
-                //console.log(office)
-                // 1. employees who have signed up for the app,
-                const usersbyOffice = allUsers.filter(u => u.location === office);
+                    // 1. employees who have signed up for the app,
+                    const usersbyOffice = allUsers.filter(u => u.location === office);
 
-                usersbyOffice.forEach((user) => {
-                    csv += nodeToCsv(user)
-                })
+                    usersbyOffice.forEach((user) => {
+                        csv += nodeToCsv(user)
+                    })
 
-                // 2. employees who have signed up for the app but haven't reported their health status for more than 7 days,
-                var checkDate = new Date();
-                var pastDate = checkDate.getDate() - 7;
-                checkDate.setDate(pastDate);
+                    // 2. employees who have signed up for the app but haven't reported their health status for more than 7 days,
+                    var checkDate = new Date();
+                    var pastDate = checkDate.getDate() - 7;
+                    checkDate.setDate(pastDate);
 
-                const usersneedsUpdate = usersbyOffice.filter(u => u.status.date < checkDate);
+                    const usersneedsUpdate = usersbyOffice.filter(u => u.status.date < checkDate);
+                    usersneedsUpdate.forEach((user) => {
+                        csv2 += nodeToCsv(user)
+                    })
 
-                usersneedsUpdate.forEach((user) => {
-                    csv2 += nodeToCsv(user)
-                })
+                    // 3. the number of app users in your office with a health status of Red and/or Orange.
+                    const usersStatusOrange = usersbyOffice.filter(u => u.status.status === 1);
+                    const usersStatusRed = usersbyOffice.filter(u => u.status.status === 2);
 
-                // 3. the number of app users in your office with a health status of Red and/or Orange.
-                const usersStatusOrange = usersbyOffice.filter(u => u.status.status === 1);
-                const usersStatusRed = usersbyOffice.filter(u => u.status.status === 2);
-
-                var numberOfOrange = usersStatusOrange.length;
-                var numberOfRed = usersStatusRed.length;
-                var total = usersbyOffice.length;
-                csv3 += `${office},${numberOfOrange},${numberOfRed},${total}\r\n`
-
+                    var numberOfOrange = usersStatusOrange.length;
+                    var numberOfRed = usersStatusRed.length;
+                    var total = usersbyOffice.length;
+                    const vaccinatedEmployeeCount = usersbyOffice.filter(u => u.vaccinationCount > 0).length;
+                    if (office == "New York") csv3 += `${office},${numberOfOrange},${numberOfRed}, ${userCountByOffice["New York - 120 Broadway"]}, ${total},${vaccinatedEmployeeCount}\r\n`;     
+                    else  csv3 += `${office},${numberOfOrange},${numberOfRed}, ${userCountByOffice[office]}, ${total},${vaccinatedEmployeeCount}\r\n`;     
             });
+
 
             let attachment = Buffer.from(csv).toString('base64');
             let attachment2 = Buffer.from(csv2).toString('base64');
@@ -123,6 +172,7 @@ function getUsers(client_db) {
 
         let collection = db.collection('users');
         let statusCollection = db.collection('status');
+        let vaccinationCollection = db.collection('vaccinations');
 
         collection.find({}, include).toArray(function (err, users) {
             var counter = 0;
@@ -135,36 +185,35 @@ function getUsers(client_db) {
                     })
                     .limit(1).toArray(function (error, st) {
                         u.status = st[0];
-                        allUsers.push(u);
-                        isDone();
+
+                        vaccinationCollection.find({
+                            "user": u._id
+                        })
+                        .count()
+                        .then(count => {
+                            u.vaccinationCount = count;
+                            allUsers.push(u);
+                            isDone();
+                        })        
 
                     });
 
             }
-
-
-
             function isDone() {
                 counter += 1;
                 if (users.length === counter) {
+                    console.log("closing db...");
                     client_db.close();
                     resolve(true);
                 }
             }
-
-
         });
-
-
-
-
     });
-
-
 }
 
+
 function sendEmail(emails, location, attachment, attachment2, attachment3) {
-    const toEmails = Array.isArray(emails)? emails : [emails];
+    var toEmails = Array.isArray(emails)? emails : [emails];
 
     const mailOptions = {
         // to: toEmail,
@@ -188,12 +237,13 @@ function sendEmail(emails, location, attachment, attachment2, attachment3) {
             },
             {
                 "content": attachment3,
-                "filename": "Breakdown by Health Status.csv",
+                "filename": "Breakdown by Office.csv",
                 "type": "text/csv"
             }
 
         ]
     }
+
 
     const messages = [];
     toEmails.forEach(function(toEmail){
