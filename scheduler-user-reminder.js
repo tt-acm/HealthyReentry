@@ -36,22 +36,22 @@ function checkUsersStatus(client_db) {
     let allUsersCount = 0
     let emails = [];
 
-    collection.find({
-      email: { $nin: ["amenchaca@thorntontomasetti.com", "marndell@thorntontomasetti.com"] },
-      location: { $nin: [ "Sydney", "Perth"] },
-      dateOfConsent:{ $gt: new Date('2019-01-01') },
-      fullyVaccinated: false
-     }).count().then(function (count) {
+
+    let userSearchCriteria = {
+        email: { $nin: ["amenchaca@thorntontomasetti.com", "marndell@thorntontomasetti.com"] },
+        location: { $nin: [ "Sydney", "Perth"] },
+        dateOfConsent:{ $gt: new Date('2019-01-01') },
+        fullyVaccinated: false
+       };
+
+    collection.find(userSearchCriteria).count().then(function (count) {
         console.log("Total users count :", count);
 
         allUsersCount = count;
 
-        const cursor = collection.find({
-          email: { $nin: ["amenchaca@thorntontomasetti.com"] },
-          location: { $nin: [ "Sydney", "Perth"] },
-          dateOfConsent:{ $gt: new Date('2019-01-01') }
-         });
+        const cursor = collection.find(userSearchCriteria);
         cursor.forEach(function (user) {
+
             statusCollection.find({
                 user: ObjectId(new ObjectId(user._id)),
                 date: {
