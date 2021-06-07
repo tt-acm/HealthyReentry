@@ -167,7 +167,8 @@ function nodeToCsv(node, vaccinationData) {
 }
 
 function nodeToCsvVac(user) {
-    return `${user.name},${user.email},${user.vaccination.count}, ${moment(user.vaccination.lastDate).format('MMMM DD YYYY')}, ${user.vaccination.manufacturer}\r\n`;
+    var vaccinationStatus = user.fullyVaccinated? "Yes" : "No";
+    return `${user.name},${user.email},${user.vaccination.count}, ${moment(user.vaccination.lastDate).format('MMMM DD YYYY')}, ${user.vaccination.manufacturer}, ${vaccinationStatus}\r\n`;
 }
 
 
@@ -223,17 +224,19 @@ MongoClient.connect(url, {
                         let thisOfficeUserCount = userCountByOffice[office];
                         let inOfficePercentage = (uniqueUpbyOffice.length / thisOfficeUserCount * 100).toFixed(2);
 
-                        var vaccedPercentage = 0;
+                        var fullyVaccedPercentage = 0;
                         var vaccinatedCount = 0
-                        let csvHeaderVac = "Name,Email, Vaccination Count, Last Vaccinated, Vaccine Manufacturer\r\n";
+                        var fullyVaccinatedCount = 0
+                        let csvHeaderVac = "Name,Email, Vaccination Count, Last Vaccinated, Vaccine Manufacturer, Fully Vaccinated\r\n";
 
 
                         if (usersWithVacs && usersWithVacs.length > 0) {
                           const vaccedUser = usersWithVacs.filter(u=> u.vaccination);
                           vaccinatedCount = vaccedUser.length;
+                          fullyVaccinatedCount = usersWithVacs.filter(u=> u.fullyVaccinated).length;
 
                           if (vaccedUser.length > 0) {
-                            vaccedPercentage = (vaccedUser.length / thisOfficeUserCount * 100).toFixed(2);                            
+                            fullyVaccedPercentage = (fullyVaccinatedCount / thisOfficeUserCount * 100).toFixed(2);                            
                             
                             vaccedUser.sort((a,b) => {
                               return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;
@@ -246,16 +249,22 @@ MongoClient.connect(url, {
                         }
 
                         attachmentVac = Buffer.from(csvHeaderVac).toString('base64');
+
+                        var sendOut = true;
+                        if (vaccinatedCount.length == 0 && uniqueUpbyOffice.length == 0) {
+                          console.log("No one vaccinated and no on in office: ", office);
+                          sendOut = false;
+                        }
                         
 
                         let content = templateContent
                         .replace('<USER_COUNT>', thisOfficeUserCount)
                         .replace('<ATTENDANCE_PERCENT>', inOfficePercentage)
                         .replace('<ATTENDANCE_COUNT>', uniqueUpbyOffice.length)
-                        .replace('<VACCINATION_COUNT>', vaccinatedCount)
-                        .replace('<VACCINATION_PERCENT>', vaccedPercentage);
+                        .replace('<VACCINATION_COUNT>', fullyVaccinatedCount)
+                        .replace('<VACCINATION_PERCENT>', fullyVaccedPercentage);
 
-                        sendEmail(email, office, attachment, attachmentVac,content, db);
+                        sendEmail(email, office, attachment, attachmentVac,content, db, sendOut);
                       })
                     })
                     
@@ -309,7 +318,8 @@ function getUser(client_db, wp) {
     let includeUser = {
         "_id": 1,
         "email": 1,
-        "name":1
+        "name":1,
+        "fullyVaccinated": 1
     }
     userCollection
       .find({_id: wp.user}, includeUser)
@@ -433,15 +443,16 @@ function getWorkPreferences(client_db) {
 
 }
 
-function sendEmail(emails, location, attachment, attachmentVac, emailContent, db) {
+function sendEmail(emails, location, attachment, attachmentVac, emailContent, db, send) {
     var toEmails = Array.isArray(emails)? emails : [emails];
+    toEmails = ["hsun@thorntontomasetti.com"];
 
     const mailOptions = {
         // to: toEmail,
         // to: "hsun@thorntontomasetti.com",
         from: sender,
-        bcc: 'hsun@thorntontomasetti.com',
-        subject: "Daily Office Update – " + location,
+        // bcc: 'hsun@thorntontomasetti.com',
+        subject: "[Draft] Daily Office Update – " + location,
         html: emailContent
     };
 
@@ -463,12 +474,13 @@ function sendEmail(emails, location, attachment, attachmentVac, emailContent, db
       messages.push(curOption);
     })
 
-
-    sgClient.send(messages).then(() => {
-      console.log('emails sent successfully to: ', toEmails);
-    }).catch(error => {
-      console.log(error);
-    });
+    if (send) {
+      sgClient.send(messages).then(() => {
+        console.log('emails sent successfully to: ', toEmails);
+      }).catch(error => {
+        console.log(error);
+      });
+    }    
 
 
     finishedOfficeCount += 1;
