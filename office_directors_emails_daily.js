@@ -445,14 +445,13 @@ function getWorkPreferences(client_db) {
 
 function sendEmail(emails, location, attachment, attachmentVac, emailContent, db, send) {
     var toEmails = Array.isArray(emails)? emails : [emails];
-    toEmails = ["hsun@thorntontomasetti.com"];
 
     const mailOptions = {
         // to: toEmail,
         // to: "hsun@thorntontomasetti.com",
         from: sender,
-        // bcc: 'hsun@thorntontomasetti.com',
-        subject: "[Draft] Daily Office Update – " + location,
+        bcc: 'hsun@thorntontomasetti.com',
+        subject: "Daily Office Update – " + location,
         html: emailContent
     };
 
