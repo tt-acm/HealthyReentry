@@ -251,7 +251,7 @@ MongoClient.connect(url, {
                         attachmentVac = Buffer.from(csvHeaderVac).toString('base64');
 
                         var sendOut = true;
-                        if (vaccinatedCount.length == 0 && uniqueUpbyOffice.length == 0) {
+                        if (vaccinatedCount == 0 && uniqueUpbyOffice.length == 0) {
                           console.log("No one vaccinated and no on in office: ", office);
                           sendOut = false;
                         }
