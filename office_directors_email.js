@@ -234,14 +234,14 @@ MongoClient.connect(url, {
               }
 
 
-              let csv3 = "Office,Number of Orange,Number of Red,Total Signups in Office, Total Office Employee Count, Employee reported in Office this week, Percentage of Employees in Office this week, Total Vaccinated in Office (1+ shot), Percentage of Employees Vaccinated (1+ shot)\r\n";
+              let csv3 = "Office,Number of Orange,Number of Red,Total Signups in Office, Total Office Employee Count, Employee reported in Office this week, Percentage of Employees in Office this week, Total Fully Vaccinated in Office, Percentage of Employees Fully Vaccinated\r\n";
               var numberOfOrange = usersStatusOrange.length;
               var numberOfRed = usersStatusRed.length;
               var total =  usersbyOffice.length;
               var employeeInOffice = uniqueUserinOffice1.length;
               var employeeInOffice2 = uniqueUserinOffice2.length;
               var employeeInOffice3 = uniqueUserinOffice3.length;
-              const employeeVaccinated = usersWithVacs.filter(u=>u.vaccination).length;
+              const employeeVaccinated = usersWithVacs.filter(u=>u.fullyVaccinated).length;
 
 
               if (key === "New York") {
@@ -278,7 +278,8 @@ function getUsers(client_db) {
             "_id": 1,
             // "dateOfConsent": 1,
             "name": 1,
-            "location": 1
+            "location": 1,
+            "fullyVaccinated": 1
         }
 
         let collection = db.collection('users');
