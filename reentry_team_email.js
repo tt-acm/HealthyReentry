@@ -100,7 +100,7 @@ MongoClient.connect(url, {
 
           let csv = "Office,Name,Email\r\n";
           let csv2 = "Office,Name,Email\r\n";
-          let csv3 = "Office,Orange,Red,Total App Signups in Office,Total Number of Employees Who Have Not Updated in 7 Days, Total Employee Count, Employee in office, Employee Percentage in Office, Total Vaccinated Employee Count (1+ shot), Vaccinated Employee Percentage (1+ shot)\r\n";
+          let csv3 = "Office,Orange,Red,Total App Signups in Office,Total Number of Employees Who Have Not Updated in 7 Days, Total Employee Count, Employee in office, Employee Percentage in Office, Total Fully Vaccinated Employee Count, Fully Vaccinated Employee Percentage\r\n";
 
           offices.forEach(office => {
               // 1. employees who have signed up for the app,
@@ -173,7 +173,7 @@ MongoClient.connect(url, {
               // var employeeInOffice2 = uniqueUserinOffice2.length;
               var employeeInOffice3 = uniqueUserinOffice3.length;
 
-              const employeeWithVac = usersbyOffice.filter(u => u.vaccinationCount > 0).length;
+              const employeeWithVac = usersbyOffice.filter(u => u.fullyVaccinated).length;
 
               if (office === "New York") {
                 csv3 += `${"New York-120 Broadway"},${numberOfOrange},${numberOfRed},${total},${totalNeedsUpdate},${userCountByOffice["New York - 120 Broadway"]},${employeeInOffice3}, ${String((employeeInOffice3/userCountByOffice["New York - 120 Broadway"]*100).toFixed(2)) + "%"},${employeeWithVac}, ${String((employeeWithVac/userCountByOffice["New York - 120 Broadway"]*100).toFixed(2)) + "%"}\r\n`;
@@ -193,7 +193,7 @@ MongoClient.connect(url, {
           })
 
 
-          const allUserVaccinated = allUsers.filter(u => u.vaccinationCount > 0);
+          const allUserVaccinated = allUsers.filter(u => u.fullyVaccinated);
 
 
           let content = contentTemplate.replace('<INOFFICE_PERCENTAGE>', ((totalUniqueName.length/1350)*100).toFixed(2)).replace('<INOFFICE_COUNT>', totalUniqueName.length);
@@ -254,7 +254,8 @@ function getUsers(client_db) {
             "_id": 1,
             // "dateOfConsent": 1,
             "name": 1,
-            "location": 1
+            "location": 1,
+            "fullyVaccinated": 1
         }
 
         let collection = db.collection('users');
