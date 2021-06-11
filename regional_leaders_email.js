@@ -12,7 +12,6 @@ const sgClient = require('@sendgrid/mail');
 
 var sender ="healthyreentry-notifications@thorntontomasetti.com"
 sgClient.setApiKey(process.env.SENDGRID_API_KEY);
-// var sender = process.env.SENDGRID_EMAIL;
 var url = process.env.MONGO_URL;
 
 
@@ -109,7 +108,7 @@ MongoClient.connect(url, {
 
             let csv = "Office,Name,Email\r\n";
             let csv2 = "Office,Name,Email\r\n";
-            let csv3 = "Office,Orange,Red, Total Office Employee Count, Total App Signups in Office, Total Office Count of Vaccinated\r\n";
+            let csv3 = "Office,Orange,Red, Total Office Employee Count, Total App Signups in Office, Total Office Count of Fully Vaccinated\r\n";
             var offices = regions[key];
             offices.forEach(office => {
                     // 1. employees who have signed up for the app,
@@ -136,7 +135,7 @@ MongoClient.connect(url, {
                     var numberOfOrange = usersStatusOrange.length;
                     var numberOfRed = usersStatusRed.length;
                     var total = usersbyOffice.length;
-                    const vaccinatedEmployeeCount = usersbyOffice.filter(u => u.vaccinationCount > 0).length;
+                    const vaccinatedEmployeeCount = usersbyOffice.filter(u => u.fullyVaccinated > 0).length;
                     if (office == "New York") csv3 += `${office},${numberOfOrange},${numberOfRed}, ${userCountByOffice["New York - 120 Broadway"]}, ${total},${vaccinatedEmployeeCount}\r\n`;     
                     else  csv3 += `${office},${numberOfOrange},${numberOfRed}, ${userCountByOffice[office]}, ${total},${vaccinatedEmployeeCount}\r\n`;     
             });
@@ -167,7 +166,8 @@ function getUsers(client_db) {
             "_id": 1,
             // "dateOfConsent": 1,
             "name": 1,
-            "location": 1
+            "location": 1,
+            "fullyVaccinated": 1
         }
 
         let collection = db.collection('users');
