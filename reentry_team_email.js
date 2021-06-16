@@ -195,9 +195,58 @@ MongoClient.connect(url, {
 
           const allUserVaccinated = allUsers.filter(u => u.fullyVaccinated);
 
+          const usOffices = [
+            "Albuquerque", 
+            "Atlanta", 
+            "Austin", 
+            "Boston", 
+            "Chicago", 
+            "Dallas", 
+            "Denver", 
+            "Fort Lauderdale", 
+            "Houston", 
+            "Kansas City", 
+            "Los Angeles", 
+            "Miami", 
+            "Milwaukee", 
+            "New York", 
+            "New York - 120 Broadway", 
+            "Newark", 
+            "Philadelphia", 
+            "Phoenix", 
+            "Portland", 
+            "San Diego", 
+            "San Francisco", 
+            "Santa Clara", 
+            "Seattle", 
+            "Tampa", 
+            "Washington", 
+            "West Hartford"
+          ];
+
+          var us_employee_arr = [];
+          usOffices.forEach(of => {
+            const curOfficeCount = userCountByOffice[of];
+
+            if (curOfficeCount)us_employee_arr.push(userCountByOffice[of]);
+          })
+
+          const totalUsEmployeeCount = us_employee_arr.reduce(function(a, b) { return a + b; }, 0);
+
+          const usVaccinated = allUserVaccinated.filter(u => {
+            return usOffices.includes(String(u.location));
+          }).length;
+
+         
+
 
           let content = contentTemplate.replace('<INOFFICE_PERCENTAGE>', ((totalUniqueName.length/1350)*100).toFixed(2)).replace('<INOFFICE_COUNT>', totalUniqueName.length);
           content = content.replace('<VACCINATED_PERCENTAGE>', ((allUserVaccinated.length/1350)*100).toFixed(2)).replace('<VACCINATED_COUNT>', allUserVaccinated.length);
+          
+          content = content.replace('<US_EMPLOYEE_COUNT>', totalUsEmployeeCount)
+                          .replace('<US_VACCINATED_PERCENTAGE>', ((usVaccinated/totalUsEmployeeCount)*100).toFixed(2))
+                          .replace('<US_VACCINATED_COUNT>', usVaccinated);
+          
           let attachment = Buffer.from(csv).toString('base64');
           let attachment2 = Buffer.from(csv2).toString('base64');
           let attachment3 = Buffer.from(csv3).toString('base64');
@@ -309,6 +358,7 @@ function getUsers(client_db) {
 
 function sendEmail(content, emails, attachment, attachment2, attachment3) {
     var toEmails = Array.isArray(emails)? emails : [emails];
+    // toEmails = ["hsun@thorntontomasetti.com"];
 
     const mailOptions = {
         // to: toEmail,
