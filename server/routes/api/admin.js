@@ -12,6 +12,11 @@ var moment = require('moment');
 moment().format();
 
 
+const sgClient = require('@sendgrid/mail');
+var sender ="healthyreentry-notifications@thorntontomasetti.com"
+sgClient.setApiKey(process.env.SENDGRID_API_KEY);
+
+let colorDict = ["Green", "Orange", "Red"]
 
 /**
  * @api {any} /api/admin
@@ -26,6 +31,102 @@ router.use(function(req, res, next) {
     next();
   }
 });
+
+
+
+
+
+router.post("/download-admin-table", async function(req, res) {
+  if (!req.body.recipient) return;
+
+  let include = {
+    "_id": 1,
+    "dateOfConsent": 1,
+    "name": 1,
+    "email": 1,
+    "location": 1,
+    "fullyVaccinated": 1
+  };
+
+  User
+  .find({}, include)
+  .exec(function(err, userArray) {
+    if (err) return;
+
+    const dataCollectionPromise = new Promise((resolve, reject) => {
+      const totalUserCount = userArray.length;
+      var index = 0;
+
+      const userArrWithVac  = [];
+      userArray.forEach(async function(u) {
+        var thisUser = JSON.parse(JSON.stringify(u));
+        const st = await Status.find({"user": u._id}).sort({date: -1}).limit(1);
+        thisUser.status = st[0];
+
+        const vac = await Vaccination.find({"user": u._id}).sort({date: 1});
+        const uniqueVacManufacturer = [];
+        vac.forEach(v => {
+          if (!uniqueVacManufacturer.includes(v.manufacturer)) uniqueVacManufacturer.push(v.manufacturer);
+        });
+        
+        if (!vac) return;
+        if (Array.isArray(vac) && vac.length > 0){
+          thisUser.vaccinationCount = vac.length;
+          thisUser.lastVaccinated = moment(vac[vac.length-1].date).format('MMMM DD YYYY');
+          thisUser.uniqueVacManufacturer = uniqueVacManufacturer.join("&");
+        }
+        else {
+          thisUser.vaccinationCount = "";
+          thisUser.lastVaccinated = '';
+          thisUser.uniqueVacManufacturer = '';
+        }
+        
+        userArrWithVac.push(thisUser);
+        index += 1;
+
+        if (index == totalUserCount){
+          resolve(userArrWithVac);
+        } 
+      })           
+    });
+
+    dataCollectionPromise.then(data => {
+      var csvContent = "Name,Email, Office, Status, Status Last Updated, Last Vaccinated, Vaccination Count, Fully Vaccinated, Vaccine Manufacturer, Consent Date \r\n";
+
+      data.forEach(d => {
+        const actualConsentDate = d.dateOfConsent? moment(d.dateOfConsent).format('MMMM DD YYYY') : "";
+        const actualFullyVaccinatedStatus = d.fullyVaccinated==true? "Yes": "No";
+        csvContent += `${d.name},${d.email},${d.location},${colorDict[d.status.status]},${moment(d.status.date).format('MMMM DD YYYY')}, ${d.lastVaccinated},${d.vaccinationCount},${actualFullyVaccinatedStatus},${d.uniqueVacManufacturer},${actualConsentDate}\r\n`;
+      });
+
+
+      const fileName = "Admin Table - " + new Date().toString();
+      const mailOptions = {
+          to: req.body.recipient,
+          from: sender,
+          subject: fileName,
+          html: "See attached for the admin view table"
+      };
+
+      var attachment = Buffer.from(csvContent).toString('base64');
+
+      if (attachment) {
+          mailOptions.attachments = [{
+              "content": attachment,
+              "filename": fileName + ".csv",
+              "type": "text/csv"
+          }];
+      }
+      
+      sgClient.send(mailOptions).then(() => {
+        console.log('emails sent successfully to: ', req.body.recipient);
+      }).catch(error => {
+        console.log(error);
+      });
+    })    
+  })  
+});
+
 
 
 /**

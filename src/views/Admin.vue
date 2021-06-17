@@ -647,9 +647,31 @@
           </div>
         </div>
 
+
+        <!-- Download Entire Admin Table Modal -->
+        <md-dialog :md-active.sync="downloadAdminTableModal">
+          <md-dialog-title>Download Entire Admin Table</md-dialog-title>
+          <md-dialog-content>
+            Once the <b>Generate</b> button is clicked, the entire table will be generated and sent to the specified email address.
+            <md-field>
+              <label>Enter your email:</label>
+              <md-input v-model="tableRecipient"></md-input>
+            </md-field>
+          </md-dialog-content>
+
+
+          <md-dialog-actions>
+            <md-button class="md-primary" @click="downloadAdminTableModal = false">Close</md-button>
+            <md-button class="md-primary" :disabled="!tableRecipient"  @click="downloadAdminTableModal = false; downloadEntireTable()">Generate</md-button>
+          </md-dialog-actions>
+        </md-dialog>
+
         <div>
+          <button id="tableDownload" type="button" class="btn btn-outline-secondary ml-2" @click="downloadAdminTableModal = true">
+            Download Entire Admin Table
+          </button>
           <button id="downloadDropdown" type="button" class="btn btn-outline-secondary ml-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Download
+            Download Selected User Data
           </button>
           <div class="dropdown-menu" aria-labelledby="downloadDropdown">
             <span class="dropdown-item text-muted"><small><i>Applies to selected persons only</i></small></span>
@@ -660,7 +682,7 @@
               Download Interactions
             </span>
             <span class="dropdown-item" @click="downloadSelectedAsCSV">
-              Download Data
+              Download Encounter Data
             </span>
             <span class="dropdown-item" data-toggle="modal" data-target="#downloadOfficeStatsModal">
               Download Office Stats
@@ -825,7 +847,7 @@
                 <md-tooltip md-direction="top">Delete this user</md-tooltip>
               </span>
 
-              {{ user.name }}
+              {{ user.name }} <small>({{user.email}})</small>
             </td>
             <td style="width: 10%">
               <span
@@ -1011,7 +1033,9 @@ export default {
         orange:0,
         red:0,
         fullyVaccinated:0
-      }
+      },
+      downloadAdminTableModal: false,
+      tableRecipient: null
     };
   },
   watch: {
@@ -1059,6 +1083,9 @@ export default {
     }
   },
   methods: {
+    downloadEntireTable() {
+      this.$api.post("/api/admin/download-admin-table", {recipient: this.tableRecipient})
+    },
     downloadUserStatusAsCSV() {
       this.$api.post("/api/admin/download-status", {selection: this.userStatusToDownload}).then(msg => {
         if (msg.data) {
