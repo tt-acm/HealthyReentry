@@ -291,7 +291,7 @@
     <!-- Vaccination detail modal -->
     <md-dialog :md-active.sync="showSelectedVaccination">
         <md-dialog-title class="pb-0 mb-2">
-          Your Vaccination Record
+          Vaccination Record
         </md-dialog-title>
 
 
