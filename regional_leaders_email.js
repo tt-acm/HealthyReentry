@@ -82,7 +82,8 @@ let userCountByOffice = {
 
 //"Office,Name,Email\r\n";
 function nodeToCsv(node) {
-    return `${node.location},${node.name},${node.email}\r\n`;
+    const fullyVacInfo = node.fullyVaccinated? "Yes":"No";
+    return `${node.location},${node.name},${node.email},${fullyVacInfo}\r\n`;
 }
 
 let allUsers = [];
@@ -106,8 +107,8 @@ MongoClient.connect(url, {
             // 3. the number of app users in the office with a health status of Red and/or Orange.
             var email = leaders[key];
 
-            let csv = "Office,Name,Email\r\n";
-            let csv2 = "Office,Name,Email\r\n";
+            let csv = "Office,Name,Email, Fully Vaccinated\r\n";
+            let csv2 = "Office,Name,Email, Fully Vaccinated\r\n";
             let csv3 = "Office,Orange,Red, Total Office Employee Count, Total App Signups in Office, Total Office Count of Fully Vaccinated\r\n";
             var offices = regions[key];
             offices.forEach(office => {
