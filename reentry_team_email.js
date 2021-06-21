@@ -21,7 +21,8 @@ let emails = process.env.VUE_APP_TEAM.split(',');
 
 //"Office,Name,Email\r\n";
 function nodeToCsv(node) {
-    return `${node.location},${node.name},${node.email}\r\n`;
+    const fullyVacInfo = node.fullyVaccinated? "Yes":"No";
+    return `${node.location},${node.name},${node.email}, ${fullyVacInfo}\r\n`;
 }
 
 let allUsers = [];
@@ -98,8 +99,8 @@ MongoClient.connect(url, {
           var offices = _.uniq(_.map(allUsers, 'location')).sort();
           // console.log("offices", offices);
 
-          let csv = "Office,Name,Email\r\n";
-          let csv2 = "Office,Name,Email\r\n";
+          let csv = "Office,Name,Email, Fully Vaccinated\r\n";
+          let csv2 = "Office,Name,Email, Fully Vaccinated\r\n";
           let csv3 = "Office,Orange,Red,Total App Signups in Office,Total Number of Employees Who Have Not Updated in 7 Days, Total Employee Count, Employee in office, Employee Percentage in Office, Total Fully Vaccinated Employee Count, Fully Vaccinated Employee Percentage\r\n";
 
           offices.forEach(office => {
@@ -358,7 +359,6 @@ function getUsers(client_db) {
 
 function sendEmail(content, emails, attachment, attachment2, attachment3) {
     var toEmails = Array.isArray(emails)? emails : [emails];
-    // toEmails = ["hsun@thorntontomasetti.com"];
 
     const mailOptions = {
         // to: toEmail,
