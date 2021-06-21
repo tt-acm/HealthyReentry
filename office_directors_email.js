@@ -126,9 +126,10 @@ let allWorkPreferences = [];
 
 //"Name,Email\r\n";
 function nodeToCsv(node, vaccination) {
+    const statusDate = node.status? moment(node.status.date).format('MMMM DD YYYY') : "Not Available";
     // return `${node.name},${node.email}\r\n`;
-    if (vaccination) return `${node.name},${node.email},${vaccination.count}, ${moment(vaccination.lastDate).format('MMMM DD YYYY')}, ${vaccination.manufacturer}\r\n`;
-    else return `${node.name},${node.email}, ${''}, ${''}, ${''} \r\n`;
+    if (vaccination) return `${node.name},${node.email},${statusDate},${vaccination.count}, ${moment(vaccination.lastDate).format('MMMM DD YYYY')}, ${vaccination.manufacturer}, ${node.fullyVaccinated}\r\n`;
+    else return `${node.name},${node.email},${statusDate}, ${''}, ${''}, ${''}, ${node.fullyVaccinated} \r\n`;
 }
 
 let allUsers = [];
@@ -166,7 +167,7 @@ MongoClient.connect(url, {
 
               if(usersbyOffice.length === 0 ) return;
               // let csvHeader = "Name,Email, \r\n";
-              let csvHeader = "Name,Email, Vaccination Count, Last Vaccinated, Vaccine Manufacturer\r\n";
+              let csvHeader = "Name,Email, Last reported status,Vaccination Count, Last Vaccinated, Vaccine Manufacturer, Fully Vaccinated\r\n";
               let csv = csvHeader;
 
               usersbyOffice.forEach((user) => {
