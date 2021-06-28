@@ -29,17 +29,16 @@ router.post("/delete-vaccination-record", function (req, res) {
 
 
 router.post("/update-vaccination-records", function (req, res) {
-  if (!req.body.sender || !req.body.target || !req.body.content) return res.status(500).send("Invalid info.");
+  if (!req.body.sender || !req.body.target || !req.body.content || !req.body.userId) return res.status(500).send("Invalid info.");
   const body = req.body.content;
   if (body == null || !Array.isArray(body) || body.length == 0) return res.status(500).send("Invalid vaccination input"); 
-
   
   const allPromises = [];
   body.forEach(v => {
     if (v.new == true){
       if (!v.manufacturer || !v.date) return;
       const vac = new Vaccination({    
-        user: req.user,
+        user: req.body.userId,
         manufacturer: v.manufacturer,
         date: v.date
       });
@@ -60,7 +59,7 @@ router.post("/update-vaccination-records", function (req, res) {
 
   Promise.all(allPromises).then((result) => {
     Vaccination.find({
-      "user": req.user._id
+      "user": req.body.userId
     }).sort({
       date: 1
     })

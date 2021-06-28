@@ -1379,6 +1379,7 @@ export default {
     submitVaccinationRecord() {
       const reqBody = {
         sender: "Admin",
+        userId: this.users[this.curSelectedUserIndex].id,
         target: this.users[this.curSelectedUserIndex].email,
         content: this.curSelectedVaccinations
       }

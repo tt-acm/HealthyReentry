@@ -527,6 +527,7 @@ export default {
     submitVaccinationRecord() {
       const reqBody = {
         sender: "User",
+        userId: this.user._id,
         target: this.user.email,
         content: this.vaccinationsToDisplay
       };
