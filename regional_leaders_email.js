@@ -70,7 +70,7 @@ let userCountByOffice = {
   "Seattle": 11,
   "Shanghai": 17,
   "Sydney": 1,
-  "Tampa": 9,
+  "Tampa": 8,
   "Toronto": 11,
   "Warrington": 25,
   'Washington': 54,
