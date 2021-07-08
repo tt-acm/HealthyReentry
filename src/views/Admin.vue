@@ -298,7 +298,7 @@
         <md-dialog-content v-if="vaccineEditTab==1" style="height: 70vh; min-width: 50vw">        
           <md-content class="mt-3">          
             <div id="vaccination-records">
-              <button type="button" class="btn btn-md" @click="allowEditVaccination = true;" disabled>
+              <button type="button" class="btn btn-md" @click="allowEditVaccination = true;" >
                 <md-icon class="fa fa-edit"></md-icon>
               </button>  
 
@@ -1388,8 +1388,9 @@ export default {
       });
     },    
     addNewVaccinateToRecord() {
-      this.newVaccine.formattedDate = new Date(this.newVaccine.date);
-      this.curSelectedVaccinations.push(this.newVaccine);
+      const vacToAdd = JSON.parse(JSON.stringify(this.newVaccine));
+      vacToAdd.formattedDate = new Date(vacToAdd.date);
+      this.curSelectedVaccinations.push(vacToAdd);
     },
     setNewVaccineManuFacturer(manufacturer) {
       this.newVaccine.manufacturer = manufacturer;
