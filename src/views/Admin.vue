@@ -298,7 +298,7 @@
         <md-dialog-content v-if="vaccineEditTab==1" style="height: 70vh; min-width: 50vw">        
           <md-content class="mt-3">          
             <div id="vaccination-records">
-              <button type="button" class="btn btn-md" @click="allowEditVaccination = true;">
+              <button type="button" class="btn btn-md" @click="allowEditVaccination = true;" disabled>
                 <md-icon class="fa fa-edit"></md-icon>
               </button>  
 
